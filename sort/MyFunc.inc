@@ -53,8 +53,7 @@ void Odd_Even_Sort(vector<Point3D> & a) {
 		}
 	} while (flag);
 }
-
-void Merge_Sort(vector<Point3D> & a, int left = 0, int right = -1) {
+void Merge_Sort_Rec(vector<Point3D> & a, Point3D * temp, int left = 0, int right = -1) {
 	//stupid user
 	if (right <= -1 || right >= a.size()) {
 		right = a.size() - 1;
@@ -67,27 +66,32 @@ void Merge_Sort(vector<Point3D> & a, int left = 0, int right = -1) {
 		return;
 	}
 	//rec
-	Merge_Sort(a, left, (right-left) / 2 + left); Merge_Sort(a, (right-left) / 2 + 1 + left, right);
+	Merge_Sort_Rec(a, temp, left, (right - left) / 2 + left); Merge_Sort_Rec(a, temp, (right - left) / 2 + 1 + left, right);
 
 	//init
 	int i_1 = left, i_2 = (right - left) / 2 + 1 + left; int i = left;
-	Point3D * temp = new Point3D[right - left + 1];
-	for (int i = left; i <= right; i++) temp[i-left] = a[i];
+	//Point3D * temp = new Point3D[right - left + 1];
+	for (int i = left; i <= right; i++) temp[i] = a[i];
 
 	//main loop
 	while (true) {
 		if (i_1 > (right - left) / 2 + left && i_2 > (right - left) / 2 + 1 + left) break;
-		if (i_1 <= (right - left) / 2 + left && compare(temp[i_1-left], temp[i_2-left])) {
-			a[i] = temp[i_1 - left];
+		if (i_1 <= (right - left) / 2 + left && compare(temp[i_1], temp[i_2])) {
+			a[i] = temp[i_1];
 			i++;
 			i_1++;
 		}
 		else {
-			a[i] = temp[i_2 - left];
+			a[i] = temp[i_2];
 			i++;
 			i_2++;
 		}
 	}
+}
+
+void Merge_Sort(vector<Point3D> & a, int left = 0, int right = -1) {
+	Point3D * temp = new Point3D[a.size()];
+	Merge_Sort_Rec(a, temp, left, right);
 	delete[] temp;
 }
 
@@ -100,7 +104,7 @@ void print(T &a) {
 
 void Combination_sort(vector<Point3D> & a) {
 	// n^2  vs  n*log(n)
-	if (a.size() > 100) Merge_Sort(a); else Odd_Even_Sort(a);
+	if (a.size() >= 10) Merge_Sort(a); else Odd_Even_Sort(a);
 }
 
 //in B copy from A

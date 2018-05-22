@@ -6,60 +6,60 @@
 #include <conio.h>
 #include <algorithm>
 #include <time.h>
+#include <chrono>
 
 using namespace std;
-typedef unsigned int UINT;
+#define PRINT false
 
 int main() {
 	
+	srand(time(0));
 	ifstream fin("in.txt");
 	int n;
-	fin >> n;
+	//fin >> n;
+	cin >> n;
 	vector<Point3D> a(n), temp(n);
 	for (int i = 0; i < n; i++) {
-		fin >> a[i].x >> a[i].y >> a[i].z;
+		//fin >> a[i].x >> a[i].y >> a[i].z;
+		a[i].x = rand(); a[i].y = rand(); a[i].z = rand();
 		temp[i].x = a[i].x; temp[i].y = a[i].y; temp[i].z = a[i].z;
 	}
-	int time = clock();
+	auto time = chrono::high_resolution_clock::now();
 
 	cout << "INPUT" << endl;
 
-	print(temp);
+	if (PRINT) print(temp);
 
 	cout << endl << "SORT BY ODD EVEN" << endl;
 	
-	time = clock();
+	time = chrono::high_resolution_clock::now();
 	Odd_Even_Sort(temp);
-	cout << "TIME : " << clock() - time << endl;
-	print(temp);
+	cout << chrono::duration_cast<chrono::nanoseconds>(chrono::high_resolution_clock::now() - time).count() << "ns" << endl;
+	if (PRINT) print(temp);
 	copy_array(a, temp);
-	time = clock();
 
 	cout << endl << "MERGE SORT" << endl;
 
-	time = clock();
+	time = chrono::high_resolution_clock::now();
 	Merge_Sort(temp);
-	cout << "TIME : " << clock() - time << endl;
-	print(temp);
+	cout << chrono::duration_cast<chrono::nanoseconds>(chrono::high_resolution_clock::now() - time).count() << "ns" << endl;
+	if (PRINT) print(temp);
 	copy_array(a, temp);
-	time = clock();
 
 	cout << endl << "COMBINATION SORT" << endl;
 
-	time = clock();
+	time = chrono::high_resolution_clock::now();
 	Combination_sort(temp);
-	cout << "TIME : " << clock() - time << endl;
-	print(temp);
+	cout << chrono::duration_cast<chrono::nanoseconds>(chrono::high_resolution_clock::now() - time).count() << "ns" << endl;
+	if (PRINT) print(temp);
 	copy_array(a, temp);
-	time = clock();
 
 	cout << endl << "MY FAVORITE SORT" << endl;
 
-	time = clock();
+	time = chrono::high_resolution_clock::now();
 	sort(temp.begin(), temp.end(),compare);
-	cout << "TIME : " << clock() - time << endl;
-	print(temp);
-	time = clock();
+	cout << chrono::duration_cast<chrono::nanoseconds>(chrono::high_resolution_clock::now() - time).count() << "ns" << endl;
+	if (PRINT) print(temp);
 
 
 	fin.close();
