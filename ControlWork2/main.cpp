@@ -1,5 +1,6 @@
 #include "MySet.h"
 #include "MyTree.h"
+#include "MyGraf.h"
 #include <iostream>
 #include <vector>
 #include <stdlib.h>
@@ -34,13 +35,31 @@ int main() {
 	fout << "INTERSECTIONS " << (double)intersection / n << "% (" << intersection << " from " << n << ")" << endl;
 	fout << "INCLUDES " << (double)includes / a.size() << "% (" << includes << " from " << a.size() << ")" << endl;
 
-	MyTree b;
+	MyTree<MySet> b;
 	for (int i = 0; i < a.size(); i++) {
 		b.insert(a[i]);
 	}
 
 	cout << "MYTREE//////////////////////////////////////////" << endl;
 	b.draw();
+
+	MyTree<MyGraf> c;
+	cout << "TREE WITH GRAFS |||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
+	bool bl = true; int temp_deep = 0;
+	while (bl) {
+		MyGraf temp;
+		for (int i = 0; i < a.size(); i++) {
+			if (b[i].deep == temp_deep) temp.insert(b[i].data);
+		}
+		if (temp.children.size() == 0) {
+			bl = false;
+		}
+		else {
+			c.insert(temp);
+		}
+		temp_deep++;
+	}
+	c.draw();
 
 
 	fout.close();
