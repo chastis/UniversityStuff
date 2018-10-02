@@ -7,6 +7,14 @@
 #include <string>
 #include <vector>
 using namespace std;
+//на википедии все хорошо написано
+//код ужасен
+//лучше написать новый
+//но работает
+//качественно и быстро
+//но ужасен
+//https://ru.wikipedia.org/wiki/%D0%9A%D0%BE%D0%B4_%D0%A5%D0%B0%D1%84%D1%84%D0%BC%D0%B0%D0%BD%D0%B0
+//https://stepik.org/lesson/13239/step/1?unit=3425
 //map <char, int> ::iterator id1,id2;
 struct all
 {

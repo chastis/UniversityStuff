@@ -1,43 +1,3 @@
-/*
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <algorithm>
-
-using namespace std;
-
-struct Point
-{
-	double x;
-	double y;
-};
-struct Rectangle
-{
-	Point up_left;
-	Point down_right;
-};
-/*
-bool compare(Polygon a, Polygon b) {
-	if (a.left_x < b.left_x)
-}
-
-int main() {
-	ifstream fin("data.in");
-	int n;
-	cout << "Please, enter count of polygons" << endl;
-	fin >> n;
-	vector<Rectangle> rect;
-	cout << "Please, enter coordinates of polygons" << endl;
-	for (int i = 0; i < n; i++) {
-		Rectangle temp;
-		fin >> temp.up_left.x >> temp.up_left.y >> temp.down_right.x >> temp.down_right.y;
-		rect.push_back(temp);
-	}
-
-
-	fin.close();
-	return 0;
-}*/
 #include<iostream>
 #include<vector>
 #include<fstream>
@@ -47,6 +7,18 @@ using namespace std;
 typedef vector<vector<bool> > V2b;
 typedef vector<vector<vector<bool>>> V3b;
 const int Right_bound = 15000, Left_bound = -15000, Up_bound = 15000, Down_bound = -15000;
+
+//https://www.youtube.com/watch?v=Y-O4fkOAOk8&feature=youtu.be
+//суть задачи это пэинт
+//представляем прямоугольники в виде пикселей
+//у нас есть только стенки толщиной один пиксель
+//начиная сначала проходим по каждому пикселю и закрашиваем его
+//и рекурсивно его соседей если это не стенка
+//в итоге получается как заливка в пэинте
+//каждый раз когда мы новый раз тыкаем заливку
+//тобишь заливаем НЕ рекурсивно
+//увеличиваем количество плоскостей на 1
+//готово
 struct Rectangle
 {
 	int minX, minY;
