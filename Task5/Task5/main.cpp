@@ -28,7 +28,7 @@ void UI()
 
 
 	cout << "Press '1' to add node" << endl;
-	cout << "Press '2' to parse comparing to N" << endl;
+	cout << "Press '2' to split comparing to N" << endl;
 	cout << "Press '3' to delete the main list" << endl;
 	cout << "Press '4' to print all lists" << endl;
 	cout << "Press '5' to insert" << endl;
@@ -52,7 +52,7 @@ void UI()
 			int N;
 			cin >> N;
 			newList.split(&newList, &list1, &list2, N);
-			newList.printList();
+			//newList.printList();
 			list1.printList();
 			list2.printList();
 			break;
@@ -63,7 +63,7 @@ void UI()
 		case '4':
 			list1.printList();
 			list2.printList();
-			newList.printList();
+			//newList.printList();
 			break;
 		case '5':
 			cout << "Enter index: ";

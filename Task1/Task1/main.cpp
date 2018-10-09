@@ -75,6 +75,7 @@ int main()
 
 	int count = CountFields(fig, x_squeeze.size(), y_squeeze.size());
 	cout << count << "\n";
+	cout << endl << "That's all Folks!" << endl;
 	system("pause");
 }
 void PrintRectangles(vector<Rectangle> a)

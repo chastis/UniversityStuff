@@ -39,9 +39,8 @@ int main() {
 	//для каждой площади подбираем случайное значение высоты
 	//складываем все вместе и делим на количество попыток (N)
 	//вынесем за скобки (upX - lowX) * (upY - lowY) / N
-	//в скобках остается сумма высот, это хранит переменна h
+	//в скобках остается сумма высот, это хранит переменна sum
 	double integral = sum * (upX - lowX) * (upY - lowY) / N;
-	//double integral = sum;
 	cout << "Integral: " << integral << endl;
 	cout << "Calculation error: " << (double)7 / 32 - integral;
 	cout << endl << "That's all folks!" << endl;
