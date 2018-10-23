@@ -122,14 +122,14 @@ public:
 void main()
 {
 	Spline cubic_spline;
-	int N = 6;
-	double x[6] = { -0.5, 1.5, 2, 3.5, 6, 9 };
-	double y[6] = { 2.5, 6, -3.5, -7, -10, 2 };
-	double xi = 2.5;
-	//int N = 7;
-	//double x[7] = { -1.5, -1, -0.5, 0, 0.5, 1, 1.5 };
-	//double y[7] = { -0.7, 0, 0.7, 1, 0.7, 0, -0.7 };
-	//double xi = -1.3;
+	//int N = 6;
+	//double x[6] = { -0.5, 1.5, 2, 3.5, 6, 9 };
+	//double y[6] = { 2.5, 6, -3.5, -7, -10, 2 };
+	//double xi = 2.5;
+	int N = 7;
+	double x[7] = { -1.5, -1, -0.5, 0, 0.5, 1, 1.5 };
+	double y[7] = { -0.7, 0, 0.7, 1, 0.7, 0, -0.7 };
+	double xi = -1.3;
 	//example solution from
 	//http://www.mathros.net.ua/znahodzhennja-nablyzhenogo-znachennja-tablychno-zadanoi-funkcii-vykorystovujuchy-kubichnu-splajn-interpoljaciju.html
 	//answer is -0.43
