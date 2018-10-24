@@ -45,6 +45,7 @@ int main() {
 
 	//l is amount of head in the end;
 	cin >> n >> m >> s >> k >> l;
+	//array with answer of question: did flip coin or not?
 	vector<bool> coins(n + m);
 	coins.assign(n + m, false);
 	int pos = 0, flip = k, i = 0;
@@ -58,6 +59,16 @@ int main() {
 		pos++;
 	}
 	//arrangment - расположение
+	//top vertex of tree of possibilities
+	//value of each vertex is Head/Tail
+	//depending on what, we have after all coins flip
+	//left child is branch with head
+	//right - with tail
+	//we will get tree, like that
+	//          T/H
+	//     H/T            T/H
+	//H/T        T/H    H/T      T/H
+	//depending we did flip coin or not
 	Possibilities * arrangement = new Possibilities;
 	vector<coins_side> answer;
 	arrangement->side = coins[0] ? TAIL : HEAD;
