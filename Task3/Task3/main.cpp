@@ -47,13 +47,16 @@ int main()
 	{
 		char c = s[j];
 		bool flag = (c == 'B' ? true : false);
+		//fill chilgren
 		for (auto p : pointers) {
+			//to us/from us
 			p->edge = (flag ? 'T' : 'F');
 			flag = !flag;
 		}
 		if (j == s.size()-1) break;
 
 		int n = pointers.size();
+		//make children
 		for (int i = 0; i < n; i++) {
 			Node * temp = new Node;
 			pointers[0]->down = temp;
