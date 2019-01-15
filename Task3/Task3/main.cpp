@@ -41,7 +41,7 @@ int main()
 	//граф для FBBF
 	//       F
 	//   T       F
-	// T   F   F   T
+	// T   F   T   F
 	//F T F T F T F T
 	for (int j = 0; j < s.size(); j++) 
 	{

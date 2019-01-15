@@ -14,7 +14,9 @@ int main()
 	// R - радиус, X1, Y1 - координаты центра
 	int x = 0;
 	int y = R;
+	//значение наклона (угловой коеффициент)
 	int delta = 1 - 2 * R;
+	//вертикальное расстояние между тукещим значением у и точным значением у для текущего х
 	int error = 0;
 	while (y >= 0) {
 		points.append(sf::Vector2f(X1 + x, Y1 + y));
@@ -22,10 +24,12 @@ int main()
 		points.append(sf::Vector2f(X1 - x, Y1 + y));
 		points.append(sf::Vector2f(X1 - x, Y1 - y));
 		error = 2 * (delta + y) - 1;
+		//если ошибка НЕ превысила 0.5 
 		if ((delta < 0) && (error <= 0)) {
 			delta += 2 * ++x + 1;
 			continue;
 		}
+		//если ошибка превысила 0.5 
 		if ((delta > 0) && (error > 0)) {
 			delta -= 2 * --y + 1;
 			continue;

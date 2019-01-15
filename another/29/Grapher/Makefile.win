@@ -1,0 +1,67 @@
+# Project: Grapher
+# Makefile created by Dev-C++ 5.11
+
+CPP      = g++.exe
+CC       = gcc.exe
+WINDRES  = windres.exe
+OBJ      = GrapherMain.o is_digit.o create_maps.o is_letter.o get_tokken.o type_of_token.o find_arity.o operators_and_functions.o shunting_yard_algorithm.o calculate.o clear.o draw_system.o draw_function.o find_y.o
+LINKOBJ  = GrapherMain.o is_digit.o create_maps.o is_letter.o get_tokken.o type_of_token.o find_arity.o operators_and_functions.o shunting_yard_algorithm.o calculate.o clear.o draw_system.o draw_function.o find_y.o
+LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib32" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32" -static-libgcc -lbgi -lgdi32 -lcomdlg32 -luuid -loleaut32 -lole32 -m32
+INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
+CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
+BIN      = Grapher.exe
+CXXFLAGS = $(CXXINCS) -m32
+CFLAGS   = $(INCS) -m32
+RM       = rm.exe -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CPP) $(LINKOBJ) -o $(BIN) $(LIBS)
+
+GrapherMain.o: GrapherMain.cpp
+	$(CPP) -c GrapherMain.cpp -o GrapherMain.o $(CXXFLAGS)
+
+is_digit.o: is_digit.cpp
+	$(CPP) -c is_digit.cpp -o is_digit.o $(CXXFLAGS)
+
+create_maps.o: create_maps.cpp
+	$(CPP) -c create_maps.cpp -o create_maps.o $(CXXFLAGS)
+
+is_letter.o: is_letter.cpp
+	$(CPP) -c is_letter.cpp -o is_letter.o $(CXXFLAGS)
+
+get_tokken.o: get_tokken.cpp
+	$(CPP) -c get_tokken.cpp -o get_tokken.o $(CXXFLAGS)
+
+type_of_token.o: type_of_token.cpp
+	$(CPP) -c type_of_token.cpp -o type_of_token.o $(CXXFLAGS)
+
+find_arity.o: find_arity.cpp
+	$(CPP) -c find_arity.cpp -o find_arity.o $(CXXFLAGS)
+
+operators_and_functions.o: operators_and_functions.cpp
+	$(CPP) -c operators_and_functions.cpp -o operators_and_functions.o $(CXXFLAGS)
+
+shunting_yard_algorithm.o: shunting_yard_algorithm.cpp
+	$(CPP) -c shunting_yard_algorithm.cpp -o shunting_yard_algorithm.o $(CXXFLAGS)
+
+calculate.o: calculate.cpp
+	$(CPP) -c calculate.cpp -o calculate.o $(CXXFLAGS)
+
+clear.o: clear.cpp
+	$(CPP) -c clear.cpp -o clear.o $(CXXFLAGS)
+
+draw_system.o: draw_system.cpp
+	$(CPP) -c draw_system.cpp -o draw_system.o $(CXXFLAGS)
+
+draw_function.o: draw_function.cpp
+	$(CPP) -c draw_function.cpp -o draw_function.o $(CXXFLAGS)
+
+find_y.o: find_y.cpp
+	$(CPP) -c find_y.cpp -o find_y.o $(CXXFLAGS)

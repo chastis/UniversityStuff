@@ -27,6 +27,7 @@ int main()
 	string target;
 	cin >> target;
 	cout << palindrome(target) << endl;
+	return 0;
 }
 
 // abbbgghhgghhga -> aghhgghhga
