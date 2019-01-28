@@ -184,12 +184,19 @@ public:
 				{
 					if (temp_item->name == goods.get_data(i)->name) break;
 				}
-				if (i == goods.size())
+				if (i == goods.size() || goods.get_data(i)->count == 0 || goods.get_data(i)->price > temp_customer->money)
 				{
 					temp_customer->products.delete_first();
 					if (temp_customer->products.size() == 0) flag = false;
-					//TODO
-					//try
+
+				}
+				else
+				{
+					goods.get_data(i)->count--;
+					temp_item->count--;
+					temp_customer->money -= goods.get_data(i)->price;
+					if (temp_item->count == 0) temp_customer->products.delete_first();
+					if (temp_customer->products.size() == 0) flag = false;
 				}
 				
 			}
