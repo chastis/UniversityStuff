@@ -189,6 +189,7 @@ public:
 					temp_customer->products.delete_first();
 					if (temp_customer->products.size() == 0) flag = false;
 					//TODO
+					//try
 				}
 				
 			}
