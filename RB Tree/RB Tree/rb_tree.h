@@ -6,7 +6,7 @@
 class RB_Tree;
 class RB_Node;
 struct Pair;
-void create_new_node(RB_Node *, RB_Node *, const Pair &, bool, bool);
+void update(RB_Node * temp);
 
 struct Pair
 {
@@ -24,7 +24,7 @@ class RB_Node
 {
 public:
 	friend class RB_Tree;
-	friend void create_new_node(RB_Node *, RB_Node *, const Pair &, bool, bool);
+	friend void update(RB_Node * temp);
 	RB_Node();
 private:
 	Pair _data;
@@ -38,7 +38,7 @@ private:
 class RB_Tree
 {
 public:
-	friend void create_new_node(RB_Node *, RB_Node *, const Pair &, bool, bool);
+	friend void update(RB_Node * temp);
 	RB_Tree();
 	void add(const Pair &data);
 	std::string find(const std::string &key);
