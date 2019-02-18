@@ -8,9 +8,6 @@
 #include <string>
 #include <vector>
 
-
-struct Pair;
-
 struct Pair
 {
 	Pair()
@@ -21,6 +18,16 @@ struct Pair
 	std::string key;
 	std::string value;
 };
+struct Vector_of_Pair
+{
+	Vector_of_Pair()
+	{
+		key = "";
+		value.resize(0);
+	}
+	std::string key;
+	std::vector<std::string> value;
+};
 
 class Hash
 {
@@ -30,15 +37,27 @@ class Hash
 			data.resize(TEMP_SIZE);
 			for (auto &now : data)
 			{
-				now = new List<Pair>;
+				now = new List<Vector_of_Pair>;
 			}
 		}
 		void add(const Pair &in)
 		{
 			int h = h0(in.key);
-			data[h]->push_back(in);
+			for (int i = 0; i < data[h]->length(); i++)
+			{
+				if (data[h]->get(i).key == in.key)
+				{
+					data[h]->get(i).value.push_back(in.value);
+					return;
+				}
+			}
+			Vector_of_Pair temp;
+			temp.key = in.key;
+			temp.value.push_back(in.value);
+			data[h]->push_back(temp);
 		}
-		std::string get(const std::string &in)
+
+		std::vector<std::string> get(const std::string &in)
 		{
 			int h = h0(in);
 
@@ -49,10 +68,11 @@ class Hash
 					return data[h]->get(i).value;
 				}
 			}
-			return "";
+			std::vector<std::string> temp;
+			return temp;
 		}
 	private:
-		std::vector<List<Pair> * > data;
+		std::vector<List<Vector_of_Pair> * > data;
 		int h0(const std::string &in)
 		{
 			long long hash = 0;
