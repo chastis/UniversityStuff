@@ -73,11 +73,6 @@ public:
 		}
 		else
 		{
-			//cannot compare const and non-const element
-			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			//беру слова назад
-			//тут полный пздец
-			//без доступа к name почему-то нельзя сравнить элементы
 			
 			if (in.name != (*data[h0].first)[h].name)
 			{

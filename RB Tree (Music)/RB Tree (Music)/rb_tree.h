@@ -22,7 +22,7 @@ private:
 	bool _is_black;
 	//количество обращений к данному узлу
 	size_t _rate;
-
+	size_t _number;
 };
 
 class RB_Tree
@@ -32,9 +32,11 @@ public:
 	RB_Tree();
 	void add(const Performer &data);
 	Performer find(const std::string &key);
+	Performer find_i(const size_t &i);
 	void print();
 private:
 	RB_Node * _head;
+	size_t _size;
 	void print_rec(RB_Node *);
 };
 #endif // !RB_TREE

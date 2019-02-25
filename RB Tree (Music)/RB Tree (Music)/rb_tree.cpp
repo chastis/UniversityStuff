@@ -32,6 +32,7 @@ RB_Node::RB_Node()
 	_right = 0;
 	_prev = 0;
 	_rate = 0;
+	_number = 1;
 }
 
 RB_Tree::RB_Tree()
@@ -149,6 +150,7 @@ void update(RB_Node * temp)
 
 void RB_Tree::add(const Performer &data)
 {
+	_size++;
 	if (_head == 0)
 	{
 		RB_Node* temp = new RB_Node;
@@ -160,6 +162,7 @@ void RB_Tree::add(const Performer &data)
 		RB_Node * temp = _head;
 		while (true)
 		{
+			temp->_number++;
 			if (data.name < temp->_data.name)
 				if (temp->_left)
 				{
@@ -195,6 +198,8 @@ void RB_Tree::add(const Performer &data)
 			else {
 				//data already exist;
 				//do nothing?
+				temp->_number--;
+				_size--;
 				return;
 			}
 		}
@@ -318,4 +323,30 @@ void RB_Tree::print_rec(RB_Node * temp)
 void RB_Tree::print()
 {
 	print_rec(_head);
+}
+
+Performer RB_Tree::find_i(const size_t &i)
+{
+	size_t j = i;
+	if (j > _size)
+	{
+		//error
+		Performer empty;
+		return empty;
+	}
+	RB_Node * temp = _head;
+	while (true)
+	{
+		size_t size_left = temp->_left ? temp->_left->_number : 0;
+		if (temp->_number == 1 || size_left+1 == j) return temp->_data;
+		if (size_left >= j)
+		{
+			temp = temp->_left;
+		}
+		else
+		{
+			j -= (size_left + 1);
+			temp = temp->_right;
+		}
+	}
 }
