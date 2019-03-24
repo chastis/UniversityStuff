@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<style>
+
+.sqr_black
+{
+	width: 30px;
+	height: 30px;
+	background: black;
+	border: 1px solid black;
+	display: inline-block;
+	padding: 0px;
+	margin: 0px;
+}
+.sqr_white
+{
+	width: 30px;
+	height: 30px;
+	background: white;
+	border: 1px solid black;
+	display: inline-block;
+	padding: 0px;
+	margin: 0px;
+}
+.br
+{
+	height: 0px;
+	padding: 0px;
+	margin: -5px 0 0 0;
+}
+</style>
+
+
+<head>
+<script>
+	function a()
+	{
+		var m = parseInt(document.getElementById("p1").value);
+		var n = parseInt(document.getElementById("p2").value);
+		//alert(m+n);
+		
+		for (var i = 0; i < n; i++)
+		{
+			for (var j = 0; j < m; j++)
+			{
+				var div = document.createElement('div');
+				if ((i+j)%2)
+				{
+					div.className = "sqr_white";
+				}	
+				else
+				{
+					div.className = "sqr_black";
+				}
+				
+				//div.innerHTML = "<div class = "sqr"></div>";
+				document.body.appendChild(div);
+			}
+			var br = document.createElement('div');
+			br.className = "br";
+			document.body.appendChild(br);
+		}
+	}
+	function b()
+	{
+		var x1 = parseFloat(document.getElementById("x1").value);
+		var x2 = parseFloat(document.getElementById("x2").value);
+		var y1 = parseFloat(document.getElementById("y1").value);
+		var y2 = parseFloat(document.getElementById("y2").value);
+		if (x1 == 0 || x2 == 0 || y1 == 0 || y2 == 0)
+		{
+			alert("Точка на координатной оси!");
+		}
+		else
+		{
+			if (x1 > 0 && y1 > 0 && x2 > 0 && y2 > 0)
+			{
+				alert("Точки в первой четверти, растояние между ними = " + Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)));
+			}
+			else if (x1 > 0 && y1 < 0 && x2 > 0 && y2 < 0)
+			{
+				alert("Точки в четвертой четверти, растояние между ними = " + Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)));
+			}
+			else if (x1 < 0 && y1 > 0 && x2 < 0 && y2 > 0)
+			{
+				alert("Точки во второй четверти, растояние между ними = " + Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)));
+			}
+			else if (x1 < 0 && y1 < 0 && x2 < 0 && y2 < 0)
+			{
+				alert("Точки в третьей четверти, растояние между ними = " + Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)));
+			}
+			else
+			{
+				var text = "";
+				if (x1 > 0 && y1 > 0)
+				{
+					text = text +  "Первая точка в первой четверти, а ";
+				}
+				else if (x1 < 0 && y1 > 0)
+				{
+					text = text +  "Первая точка во второй четверти, а ";
+				}
+				else if (x1 > 0 && y1 < 0)
+				{
+					text = text +  "Первая точка в четвертой четверти, а ";
+				}
+				else if (x1 < 0 && y1 < 0)
+				{
+					text = text +  "Первая точка в третьей четверти, а ";
+				} else
+				{
+					text = text +  "Первая точка на координатной оси, а ";
+				}
+				//////////////////////////////////////////вторая точка
+				if (x2 > 0 && y2 > 0)
+				{
+					text = text +  "вторая точка в первой четверти";
+				}
+				else if (x2 < 0 && y2 > 0)
+				{
+					text = text +  "вторая точка во второй четверти";
+				}
+				else if (x2 > 0 && y2 < 0)
+				{
+					text = text +  "вторая точка в четвертой четверти";
+				}
+				else if (x2 < 0 && y2 < 0)
+				{
+					text = text +  "вторая точка в третьей четверти";
+				} else
+				{
+					text = text +  "вторая точка на координатной оси";
+				}
+				alert(text);
+			}
+		}
+	}
+</script>
+
+</head>
+
+<body>
+	<form>
+		M
+		<input type = "text" id = "p1">
+		N
+		<input type = "text" id = "p2">
+		<input type = "button" value = "DRAW" onclick = "a()">
+		<br><br>
+		x1
+		<input type = "text" id = "x1">
+		y1
+		<input type = "text" id = "y1">
+		<br>
+		x2
+		<input type = "text" id = "x2">
+		y2
+		<input type = "text" id = "y2">
+		<input type = "button" value = "ANSWER" onclick = "b()">
+	</form>
+	<br>
+</body> 
