@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+
+<style>
+.block
+{
+	border: 1px solid black;
+	margin: 1px;
+	padding: 1px;
+}
+.letter
+{
+	position: absolute;
+	margin-left: 25%;
+	margin-top: 42px;
+	width = 50%;
+}
+</style>
+
+
+<head>
+<script>
+	function calculate()
+	{
+		var temp = parseInt(form1.	price.value);
+		if (form1.way.value == "post")
+		{
+			temp+=20;
+		}
+		else
+		{
+			temp+=40;
+		}
+		if (form1.box.checked)
+		{
+			temp+=100;
+		}
+		form1.cost.value = temp;
+	}
+	function reset()
+	{
+		form1.cost.value = "";
+		form1.amount.value = 0;
+		form1.price.value = 0;
+		form1.name.value = "";
+		form1.adress.value = "";
+		form1.box.checked = false;
+		form1.list.selectedIndex = 0;
+		form1.way.value = "post";
+	}
+	function sent()
+	{
+		var temp = form1.innerHTML;
+		form2.innerHTML = form1.innerHTML;
+		form2.style.width = "50%";
+		form2.cost.value = form1.cost.value;
+		form2.amount.value = form1.amount.value;
+		form2.price.value = form1.price.value;
+		form2.name.value = form1.name.value;
+		form2.adress.value = form1.adress.value;
+		form2.box.checked = form1.box.checked;
+		form2.list.selectedIndex = form1.list.selectedIndex;
+		form2.way.value = form1.way.value;
+	}
+	function change_price()
+	{
+		form1.price.value = form1.list.options[form1.list.selectedIndex].value * form1.amount.value;
+	}
+</script>
+
+</head>
+
+<body>
+	<form name = "form1">
+		<div class = "block">
+			<div class = "block" style = "text-align: center;">
+			Замовлення на придбання товару
+			</div>
+			<div class = "block">
+				Назва товару
+				<br>
+				<form action="select" method="get">
+					<select size="1" id = "list" onchange = "change_price()">
+						<option value="42" selected>Автостопом по галактике - 42</option>
+						<option value="37">Ресторан на краю вселенной - 37</option>
+						<option value="73">Жизнь, Вселенная и все остальное - 73</option>
+						<option value="14">Почти безвредна - 14</option>
+						<option value="88">Всего хорошего и спасибо за рыбу! - 88</option>
+					</select>
+				</form>
+			</div>
+			<div class = "block">
+				Кількість
+				<input type = "text" id = "amount" value = "0" oninput = "change_price()">
+				Вартість замовленних книг
+				<input type = "text" id = "price" value = "0" readonly="readonly">
+			</div>
+			<div class = "block">
+				Спосіб доставки замовлення<br>
+				<input type="radio" name="way" value="post" checked>Поштою<br>
+				<input type="radio" name="way" value="home">Доставка до дому<br>
+				<input type="checkbox" name = "box"> У святковій упаковці
+			</div>
+			<div class = "block" style = "text-align: right;">
+				Загальна вартість замовлення
+				<input type = "text" id = "cost" readonly="readonly">
+				<input type = "button" value = "Підрахувати" onclick = "calculate()">
+			</div>
+			<div class = "block">
+				Дані замовника<br>
+				Ім'я: <input type = "text" id = "name">
+				Адреса: <input type = "text" id = "adress">
+			</div>
+			<div class = "block" style = "text-align: right;">
+				<input type = "button" value = "Відновити початкові значення полів" onclick = "reset()">
+				<input type = "button" value = "Відіслати дані" onclick = "sent()">
+			</div>
+		</div>
+	</form>
+	<form name = "form2" class = "letter">
+	</form>
+</body> 
