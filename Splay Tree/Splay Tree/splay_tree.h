@@ -1,5 +1,6 @@
 #ifndef SPLAY_TREE_H
 #define SPLAY_TREE_H
+#include <iostream>
 
 template<typename T> class SplayTree {
 private:
@@ -10,7 +11,7 @@ private:
 		T data;
 
 		SplayNode(const T & key = T())
-			: leftChild(nullptr), rightChild(nullptr), parent(nullptr), key(key) {}
+			: leftChild(nullptr), rightChild(nullptr), parent(nullptr), data(key) {}
 
 		~SplayNode() {
 			delete leftChild;
@@ -125,130 +126,145 @@ private:
 
 	void _Splay(SplayNode * pivotElement) {
 		while (pivotElement != root) {
-			if (pivotElement->parent == root) {
+			if (pivotElement->parent == root)
+			{
 
 				if (pivotElement == pivotElement->parent->leftChild)
-					_RightRotate(pivotElement);
+					_RightRotate(pivotElement->parent);
 				else if (pivotElement == pivotElement->parent->rightChild) {
-					_LeftRotate(pivotElement);
+					_LeftRotate(pivotElement->parent);
 
-				}
-				else {
-					// Zig-Zig step.
-					if (pivotElement == pivotElement->parent->leftChild &&
-						pivotElement->parent == pivotElement->parent->parent->leftChild) {
-
-						_RightRotate(pivotElement->parent->parent);
-						_RightRotate(pivotElement->parent);
-
-					}
-					else if (pivotElement == pivotElement->parent->rightChild &&
-						pivotElement->parent == pivotElement->parent->parent->rightChild) {
-
-						_LeftRotate(pivotElement->parent->parent);
-						_LeftRotate(pivotElement->parent);
-					}
-					// Zig-Zag step.
-					else if (pivotElement == pivotElement->parent->rightChild &&
-						pivotElement->parent == pivotElement->parent->parent->leftChild) {
-
-						_LeftRotate(pivotElement->parent);
-						_RightRotate(pivotElement->parent);
-
-					}
-					else if (pivotElement == pivotElement->parent->leftChild &&
-						pivotElement->parent == pivotElement->parent->parent->rightChild) {
-
-						_RightRotate(pivotElement->parent);
-						_LeftRotate(pivotElement->parent);
-					}
 				}
 			}
+			else
+			{
+				// Zig-Zig step.
+				if (pivotElement == pivotElement->parent->leftChild &&
+					pivotElement->parent == pivotElement->parent->parent->leftChild) {
+
+					_RightRotate(pivotElement->parent->parent);
+					_RightRotate(pivotElement->parent);
+
+				}
+				else if (pivotElement == pivotElement->parent->rightChild &&
+					pivotElement->parent == pivotElement->parent->parent->rightChild) {
+
+					_LeftRotate(pivotElement->parent->parent);
+					_LeftRotate(pivotElement->parent);
+				}
+				// Zig-Zag step.
+				else if (pivotElement == pivotElement->parent->rightChild &&
+					pivotElement->parent == pivotElement->parent->parent->leftChild) {
+
+					_LeftRotate(pivotElement->parent);
+					_RightRotate(pivotElement->parent);
+
+				}
+				else if (pivotElement == pivotElement->parent->leftChild &&
+					pivotElement->parent == pivotElement->parent->parent->rightChild) {
+
+					_RightRotate(pivotElement->parent);
+					_LeftRotate(pivotElement->parent);
+				}
+				else
+				{
+					if (pivotElement == pivotElement->parent->leftChild)
+						_RightRotate(pivotElement->parent);
+					else _LeftRotate(pivotElement->parent);
+
+				}
+			}
+
 		}
 	}
-	public:
-		SplayTree() { root = nullptr; }
+public:
+	SplayTree() { root = nullptr; }
 
-		virtual ~SplayTree() { delete root; }
+	virtual ~SplayTree() { delete root; }
 
-		void Insert(const T & key) {
-			SplayNode * preInsertPlace = nullptr;
-			SplayNode * insertPlace = root;
+	void Insert(const T & key) {
+		SplayNode * preInsertPlace = nullptr;
+		SplayNode * insertPlace = root;
 
-			while (insertPlace != nullptr) {
-				preInsertPlace = insertPlace;
+		while (insertPlace != nullptr) {
+			preInsertPlace = insertPlace;
 
-				if (insertPlace->data() < key)
-					insertPlace = insertPlace->rightChild;
-				else if (key <= insertPlace->data)
-					insertPlace = insertPlace->leftChild;
-			}
-
-			SplayNode * insertElement = new SplayNode(key);
-			insertElement->parent = preInsertPlace;
-
-			if (preInsertPlace == nullptr)
-				root = insertElement;
-			else if (preInsertPlace->data < insertElement->data)
-				preInsertPlace->rightChild = insertElement;
-			else if (insertElement->data < preInsertPlace->data)
-				preInsertPlace->leftChild = insertElement;
-
-			_Splay(insertElement);
+			if (insertPlace->data < key)
+				insertPlace = insertPlace->rightChild;
+			else if (key <= insertPlace->data)
+				insertPlace = insertPlace->leftChild;
 		}
 
-		void Remove(const T & key) {
-			SplayNode * removeElement = _Search(key);
+		SplayNode * insertElement = new SplayNode(key);
+		insertElement->parent = preInsertPlace;
 
-			if (removeElement != nullptr) {
-				if (removeElement->rightChild == nullptr)
-					_Transplant(removeElement, removeElement->leftChild);
-				else if (removeElement->leftChild == nullptr)
-					_Transplant(removeElement, removeElement->rightChild);
-				else {
-					SplayNode * newLocalRoot = _Minimum(removeElement->rightChild);
+		if (preInsertPlace == nullptr)
+			root = insertElement;
+		else if (preInsertPlace->data < insertElement->data)
+			preInsertPlace->rightChild = insertElement;
+		else if (insertElement->data < preInsertPlace->data)
+			preInsertPlace->leftChild = insertElement;
 
-					if (newLocalRoot->parent != removeElement) {
+		_Splay(insertElement);
+	}
 
-						_Transplant(newLocalRoot, newLocalRoot->rightChild);
+	void Remove(const T & key) {
+		SplayNode * removeElement = _Search(key);
 
-						newLocalRoot->rightChild = removeElement->rightChild;
-						newLocalRoot->rightChild->parent = newLocalRoot;
-					}
+		if (removeElement != nullptr) {
+			if (removeElement->rightChild == nullptr)
+				_Transplant(removeElement, removeElement->leftChild);
+			else if (removeElement->leftChild == nullptr)
+				_Transplant(removeElement, removeElement->rightChild);
+			else {
+				SplayNode * newLocalRoot = _Minimum(removeElement->rightChild);
 
-					_Transplant(removeElement, newLocalRoot);
+				if (newLocalRoot->parent != removeElement) {
 
-					newLocalRoot->leftChild = removeElement->leftChild;
-					newLocalRoot->leftChild->parent = newLocalRoot;
+					_Transplant(newLocalRoot, newLocalRoot->rightChild);
 
-					_Splay(newLocalRoot);
+					newLocalRoot->rightChild = removeElement->rightChild;
+					newLocalRoot->rightChild->parent = newLocalRoot;
 				}
 
-				delete removeElement;
+				_Transplant(removeElement, newLocalRoot);
+
+				newLocalRoot->leftChild = removeElement->leftChild;
+				newLocalRoot->leftChild->parent = newLocalRoot;
+
+				_Splay(newLocalRoot);
 			}
+
+			delete removeElement;
 		}
+	}
 
-		bool Search(const T &key) { return _Search(key) != nullptr; }
+	bool Search(const T &key) { return _Search(key) != nullptr; }
 
-		bool isEmpty() const { return root == nullptr; }
+	bool isEmpty() const { return root == nullptr; }
 
-		T Successor(const T & key) {
-			if (_Successor(_Search(key)) != nullptr) {
-				return _Successor(_Search(key))->getValue();
-			}
-			else {
-				return -1;
-			}
+	T Successor(const T & key) {
+		if (_Successor(_Search(key)) != nullptr) {
+			return _Successor(_Search(key))->getValue();
 		}
-
-		T Predecessor(const T & key) {
-			if (_Predecessor(_Search(key)) != nullptr) {
-				return _Predecessor(_Search(key))->getValue();
-			}
-			else {
-				return -1;
-			}
+		else {
+			return -1;
 		}
-	};
+	}
+
+	T Predecessor(const T & key) {
+		if (_Predecessor(_Search(key)) != nullptr) {
+			return _Predecessor(_Search(key))->getValue();
+		}
+		else {
+			return -1;
+		}
+	}
+
+	void print()
+	{
+		std::cout << root->amount_of_songs << " -> ";
+	}
+};
 
 #endif

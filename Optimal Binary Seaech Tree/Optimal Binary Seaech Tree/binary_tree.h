@@ -1,4 +1,4 @@
-#ifndef BINARY_TREE_H
+﻿#ifndef BINARY_TREE_H
 #define BINARY_TREE_H
 
 #include <utility>
@@ -11,7 +11,7 @@ enum class sides
 };
 
 template <class T>
-bool compare(const std::pair<T, double> &a,const std::pair<T, double> &b)
+bool compare(const std::pair<T, double> &a, const std::pair<T, double> &b)
 {
 	//if a <= b sort will be in great order
 	return a.first <= b.first;
