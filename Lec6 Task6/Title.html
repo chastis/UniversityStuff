@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<style>
+.block
+{
+	border: 1px solid black;
+	margin: 1px;
+	padding: 1px;
+}
+</style>
+
+
+<head>
+<script>
+	function change_price()
+	{
+		var x = form1.price.value * form1.amount.value * 100;
+		if (isNaN(x)|| form1.price.value < 0 || form1.amount.value < 0 || form1.amount.value > Math.floor(form1.amount.value))
+		{
+			form1.all_value.value = "Введені дані інвалідні";
+			return;
+		}
+		x = Math.trunc(x);
+		var coin = x % 100;
+		var cash = Math.floor((x - coin) / 100);
+		var answer = cash;
+		
+		if (cash % 10 == 1)
+          answer += ' гривня ';
+		  else if (x % 10 == 2 || x % 10 == 3 || x % 10 == 4)
+			  answer += ' гривні ';
+		  else 
+			  answer += ' гривень ';   
+			   
+			   
+		answer += coin; 
+		if (coin % 10 == 1)
+			answer += ' копійка ';
+		  else if (coin % 10 == 2 || coin % 10 == 3 || coin % 10 == 4)
+			answer += ' копійки ';
+		  else 
+			answer += ' копійок '; 
+		
+		form1.all_value.value = answer;
+	}
+	function recolor()
+	{
+		for (i in document.getElementsByTagName("p"))
+			if (document.getElementsByTagName("p")[i].style.backgroundColor == "red")
+				document.getElementsByTagName("p")[i].style.backgroundColor = "white";
+			else
+				document.getElementsByTagName("p")[i].style.backgroundColor = "red"
+	}
+	function remove()
+	{
+		var p = document.getElementById("p1");
+		if (!isNaN(p))
+		{
+			var d = document.getElementById("that_hr");
+			var a = document.createElement("div");
+			a.setAttribute("id","p1");
+			a.innerHTML = "p1 это вот здесь!!!<br>Удали меня, если осмелишься!!!";
+			form1.that_button.value = "Удалить id = p1";
+			d.parentNode.insertBefore(a,d);
+			return;
+		}
+		p.parentNode.removeChild(p);
+		form1.that_button.value = "Вставить id = p1";
+	}
+	function constructor()
+	{
+		var d = document.getElementById("conteiner");
+		for (var i = 0; i < 3; ++i)
+		{
+			var p = document.createElement("p");
+			p.innerHTML = "Текст " + i;
+			d.appendChild(p);
+		}
+		var a = document.createElement("a");
+		a.href = "https://en.wikipedia.org/wiki/42_(number)";
+		a.innerHTML = "Текст 42"
+		d.insertBefore(a,p);
+	}
+</script>
+
+</head>
+
+<body onload = "constructor()">
+	<form name = "form1">
+		<div class = "block">
+			Ціна
+			<input type = "text" id = "price" value = "0" oninput = "change_price()">
+			Кількість
+			<input type = "text" id = "amount" value = "0" oninput = "change_price()">
+			<br>
+			Вартість замовленних книг
+			<input type = "text" id = "all_value" value = "0" readonly="readonly">
+		</div>
+		<div class = "block">
+			<p> Внимание!!! </p>
+			<p> Спасибо за внимание!</p>
+			<hr>
+			<div id = "p1">
+			p1 это вот здесь!!!<br>
+			Удали меня, если осмелишься!!!
+			</div>
+			<hr id = "that_hr">
+			<div id = "conteiner">
+				тут должно что-то появиться ...
+			</div>
+		</div>
+		<div class = "block">
+			<input type = "button" value = "Перекрасить <p>" onclick = "recolor()">
+			<input type = "button" value = "Удалить id = p1" onclick = "remove()" id = "that_button">
+		</div>
+	</form>
+</body> 
