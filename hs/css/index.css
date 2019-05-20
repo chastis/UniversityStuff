@@ -1,0 +1,91 @@
+/* Aside */
+.content_news {
+	float: left;
+	margin: 0;
+	padding: 5px;
+	height: 700px;
+	width: 300px;
+	background-color: #bf8040;
+}
+
+.content_news_header {
+	color: #ffffcc;
+	font-size: 25px;
+	margin: 5px 10px 10px 5px;
+}
+
+.content_news-block {
+	text-align: left;
+	margin: 0 0 0 10px;
+	padding: 0;
+}
+.content_news_list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.content_new-item{
+	margin: 0;
+	padding: 0;
+}
+.content_new-item-figure{
+	margin: 0;
+	padding: 10px;
+	color: #fff0b3;
+}
+.content_new-item-label{
+	margin: 0;
+	padding: 0;
+	color: #331f00;
+	font-style: italic;
+	font-size: 16px;
+}
+.content_new-item-text{
+	margin: 0;
+	padding: 0;
+}
+
+.content_all_news {
+	left: 150px;
+	position: relative;
+	margin: 0;
+	padding: 0;
+	right:0;
+	bottom: 0;
+	color: #ffffcc;
+	text-decoration: underline;
+}
+
+.content_all_news:hover {
+	color:blue;
+}
+
+.content_about{
+	float: left;
+	margin: 0;
+	padding: 5px;
+	left: 0;
+	height: 700px;
+	width: 680px;
+}
+.content_about-header{
+	height: 100px;
+	line-height: 50px;
+	text-align: center;
+	font-size: 42px;
+	font-weight: bold;
+}
+.content_about-text{
+	margin: 0;
+	padding: 5px;
+}
+.content_about-image{
+	//left: 50%;
+	width: 300px;
+	height: 300px;
+	margin: auto;
+	background-image: url("../img/smorc.jpg");
+	background-size: 100%;
+	background-position: center bottom;
+	background-repeat: no-repeat;
+}
