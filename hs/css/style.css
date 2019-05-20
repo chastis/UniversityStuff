@@ -303,7 +303,7 @@ body, html {
 	position: relative;
 	overflow: hidden;
 	transition: max-height 0.5s;
-	max-height: 1000px;
+	max-height: 200px;
 	margin: 0;
 }
 

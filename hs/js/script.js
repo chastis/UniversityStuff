@@ -80,7 +80,7 @@ function loadPage() {
             if (content.style.maxHeight != "0px"){
 				content.style.maxHeight = "0px";
             } else {
-				content.style.maxHeight = "1000px";
+				content.style.maxHeight = content.scrollHeight + "px";
             }
         });
 		var content = coll[i].nextElementSibling;
