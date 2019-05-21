@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<style>
+.column {
+	//position: absolute;
+	height: 200px;
+	display: inline-block;
+	background-color: #0099cc;
+	margin: 5px;
+	border: 1px solid black;
+}
+
+.block {
+	padding: 10px;
+	border: 1px solid black;
+}
+
+.clearfix {
+	border: 0px;
+}
+</style>
+
+
+<head>
+	<script>
+	function change() {
+		var content = document.querySelector('.content');
+		var n = form1.amount.value;
+		if (isNaN(n - 1)|| n < 0)
+			{
+				alert("Something get wrong...");
+				return;
+			}
+		var input = "№ | Ім'я  | Значення ";
+		for (var i = 0; i < n; i++) {
+			input += "<div class = 'block clearfix'>" + i + " : <input type = 'text' value='0' class = 'diagram_name'> <input type = 'text' value='0' class = 'diagram_h'></div>";
+		}
+		content.innerHTML = input;
+	}
+	function create() {
+		var content = document.querySelector('.content');
+		var dia = document.querySelector('.diagram');
+		var n = form1.amount.value;
+		var max_h = 0;
+		var input = "";	
+		for (var i = 0; i < n; i++) {
+			var temp_h = content.children[i].children[1].value;
+			var temp_name = content.children[i].children[0].value;
+			if (isNaN(temp_h - 1)|| temp_h < 0 || temp_h > Math.floor(temp_h))
+			{
+				alert("Something get wrong...");
+				return;
+			}
+			if (parseInt(temp_h) > parseInt(max_h)) {
+				max_h = temp_h;
+			}	
+			input += "<li class='column'>" + temp_name + "</li>";
+			//alert( temp_name + " " + temp_h);
+		}
+		dia.innerHTML = input;
+		for (var i = 0; i < n; i++) {	
+			var temp_h = content.children[i].children[1].value;
+			
+			dia.children[i].style.height = (temp_h * 200) / max_h+ "px";
+			
+			//alert(temp_h);
+		}
+		//alert(max_h);			
+	}
+	</script>
+</head>
+
+<body>
+	<form name = "form1">
+		<div class = "block">
+			Гістограмма
+			<div class = "block clearfix">
+				Кількість стовпців гістограми: <input type = "text" value="0" id = "amount" oninput = "change()">
+			</div>
+			<div class = "block clearfix">
+				<input type = "button" value = "Створити Діаграму" onclick = "create()">
+			</div>
+			<div class = "content">
+			</div>
+		</div>
+	</form>
+	<div class="block">
+		Створена Діаграма: <br>
+        <ul class="diagram">
+        </ul>
+      </div>
+</body> 
