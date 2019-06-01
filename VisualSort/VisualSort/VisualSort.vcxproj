@@ -134,10 +134,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BaseElement.cpp" />
+    <ClCompile Include="Data.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="maps\map1.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BaseElement.h" />
+    <ClInclude Include="Data.h" />
+    <ClInclude Include="helpers.h" />
+    <ClInclude Include="Visualisation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
