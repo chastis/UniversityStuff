@@ -8,7 +8,6 @@ class BaseElement
 public:
 	friend void swap(BaseElement &, BaseElement &);
 	BaseElement(float x, float y, float w, float h, long long value);
-	void gene
 	virtual ~BaseElement() = default;
 private:
 	sf::RectangleShape _rect;
