@@ -138,6 +138,7 @@
     <ClCompile Include="Data.cpp" />
     <ClCompile Include="Element.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Sortings.cpp" />
     <ClCompile Include="Visualizer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -145,6 +146,7 @@
     <ClInclude Include="Data.h" />
     <ClInclude Include="Element.h" />
     <ClInclude Include="helpers.h" />
+    <ClInclude Include="Sortings.h" />
     <ClInclude Include="Visualizer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

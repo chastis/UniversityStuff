@@ -22,10 +22,10 @@ public:
 	//sort must be function, that takes iterator on firstm iterator on last and comparator
 	template <typename SortFunc, typename Comp>
 	void sort(SortFunc, Comp);
-
 private:
 	std::vector<Element>& _elements;
 	bool sorting;
+	
 };
 
 
@@ -39,9 +39,12 @@ inline void Visualizer::sort(SortFunc sort, Comp comp)
 		sort(_elements.begin(), _elements.end(), comp);
 		sorting = false;
 	};
-
-	std::thread t1(_sort);
-	t1.detach();
+	//_sort();
+	std::thread * t1 = new std::thread(_sort);
+	t1->detach();
+	//temp_thread = new std::thread(_sort);
+	//temp_thread->detach();
+	delete t1;
 }
 
 #endif //CLASS_VISUALIZER_H
