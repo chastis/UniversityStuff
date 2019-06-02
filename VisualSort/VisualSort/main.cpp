@@ -3,50 +3,25 @@
 
 using namespace sf;
 
-void sort(Visualizer& v) {
-	auto& vec = v._elements;
-	for (size_t i = 0; i < vec.size() - 1; ++i) {
-		if (Data::comp(vec[i], vec[i + 1])) {
-			auto temp = vec[i];
-			vec[i] = vec[i + 1];
-			vec[i + 1] = temp;
-			i = 0;
-		}
-	}
+void sort(Data& d) {
+	std::sort(d.begin(), d.end(), Data::comp);
 }
 
 int main()
 {
 	RenderWindow window(VideoMode(800, 600), "Visual sort");
 	
-	Data d(10, 500, 10);
+	Data d(10, 500, 10000);
 	Visualizer visualizer(d);
-	//visualizer.sort();
 	visualizer.setSize({800, 50});
-	//visualizer.sort();
 	visualizer.setPosition({0, 300});
-	
-	
-	//visualizer.setPosition({ 0, 300 });
-	/*std::thread sort_thread(sort, std::ref(visualizer));*/
 
-	//std::sort(visualizer._elements.begin(), visualizer._elements.end(), Data::comp);
+	auto _comp = [&](Element a, Element b) {
+		std::this_thread::sleep_for(std::chrono::nanoseconds(10));
+		return Data::comp(a, b);
+	};
 
-	//visualizer.sort();
-	visualizer.print();
-	visualizer.sort();
-	std::cout << "HERE WE ARE" << std::endl;
-	visualizer.print();
-	std::cout << "HERE WE ARE" << std::endl;
-	window.clear(Color::Black);
-	window.draw(visualizer);
-	visualizer.setPosition({ 0, 400 });
-	visualizer.sort();
-	visualizer.print();
-	std::cout << std::endl;
-	//for (auto& v : visualizer._elements) window.draw(v);
-	window.draw(visualizer);
-	window.display();
+	visualizer.sort(std::sort<decltype(d.begin()), decltype(_comp)>, _comp);
 
 	while (window.isOpen())
 	{
@@ -58,10 +33,12 @@ int main()
 			if (event.type == Event::Closed)
 				window.close();
 		}
+
+		window.clear();
+		window.draw(visualizer);
+		window.display();
 		//window.clear(Color::Black);
-		
 	}
 
-	//sort_thread.join();
 	return 0;
 }

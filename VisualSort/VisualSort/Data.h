@@ -2,7 +2,7 @@
 #define DATA_H
 
 #include "helpers.h"
-#include "BaseElement.h"
+#include "Element.h"
 
 class Data
 {
@@ -10,23 +10,20 @@ public:
 	Data(long long, long long, size_t);
 	Data(const std::string &);
 	Data(const std::vector<long long> &);
-		
-	std::vector<sf::RectangleShape>& getElements();
-
-	std::vector<long long>::iterator begin();
-	std::vector<long long>::iterator end();
-	std::vector<sf::RectangleShape>::iterator el_begin();
-	std::vector<sf::RectangleShape>::iterator el_end();
-
 	~Data() = default;
 
-	static bool comp(sf::RectangleShape, sf::RectangleShape);
+	std::vector<Element>& getElements();
+
+	static bool comp(Element, Element);
+
+	std::vector<Element>::iterator begin();
+	std::vector<Element>::iterator end();
 
 private:
 	long long _min;
 	long long _max;
-	std::vector<long long> _data;
-	std::vector<sf::RectangleShape> _elements;
+	//std::vector<long long> _data;
+	std::vector<Element> _elements;
 	void generateElements();
 };
 

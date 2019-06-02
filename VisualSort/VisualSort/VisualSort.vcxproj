@@ -136,12 +136,14 @@
   <ItemGroup>
     <ClCompile Include="BaseElement.cpp" />
     <ClCompile Include="Data.cpp" />
+    <ClCompile Include="Element.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Visualizer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseElement.h" />
     <ClInclude Include="Data.h" />
+    <ClInclude Include="Element.h" />
     <ClInclude Include="helpers.h" />
     <ClInclude Include="Visualizer.h" />
   </ItemGroup>
