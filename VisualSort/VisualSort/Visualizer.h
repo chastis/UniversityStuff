@@ -26,7 +26,8 @@ public:
 private:
 	std::vector<Element> _elements;
 	std::mutex sorting;
-	std::thread * temp_thread;
+	std::vector<std::thread *>temp_thread;
+	int num;
 };
 
 
@@ -51,16 +52,16 @@ inline void Visualizer::sort(SortFunc &sort, Comp &comp)
 
 		if (sorting.try_lock())
 		{
-			temp_thread = new std::thread(_sort);
-			temp_thread->detach();
+			temp_thread[num % 15] = new std::thread(_sort);
+			temp_thread[num++ % 15 ]->detach();
 			sorting.unlock();
 		}
 		else {
 			std::cout << "second" << std::endl;
-			temp_thread->detach();
-			delete temp_thread;
-			temp_thread = new std::thread(_sort);
-			temp_thread->detach();
+			temp_thread[num % 15]->detach();
+			delete temp_thread[num % 15];
+			temp_thread[num % 15] = new std::thread(_sort);
+			temp_thread[num++ % 15]->detach();
 			sorting.unlock();
 		}
 	}

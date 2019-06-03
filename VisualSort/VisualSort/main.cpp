@@ -5,6 +5,7 @@
 
 using namespace sf;
 
+
 void sort(Data& d) {
 	std::sort(d.begin(), d.end(), Data::comp);
 }
@@ -17,6 +18,7 @@ int main()
 	long long size = 100;
 	Data d(10, 500, 1000);
 	Visualizer visualizer(d);
+	Visualizer * vis = 0;
 	visualizer.setSize({800, 50});
 	visualizer.setPosition({0, 300});
 
@@ -71,6 +73,7 @@ int main()
 			
 			if (menu.is_menu())
 			{
+				shut_down = true;
 				//try to change color of menu's buttons
 				menu.change_colors(pos);
 				//pressed left mouse
@@ -78,7 +81,9 @@ int main()
 				{
 					if (event.key.code == sf::Mouse::Left)
 					{
-						menu.work(pos, window, size, current_type, visualizer);
+						Data d_t(10, 500, 1000);
+						vis = new Visualizer(d_t);
+						menu.work(pos, window, size, current_type, *vis);
 
 						
 					}
@@ -97,7 +102,8 @@ int main()
 		{
 			menu.draw(window, size);
 		}
-		else window.draw(visualizer);
+		//else window.draw(visualizer);
+		else window.draw(*vis);
 		window.display();
 	}
 	return 0;

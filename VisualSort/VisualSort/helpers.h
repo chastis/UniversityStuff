@@ -16,5 +16,6 @@ enum class sort_type { std, bubble };
 
 constexpr float DEFAULT_EL_SIZE = 10.f;
 using Point = sf::Vector2f;
+static bool shut_down = false;
 
 #endif // !HELPERS

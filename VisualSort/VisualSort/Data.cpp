@@ -49,6 +49,7 @@ bool Data::comp(Element a, Element b)
 	auto color_b = b.getColor();
 	s1td::this_thread::sleep_for(std::chrono::microseconds(1));*/
 	//std::this_thread::sleep_for(std::chrono::microseconds(2));
+	if (shut_down) std::terminate();
 	return a.getValue() < b.getValue();
 }
 

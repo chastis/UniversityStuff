@@ -176,10 +176,14 @@ void Menu::work(sf::Vector2f pos, sf::RenderWindow &window, long long &size, sor
 		//bubble
 		case 1:
 		{
+			shut_down = false;
 			type = sort_type::bubble;
 			_is_menu = false;
 
 			Data d(10, 500, size);
+
+			//Visualizer newVis;
+			//vis = newVis;
 
 			vis.setData(d);
 			vis.setSize({ 800, 50 });
@@ -193,6 +197,7 @@ void Menu::work(sf::Vector2f pos, sf::RenderWindow &window, long long &size, sor
 		//std
 		case 2:
 		{
+			shut_down = false;
 			type = sort_type::std;
 			_is_menu = false;
 
