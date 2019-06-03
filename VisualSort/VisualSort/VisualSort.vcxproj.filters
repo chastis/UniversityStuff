@@ -33,6 +33,9 @@
     <ClCompile Include="Sortings.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="Menu.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseElement.h">
@@ -51,6 +54,9 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="Sortings.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="Menu.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

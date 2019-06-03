@@ -138,6 +138,7 @@
     <ClCompile Include="Data.cpp" />
     <ClCompile Include="Element.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Sortings.cpp" />
     <ClCompile Include="Visualizer.cpp" />
   </ItemGroup>
@@ -146,6 +147,7 @@
     <ClInclude Include="Data.h" />
     <ClInclude Include="Element.h" />
     <ClInclude Include="helpers.h" />
+    <ClInclude Include="Menu.h" />
     <ClInclude Include="Sortings.h" />
     <ClInclude Include="Visualizer.h" />
   </ItemGroup>

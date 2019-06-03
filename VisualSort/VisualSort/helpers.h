@@ -10,7 +10,9 @@
 #include <fstream>
 #include <numeric>
 #include <thread>
+#include <mutex>
 
+enum class sort_type { std, bubble };
 
 constexpr float DEFAULT_EL_SIZE = 10.f;
 using Point = sf::Vector2f;
