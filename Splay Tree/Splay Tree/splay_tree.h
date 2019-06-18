@@ -1,6 +1,7 @@
 #ifndef SPLAY_TREE_H
 #define SPLAY_TREE_H
 #include <iostream>
+#include "music_shop.h"
 
 template<typename T> class SplayTree {
 private:
@@ -9,7 +10,7 @@ private:
 		SplayNode * rightChild;
 		SplayNode * parent;
 		T data;
-
+		int key;
 		SplayNode(const T & key = T())
 			: leftChild(nullptr), rightChild(nullptr), parent(nullptr), data(key) {}
 
@@ -177,8 +178,24 @@ private:
 
 		}
 	}
+
+	void print_this(SplayNode * temp)
+	{
+		if (temp->leftChild)
+		{
+			std::cout << temp->key << " -> " << temp->leftChild->key << std::endl;
+			print_this(temp->leftChild);
+		}
+		if (temp->rightChild)
+		{
+			std::cout << temp->key << " -> " << temp->rightChild->key << std::endl;
+			print_this(temp->rightChild);
+		}
+	}
+
+	int true_key;
 public:
-	SplayTree() { root = nullptr; }
+	SplayTree() { root = nullptr; true_key = 0; }
 
 	virtual ~SplayTree() { delete root; }
 
@@ -196,6 +213,7 @@ public:
 		}
 
 		SplayNode * insertElement = new SplayNode(key);
+		insertElement->key = true_key++;
 		insertElement->parent = preInsertPlace;
 
 		if (preInsertPlace == nullptr)
@@ -263,8 +281,12 @@ public:
 
 	void print()
 	{
-		std::cout << root->amount_of_songs << " -> ";
+		SplayNode * temp = root;
+		print_this(temp);
+		
 	}
 };
+
+
 
 #endif

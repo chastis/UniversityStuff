@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{13B48629-03F4-4BA5-B5E4-2149DB62590A}</ProjectGuid>
-    <RootNamespace>Persisent_Set</RootNamespace>
+    <ProjectGuid>{57A6FFF4-EC7A-4737-A61E-A5E775051E3D}</ProjectGuid>
+    <RootNamespace>Bplus</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -114,9 +114,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HistoryTree.h" />
-    <ClInclude Include="Tree.h" />
-    <ClInclude Include="Shop.h" />
+    <ClInclude Include="Bplus.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

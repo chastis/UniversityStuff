@@ -10,8 +10,7 @@ int main()
 	Album a;
 	a.amout_of_songs = 2;
 	tree.Insert(a);
-	a.amout_of_songs = 10;
-	tree.Insert(a);
+	
 	a.amout_of_songs = 12;
 	tree.Insert(a);
 	a.amout_of_songs = 5;
@@ -22,5 +21,6 @@ int main()
 	tree.Insert(a);
 	a.amout_of_songs = 37;
 	tree.Insert(a);
+	tree.print();
 	return 0;
 }

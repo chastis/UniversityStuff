@@ -1,10 +1,11 @@
-﻿#include <iostream>
-#include "binary_tree.h"
-#include "music_shop.h"
+﻿#include "TestClass.h"
+#include <iostream>
 
+int main()
+{
 
-int main() {
+	TestClass test = TestClass();
+	test.start();
 
-	
 	return 0;
 }
