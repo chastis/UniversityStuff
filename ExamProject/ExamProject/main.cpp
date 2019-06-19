@@ -1,20 +1,20 @@
 #include <iostream>
 #include <string>
-#include "RB_Tree.h"
+#include "BPlus_Tree.h"
 
 using namespace std;
 
 int main()
 {
-	RB_Tree<string> tree;
+	BPlusTree<string, string> tree(1);
 	string one, two, three;
 	one = "hello";
 	two = "bye";
-	tree.add(one);
-	tree.add(two);
+	tree.insert(one, "1");
+	tree.insert(two, "2");
 	three = "one";
-	tree.add(three);
-	tree.print();
+	tree.insert(three, "3");
+	tree.showLeaves();
 
 
 	cin.get();
