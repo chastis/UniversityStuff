@@ -1,32 +1,22 @@
 #include <iostream>
-#include "List.h"
+#include <string>
+#include "RB_Tree.h"
 
 using namespace std;
 
 int main()
 {
-	List<int> a;
-	a.set(1, 2);
-	a.set(1, 3);
-	a.set(42, 42);
-	a.set(-42, -42);
-	cout << a << endl;
-	cout << a.get(0) << endl;
-	cout << a.get(-1) << endl;
-	//cout << a.get(42) << endl;
-	a[1] = a[2];
-	cout << a[1] << endl;
-	//cout << a[42] << endl;
-	cout << a << endl;
-	a.insert(0, 0);
-	a.insert(a.length() - 1, a.length() - 1);
-	a.insert(1, 1);
-	cout << a << endl;
-	a.remove(1);
-	a.remove(a.length() - 1);
-	a.remove(0);
-	cout << a << endl;
-	cout << "That's all Folks!" << endl;
+	RB_Tree<string> tree;
+	string one, two, three;
+	one = "hello";
+	two = "bye";
+	tree.add(one);
+	tree.add(two);
+	three = "one";
+	tree.add(three);
+	tree.print();
+
+
 	cin.get();
 	return 0;
 }
