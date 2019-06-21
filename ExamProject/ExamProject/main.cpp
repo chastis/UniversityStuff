@@ -1,11 +1,13 @@
 #include <iostream>
 #include <string>
 #include "BPlus_Tree.h"
+#include "Sortings.h"
 
 using namespace std;
 
 int main()
 {
+	Sortings<int>::getCountSort();
 	BPlusTree<string, string> tree(1);
 	string one, two, three;
 	one = "hello";

@@ -27,12 +27,21 @@
     <ClCompile Include="BPlus_Tree.h">
       <Filter>Файлы заголовков</Filter>
     </ClCompile>
+    <ClCompile Include="Sortings.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="List.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="RB_Tree.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="HashTable.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Sortings.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
