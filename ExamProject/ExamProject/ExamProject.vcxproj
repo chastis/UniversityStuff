@@ -128,12 +128,12 @@
     <ClCompile Include="BPlus_Tree.h" />
     <ClCompile Include="List.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="RB_Tree.cpp" />
     <ClCompile Include="Sortings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HashTable.h" />
     <ClInclude Include="List.h" />
+    <ClInclude Include="Map.h" />
     <ClInclude Include="RB_Tree.h" />
     <ClInclude Include="Sortings.h" />
   </ItemGroup>
