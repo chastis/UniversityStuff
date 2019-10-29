@@ -802,6 +802,7 @@ void DataBase::delete_m()
 					lessonsFile.read(reinterpret_cast<char*>(&lesson), sizeof Lesson);
 					if (lessonsFile)
 					{
+
 						if (lesson.groupID != tableID)
 						{
 							tempFile.write(reinterpret_cast<char*>(&lesson), sizeof Lesson);
