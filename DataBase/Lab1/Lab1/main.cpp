@@ -167,7 +167,7 @@ void DataBase::init(const std::string& studentsFileName, const std::string& grou
 			groupsCount++;
 			if (tempGroup.id >= groupsUID)
 			{
-				groupsUID = tempSubject.id + 1;
+				groupsUID = tempGroup.id + 1;
 			}
 		}
 	}
@@ -679,9 +679,8 @@ void DataBase::delete_m()
 			}
 			Subject currentRecord;
 			subjectsFile.seekg(0);
-			std::fstream tempFile;
-			tempFile.open("temp.bin");
-			tempFile.setf(std::ios::binary);
+			std::ofstream tempFile;		
+			tempFile.open("temp.bin", std::ios::binary | std::ios::trunc);
 			tempFile.seekp(0);
 			bool bWasFind = false;
 			while (subjectsFile)
@@ -702,9 +701,48 @@ void DataBase::delete_m()
 			subjectsFile.clear();
 			if (bWasFind)
 			{
-				// TODO
+				subjectsFile.close();
+				tempFile.close();			
+				std::rename("subjects.bin", "trash.bin");
+				std::rename("temp.bin", "subjects.bin");
+				std::rename("trash.bin","temp.bin");
+				subjectsFile.open("subjects.bin");
+				subjectsFile.setf(std::ios::binary);
 				subjectsCount--;
-				subjectsFile.swap(tempFile);
+
+				tempFile.open("temp.bin", std::ios::binary | std::ios::trunc);
+				tempFile.seekp(0);
+				Lesson lesson;
+				lessonsFile.seekg(0);
+				uint32_t countLessons = 0;
+				while (lessonsFile)
+				{
+					lessonsFile.read(reinterpret_cast<char*>(&lesson), sizeof Lesson);
+					if (lessonsFile)
+					{
+						if (lesson.subjectID != tableID)
+						{
+							tempFile.write(reinterpret_cast<char*>(&lesson), sizeof Lesson);
+						}
+						else
+						{
+							countLessons++;
+						}
+					}
+				}
+				lessonsFile.clear();
+				if (countLessons>0)
+				{
+					lessonsFile.close();
+					tempFile.close();					
+					std::rename("lessons.bin", "trash.bin");
+					std::rename("temp.bin", "lessons.bin");
+					std::rename("trash.bin","temp.bin");
+					lessonsFile.open("lessons.bin");
+					lessonsFile.setf(std::ios::binary);
+					lessonsCount -= countLessons;
+				}
+
 			}
 			else
 			{
@@ -722,9 +760,8 @@ void DataBase::delete_m()
 			}
 			Group currentRecord;
 			groupsFile.seekg(0);
-			std::fstream tempFile;
-			tempFile.open("temp.bin");
-			tempFile.setf(std::ios::binary);
+			std::ofstream tempFile;
+			tempFile.open("temp.bin", std::ios::binary | std::ios::trunc);
 			tempFile.seekp(0);
 			bool bWasFind = false;
 			while (groupsFile)
@@ -745,9 +782,48 @@ void DataBase::delete_m()
 			groupsFile.clear();
 			if (bWasFind)
 			{
-				// TODO
+				groupsFile.close();
+				tempFile.close();
+			
+				std::rename("groups.bin", "trash.bin");
+				std::rename("temp.bin", "groups.bin");
+				std::rename("trash.bin","temp.bin");
+				groupsFile.open("groups.bin");
+				groupsFile.setf(std::ios::binary);
 				groupsCount--;
-				groupsFile.swap(tempFile);
+
+				tempFile.open("temp.bin", std::ios::binary | std::ios::trunc);
+				tempFile.seekp(0);
+				Lesson lesson;
+				lessonsFile.seekg(0);
+				uint32_t countLessons = 0;
+				while (lessonsFile)
+				{
+					lessonsFile.read(reinterpret_cast<char*>(&lesson), sizeof Lesson);
+					if (lessonsFile)
+					{
+						if (lesson.groupID != tableID)
+						{
+							tempFile.write(reinterpret_cast<char*>(&lesson), sizeof Lesson);
+						}
+						else
+						{
+							countLessons++;
+						}
+					}
+				}
+				lessonsFile.clear();
+				if (countLessons > 0)
+				{
+					lessonsFile.close();
+					tempFile.close();
+					std::rename("lessons.bin", "trash.bin");
+					std::rename("temp.bin", "lessons.bin");
+					std::rename("trash.bin", "temp.bin");
+					lessonsFile.open("lessons.bin");
+					lessonsFile.setf(std::ios::binary);
+					lessonsCount -= countLessons;
+				}
 			}
 			else
 			{
@@ -844,9 +920,8 @@ void DataBase::delete_s()
 	{
 		clearCin();
 	}
-	std::fstream tempFile;
-	tempFile.open("temp.bin");
-	tempFile.setf(std::ios::binary);
+	std::ofstream tempFile;
+	tempFile.open("temp.bin", std::ios::binary | std::ios::trunc);
 	tempFile.seekp(0);
 
 	lessonsFile.seekg(0);
@@ -871,8 +946,13 @@ void DataBase::delete_s()
 	}
 	else
 	{
-		// TODO
-		lessonsFile.swap(tempFile);
+		lessonsFile.close();
+		tempFile.close();	
+		std::rename("lessons.bin", "trash.bin");
+		std::rename("temp.bin", "lessons.bin");
+		std::rename("trash.bin", "temp.bin");
+		lessonsFile.open("lessons.bin");
+		lessonsFile.setf(std::ios::binary);
 		lessonsCount--;
 	}
 }
