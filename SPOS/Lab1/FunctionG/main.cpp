@@ -22,10 +22,10 @@ int main(int argc, TCHAR* argv[])
 		wParam = WM_USER + 1;
 		answer += wParam;
 	}
-	const BOOL success = PostThreadMessageW(processID, answer, wParam, 0);
+	const BOOL success = PostThreadMessageW(processID, answer, wParam, 1);
 	if (success)
 	{
-		std::cout << "process G ended successfully" << std::endl;
+		//std::cout << "process G ended successfully" << std::endl;
 	}
 	else
 	{

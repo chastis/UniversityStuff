@@ -6,7 +6,6 @@
 #include <chrono>
 #include <future>
 #include <sstream>
-#include "demofuncs"
 
 namespace MyNamespace
 {
@@ -117,7 +116,7 @@ int main(int argc, TCHAR* argv[])
 		std::cout << "[1] - Start" << std::endl;
 		std::cout << "[2] - Exit" << std::endl;
 		int32_t operationNum;
-		while (!(std::cin >> operationNum) || operationNum < 1 || operationNum>5)
+		while (!(std::cin >> operationNum) || operationNum < 1 || operationNum>2)
 		{
 			MyNamespace::cleanUpCin();
 		}
@@ -168,7 +167,7 @@ int main(int argc, TCHAR* argv[])
 				return 1;
 			}
 			MSG msg;
-			std::cout << "start to getting message..." << std::endl;
+			//std::cout << "start to getting message..." << std::endl;
 
 
 			STARTUPINFO siError;
@@ -181,6 +180,10 @@ int main(int argc, TCHAR* argv[])
 			{
 				if (MyNamespace::bEscapeRequest||MyNamespace::bIsTimerDone)
 				{
+					MyNamespace::bRequestTimerStart = false;
+					MyNamespace::bIsTimerStart = false;
+					MyNamespace::bIsTimerDone = false;
+
 					if (!MyNamespace::bIsErrorMessageCreated)
 					{
 						ZeroMemory(&siError, sizeof(siError));
@@ -201,8 +204,9 @@ int main(int argc, TCHAR* argv[])
 					GetExitCodeProcess(piError.hProcess, &errorExitCode);
 					if (MyNamespace::inputKey == MyNamespace::InputKey::Yes || errorExitCode!=STILL_ACTIVE)
 					{
-						std::cout << "Calculation was stopped by User" << std::endl;
+						errorExitCode != STILL_ACTIVE ? std::cout << "Calculation was stopped because time for answer has left" << std::endl : std::cout << "Calculation was stopped by User" << std::endl;
 						MyNamespace::bIsErrorMessageCreated = false;
+						MyNamespace::bRequestTimerStart = true;
 						TerminateProcess(piF.hProcess, 0);
 						TerminateProcess(piG.hProcess, 0);
 						TerminateProcess(piError.hProcess, 0);
@@ -211,27 +215,28 @@ int main(int argc, TCHAR* argv[])
 					}
 					else if (MyNamespace::inputKey == MyNamespace::InputKey::No)
 					{
-						MyNamespace::startTimerPoint = std::chrono::high_resolution_clock::now();
+						MyNamespace::bRequestTimerStart = true;
+						MyNamespace::bIsTimerStart = false; 
 						MyNamespace::bIsTimerDone = false;
+						MyNamespace::bEscapeRequest = false;
 						MyNamespace::bIsErrorMessageCreated = false;
 						TerminateProcess(piError.hProcess, 0);
 						CloseHandle(piError.hProcess);
 					}
 					MyNamespace::inputKey = MyNamespace::InputKey::None;
 				}
-				
 				const BOOL bRet = PeekMessage(&msg, NULL, 0, UINT32_MAX, PM_REMOVE);
 				//const BOOL bRet = GetMessage(&msg, NULL, 0,UINT32_MAX);
 				if (bRet)
 				{
 					const UINT Message = msg.message - msg.wParam;
 					//std::cout << "Got new Message! " << Message << std::endl;
-					if (!a.first)
+					if (!a.first && msg.lParam == 0)
 					{
 						a.first = true;
 						a.second = Message;
 					}
-					else if (!b.first)
+					if (!b.first && msg.lParam == 1)
 					{
 						b.first = true;
 						b.second = Message;
@@ -240,7 +245,7 @@ int main(int argc, TCHAR* argv[])
 					{
 						TerminateProcess(piF.hProcess, 0);
 						TerminateProcess(piG.hProcess, 0);
-						std::cout << "Program has done, because one of params is " << MyNamespace::ExitParam << std::endl;
+						//std::cout << "Program end , because one of params is " << MyNamespace::ExitParam << std::endl;
 						break;
 					}				
 				}
@@ -253,8 +258,17 @@ int main(int argc, TCHAR* argv[])
 			}
 			CloseHandle(piF.hProcess);
 			CloseHandle(piG.hProcess);			
-			std::cout << "Program finished successfully!" << std::endl;
-			std::cout << "Output is " << (a.first ? std::to_string(a.second) : "a wasn't calculated") << " and " << (b.first ? std::to_string(b.second) : "b wasn't calculated") << std::endl;
+			//std::cout << "Program finished successfully!" << std::endl;
+			std::cout << "Output is " << a.second * b.second << std::endl;
+			if (!a.first)
+			{
+				std::cout << "f wasn't calculated" << std::endl;
+			}
+			if (!b.first)
+			{
+				std::cout << "g wasn't calculated" << std::endl;
+			}
+			//std::cout << "Output is " << (a.first ? std::to_string(a.second) : "f wasn't calculated") << " and " << (b.first ? std::to_string(b.second) : "g wasn't calculated") << std::endl;
 			std::cout << "Enter smth to continue..." << std::endl;
 			std::cin.get();
 			std::cin.get();
