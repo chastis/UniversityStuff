@@ -15,7 +15,7 @@ int main(int argc, TCHAR* argv[])
 
 	// here go function
 
-	uint32_t answer = spos::lab1::demo::f_func<spos::lab1::demo::INT>(x);
+	uint32_t answer = spos::lab1::demo::g_func<spos::lab1::demo::INT>(x);
 	uint32_t wParam = 0;
 	if (answer<=WM_USER)
 	{
@@ -25,7 +25,7 @@ int main(int argc, TCHAR* argv[])
 	const BOOL success = PostThreadMessageW(processID, answer, wParam, 0);
 	if (success)
 	{
-		std::cout << "process G ended successfully " << std::endl;
+		std::cout << "process G ended successfully" << std::endl;
 	}
 	else
 	{

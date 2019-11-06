@@ -25,7 +25,7 @@ int main(int argc, TCHAR* argv[])
 	const BOOL success = PostThreadMessageW(processID, answer, wParam, 0);
 	if (success)
 	{
-		std::cout << "process F ended successfully " << std::endl;
+		std::cout << "process F ended successfully" << std::endl;
 	}
 	else
 	{

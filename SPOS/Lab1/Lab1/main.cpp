@@ -25,6 +25,10 @@ namespace MyNamespace
 	bool bEscapeRequest = false;
 	bool bIsErrorMessageCreated = false;
 	InputKey inputKey = InputKey::None;
+	bool bRequestTimerStart = false;
+	bool bIsTimerStart = false;
+	bool bIsTimerDone = false;
+	std::chrono::steady_clock::time_point startTimerPoint;
 
 	/* methods */
 
@@ -72,9 +76,38 @@ int main(int argc, TCHAR* argv[])
 			}
 	});
 	
-
+	auto timer = std::async(std::launch::async,([]()
+		{
+			while (true)
+			{
+				if (MyNamespace::bRequestTimerStart)
+				{
+					if (!MyNamespace::bIsTimerStart)
+					{
+						MyNamespace::startTimerPoint = std::chrono::high_resolution_clock::now();
+						MyNamespace::bIsTimerStart = true;
+					}
+					else
+					{
+						if (std::chrono::duration_cast<std::chrono::seconds>((std::chrono::high_resolution_clock::now() - MyNamespace::startTimerPoint)).count()>MyNamespace::SecondsToTryTerminate)
+						{
+							MyNamespace::bIsTimerDone = true;
+						}
+					}
+				}
+				else
+				{
+					//MyNamespace::bRequestTimerStart = false;
+					MyNamespace::bIsTimerStart = false;
+					MyNamespace::bIsTimerDone = false;
+				}
+			}
+		}));
 	while (true)
 	{
+		MyNamespace::bRequestTimerStart = false;
+		MyNamespace::bIsTimerStart = false;
+		MyNamespace::bIsTimerDone = false;
 		MyNamespace::inputKey = MyNamespace::InputKey::None;
 		MyNamespace::bEscapeRequest = false;
 		MyNamespace::bIsErrorMessageCreated = false;
@@ -141,11 +174,12 @@ int main(int argc, TCHAR* argv[])
 			STARTUPINFO siError;
 			PROCESS_INFORMATION piError;
 			DWORD errorExitCode = 0;
+			MyNamespace::bRequestTimerStart = true;
 			// some strange architecture
 			std::pair<bool, UINT> a{ false, 0 }, b{false, 0};
 			while (!a.first||!b.first)
 			{
-				if (MyNamespace::bEscapeRequest)
+				if (MyNamespace::bEscapeRequest||MyNamespace::bIsTimerDone)
 				{
 					if (!MyNamespace::bIsErrorMessageCreated)
 					{
@@ -167,7 +201,7 @@ int main(int argc, TCHAR* argv[])
 					GetExitCodeProcess(piError.hProcess, &errorExitCode);
 					if (MyNamespace::inputKey == MyNamespace::InputKey::Yes || errorExitCode!=STILL_ACTIVE)
 					{
-						std::cout << "Calculation was stopped" << std::endl;
+						std::cout << "Calculation was stopped by User" << std::endl;
 						MyNamespace::bIsErrorMessageCreated = false;
 						TerminateProcess(piF.hProcess, 0);
 						TerminateProcess(piG.hProcess, 0);
@@ -177,6 +211,8 @@ int main(int argc, TCHAR* argv[])
 					}
 					else if (MyNamespace::inputKey == MyNamespace::InputKey::No)
 					{
+						MyNamespace::startTimerPoint = std::chrono::high_resolution_clock::now();
+						MyNamespace::bIsTimerDone = false;
 						MyNamespace::bIsErrorMessageCreated = false;
 						TerminateProcess(piError.hProcess, 0);
 						CloseHandle(piError.hProcess);
@@ -221,7 +257,8 @@ int main(int argc, TCHAR* argv[])
 			std::cout << "Output is " << (a.first ? std::to_string(a.second) : "a wasn't calculated") << " and " << (b.first ? std::to_string(b.second) : "b wasn't calculated") << std::endl;
 			std::cout << "Enter smth to continue..." << std::endl;
 			std::cin.get();
-			_getch();
+			std::cin.get();
+			//_getch();
 			break;
 		}
 		case 2:
