@@ -9,10 +9,21 @@
 
 namespace MyNamespace
 {
+	enum class InputKey
+	{
+		Yes,
+		No,
+		None
+	};
+
 	/* global variables */
 
 	uint32_t DefaultSize = 100;
 	uint32_t ExitParam = 0;
+	uint32_t SecondsToTryTerminate = 10;
+	bool bEscapeRequest = false;
+	bool bIsErrorMessageCreated = false;
+	InputKey inputKey = InputKey::None;
 
 	/* methods */
 
@@ -26,34 +37,15 @@ namespace MyNamespace
 		}
 	}
 
-	class TimeManager
-	{
-	public:
-		void start()
-		{
-			startPoint = std::chrono::high_resolution_clock::now();
-		}
-		float getTime() const
-		{
-			return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - startPoint).count();
-		}
-		bool isTimePassed(const float milliseconds) const
-		{
-			return getTime() >= milliseconds;
-		}
-	private:
-		std::chrono::high_resolution_clock::time_point startPoint;
-	};
-
-	bool CreateProcess(char* name, LPSTARTUPINFOA startupInfo, LPPROCESS_INFORMATION processInfo)
+	bool CreateProcess(char* name, LPSTARTUPINFOA startupInfo, LPPROCESS_INFORMATION processInfo, DWORD flag = 0)
 	{
 		return CreateProcess(
 			NULL,            // No module name (use command line)
 			name,                          // Command line
 			NULL,         // Process handle not inheritable
 			NULL,         // Thread handle not inheritable
-			FALSE,         // Set handle inheritance to FALSE
-			0,            // No creation flags
+			FALSE,        // Set handle inheritance to FALSE
+			flag,            // No creation flags
 			NULL,          // Use parent's environment block
 			NULL,     // Use parent's starting directory 
 			startupInfo,             // Pointer to STARTUPINFO structure
@@ -64,10 +56,26 @@ namespace MyNamespace
 
 int main(int argc, TCHAR* argv[])
 {
-
+	auto f_proc = std::async(std::launch::async, []()
+	{
+			while (true)
+			{
+				if (GetAsyncKeyState(VK_ESCAPE) == -32767)
+					MyNamespace::bEscapeRequest = true;
+				if (GetAsyncKeyState(0x59) == -32767)
+					MyNamespace::inputKey = MyNamespace::InputKey::Yes;
+				if (GetAsyncKeyState(0x4E) == -32767)
+					MyNamespace::inputKey = MyNamespace::InputKey::No;
+			}
+	});
+	
 
 	while (true)
 	{
+		MyNamespace::inputKey = MyNamespace::InputKey::None;
+		MyNamespace::bEscapeRequest = false;
+		MyNamespace::bIsErrorMessageCreated = false;
+
 		system("cls");
 		std::cout << "Please, choose option!" << std::endl;
 		std::cout << "[1] - Start" << std::endl;
@@ -100,7 +108,6 @@ int main(int argc, TCHAR* argv[])
 				std::cout << "CreateProcess G failed" << std::endl;
 				return 1;
 			}
-
 			STARTUPINFO siF;
 			PROCESS_INFORMATION piF;
 
@@ -118,15 +125,58 @@ int main(int argc, TCHAR* argv[])
 			}
 			MSG msg;
 			std::cout << "start to getting message..." << std::endl;
+
+
+			STARTUPINFO siError;
+			PROCESS_INFORMATION piError;
+			DWORD errorExitCode = 0;
 			// some strange architecture
 			std::pair<bool, UINT> a{ false, 0 }, b{false, 0};
 			while (!a.first||!b.first)
 			{
-				const BOOL bRet = GetMessage(&msg, NULL, 0,UINT32_MAX);
+				if (MyNamespace::bEscapeRequest)
+				{
+					if (!MyNamespace::bIsErrorMessageCreated)
+					{
+						ZeroMemory(&siError, sizeof(siError));
+						siError.cb = sizeof(siError);
+						ZeroMemory(&piError, sizeof(piError));
+
+						char errorProcessName[] = "ErrorMessage";
+						if (!MyNamespace::CreateProcessA(errorProcessName, &siError, &piError, CREATE_NEW_CONSOLE))
+						{
+							std::cout << "Create ErrorProcess failed" << std::endl;
+						}
+						MyNamespace::bIsErrorMessageCreated = true;
+					}
+					MyNamespace::bEscapeRequest = false;
+				}
+				if (MyNamespace::bIsErrorMessageCreated)
+				{
+					GetExitCodeProcess(piError.hProcess, &errorExitCode);
+					if (MyNamespace::inputKey == MyNamespace::InputKey::Yes || errorExitCode!=STILL_ACTIVE)
+					{
+						std::cout << "Calculation was stopped" << std::endl;
+						MyNamespace::bIsErrorMessageCreated = false;
+						TerminateProcess(piF.hProcess, 0);
+						TerminateProcess(piG.hProcess, 0);
+						TerminateProcess(piError.hProcess, 0);
+						break;
+					}
+					else if (MyNamespace::inputKey == MyNamespace::InputKey::No)
+					{
+						MyNamespace::bIsErrorMessageCreated = false;
+						TerminateProcess(piError.hProcess, 0);
+					}
+					MyNamespace::inputKey = MyNamespace::InputKey::None;
+				}
+				
+				const BOOL bRet = PeekMessage(&msg, NULL, 0, UINT32_MAX, PM_REMOVE);
+				//const BOOL bRet = GetMessage(&msg, NULL, 0,UINT32_MAX);
 				if (bRet)
 				{
 					const UINT Message = msg.message - msg.wParam;
-					std::cout << "NEW MESSAGE!!!! " << Message << std::endl;
+					std::cout << "Got new Message! " << Message << std::endl;
 					if (!a.first)
 					{
 						a.first = true;
@@ -147,12 +197,14 @@ int main(int argc, TCHAR* argv[])
 				}
 			}
 
-
+			TerminateProcess(piError.hProcess, 0);
 			CloseHandle(piF.hProcess);
 			CloseHandle(piG.hProcess);
+			CloseHandle(piError.hProcess);
 			std::cout << "Program finished successfully!" << std::endl;
-			std::cout << "Output is " << a.second << " and " << b.second << std::endl;
+			std::cout << "Output is " << (a.first ? std::to_string(a.second) : "a wasn't calculated") << " and " << (b.first ? std::to_string(b.second) : "b wasn't calculated") << std::endl;
 			std::cout << "Enter smth to continue..." << std::endl;
+			std::cin.get();
 			_getch();
 			break;
 		}
