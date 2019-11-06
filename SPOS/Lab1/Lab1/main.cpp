@@ -6,6 +6,7 @@
 #include <chrono>
 #include <future>
 #include <sstream>
+#include "demofuncs"
 
 namespace MyNamespace
 {
@@ -60,12 +61,14 @@ int main(int argc, TCHAR* argv[])
 	{
 			while (true)
 			{
-				if (GetAsyncKeyState(VK_ESCAPE) == -32767)
-					MyNamespace::bEscapeRequest = true;
+				MyNamespace::bEscapeRequest = (GetAsyncKeyState(VK_ESCAPE) == -32767);
+
 				if (GetAsyncKeyState(0x59) == -32767)
 					MyNamespace::inputKey = MyNamespace::InputKey::Yes;
-				if (GetAsyncKeyState(0x4E) == -32767)
+				else if (GetAsyncKeyState(0x4E) == -32767)
 					MyNamespace::inputKey = MyNamespace::InputKey::No;
+				else
+					MyNamespace::inputKey = MyNamespace::InputKey::None;
 			}
 	});
 	
@@ -80,7 +83,7 @@ int main(int argc, TCHAR* argv[])
 		std::cout << "Please, choose option!" << std::endl;
 		std::cout << "[1] - Start" << std::endl;
 		std::cout << "[2] - Exit" << std::endl;
-		int operationNum;
+		int32_t operationNum;
 		while (!(std::cin >> operationNum) || operationNum < 1 || operationNum>5)
 		{
 			MyNamespace::cleanUpCin();
@@ -89,6 +92,14 @@ int main(int argc, TCHAR* argv[])
 		{
 		case 1:
 		{
+
+			int32_t x;
+			std::cout << "Enter the x" << std::endl;
+			while (!(std::cin >> x))
+			{
+				MyNamespace::cleanUpCin();
+			}
+
 			STARTUPINFO siG;
 			PROCESS_INFORMATION piG;
 
@@ -98,9 +109,9 @@ int main(int argc, TCHAR* argv[])
 
 			char* processName = new char[MyNamespace::DefaultSize];
 			const DWORD thisThreadId = GetCurrentThreadId();
-			std::cout << "this thread = " << thisThreadId << std::endl;
+			//std::cout << "this thread = " << thisThreadId << std::endl;
 
-			std::string stringName = "FunctionG.exe " + std::to_string(thisThreadId);
+			std::string stringName = "FunctionG.exe " + std::to_string(thisThreadId) + " " + std::to_string(x);
 			strcpy_s(processName, MyNamespace::DefaultSize, stringName.c_str());
 
 			if (!MyNamespace::CreateProcessA(processName, &siG, &piG))
@@ -115,7 +126,7 @@ int main(int argc, TCHAR* argv[])
 			siF.cb = sizeof(siF);
 			ZeroMemory(&piF, sizeof(piF));
 
-			stringName = "FunctionF.exe " + std::to_string(thisThreadId);
+			stringName = "FunctionF.exe " + std::to_string(thisThreadId) + " " + std::to_string(x);
 			strcpy_s(processName, MyNamespace::DefaultSize, stringName.c_str());
 
 			if (!MyNamespace::CreateProcessA(processName, &siF, &piF))
@@ -161,12 +172,14 @@ int main(int argc, TCHAR* argv[])
 						TerminateProcess(piF.hProcess, 0);
 						TerminateProcess(piG.hProcess, 0);
 						TerminateProcess(piError.hProcess, 0);
+						CloseHandle(piError.hProcess);
 						break;
 					}
 					else if (MyNamespace::inputKey == MyNamespace::InputKey::No)
 					{
 						MyNamespace::bIsErrorMessageCreated = false;
 						TerminateProcess(piError.hProcess, 0);
+						CloseHandle(piError.hProcess);
 					}
 					MyNamespace::inputKey = MyNamespace::InputKey::None;
 				}
@@ -176,7 +189,7 @@ int main(int argc, TCHAR* argv[])
 				if (bRet)
 				{
 					const UINT Message = msg.message - msg.wParam;
-					std::cout << "Got new Message! " << Message << std::endl;
+					//std::cout << "Got new Message! " << Message << std::endl;
 					if (!a.first)
 					{
 						a.first = true;
@@ -197,10 +210,13 @@ int main(int argc, TCHAR* argv[])
 				}
 			}
 
-			TerminateProcess(piError.hProcess, 0);
+			if (MyNamespace::bIsErrorMessageCreated)
+			{
+				TerminateProcess(piError.hProcess, 0);
+				CloseHandle(piError.hProcess);
+			}
 			CloseHandle(piF.hProcess);
-			CloseHandle(piG.hProcess);
-			CloseHandle(piError.hProcess);
+			CloseHandle(piG.hProcess);			
 			std::cout << "Program finished successfully!" << std::endl;
 			std::cout << "Output is " << (a.first ? std::to_string(a.second) : "a wasn't calculated") << " and " << (b.first ? std::to_string(b.second) : "b wasn't calculated") << std::endl;
 			std::cout << "Enter smth to continue..." << std::endl;
@@ -210,7 +226,8 @@ int main(int argc, TCHAR* argv[])
 		}
 		case 2:
 		{
-			return 0;
+			std::exit(42);
+			return 0;			
 		}
 		default:
 		{

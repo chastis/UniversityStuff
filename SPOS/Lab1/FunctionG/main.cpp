@@ -1,18 +1,21 @@
 #include <iostream>
 #include <windows.h>
 #include <thread>
+#include "demofuncs"
 
 int main(int argc, TCHAR* argv[])
 {
-	const DWORD processID = std::atoi(argv[1]);
-	if (argc > 1)
+	if (argc < 2)
 	{
-		//std::cout << "process G get started" << std::endl;
+		std::cout << "process G broken " << std::endl;
+		return 1;
 	}
-	// here go function
-	std::this_thread::sleep_for(std::chrono::seconds(17));
-	uint32_t answer = 73;
+	const DWORD processID = std::atoi(argv[1]);
+	const int32_t x = std::atoi(argv[2]);
 
+	// here go function
+
+	uint32_t answer = spos::lab1::demo::f_func<spos::lab1::demo::INT>(x);
 	uint32_t wParam = 0;
 	if (answer<=WM_USER)
 	{
