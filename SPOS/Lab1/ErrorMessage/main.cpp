@@ -4,7 +4,7 @@
 
 int main()
 {
-	for (int32_t i = 60; i--; i >= 0)
+	for (int32_t i = 10; i--; i >= 0)
 	{
 		system("cls");
 		std::cout << "Do you want to stop calculating?" << std::endl;

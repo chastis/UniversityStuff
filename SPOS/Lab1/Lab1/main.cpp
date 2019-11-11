@@ -64,6 +64,7 @@ int main(int argc, TCHAR* argv[])
 	{
 			while (true)
 			{
+				// TODO : make bEscape to enum
 				MyNamespace::bEscapeRequest = (GetAsyncKeyState(VK_ESCAPE) == -32767);
 
 				if (GetAsyncKeyState(0x59) == -32767)
@@ -102,6 +103,7 @@ int main(int argc, TCHAR* argv[])
 				}
 			}
 		}));
+
 	while (true)
 	{
 		MyNamespace::bRequestTimerStart = false;
@@ -112,17 +114,6 @@ int main(int argc, TCHAR* argv[])
 		MyNamespace::bIsErrorMessageCreated = false;
 
 		system("cls");
-		std::cout << "Please, choose option!" << std::endl;
-		std::cout << "[1] - Start" << std::endl;
-		std::cout << "[2] - Exit" << std::endl;
-		int32_t operationNum;
-		while (!(std::cin >> operationNum) || operationNum < 1 || operationNum>2)
-		{
-			MyNamespace::cleanUpCin();
-		}
-		switch (operationNum)
-		{
-		case 1:
 		{
 
 			int32_t x;
@@ -131,7 +122,10 @@ int main(int argc, TCHAR* argv[])
 			{
 				MyNamespace::cleanUpCin();
 			}
-
+			if (x == -1)
+			{
+				exit(0);
+			}
 			STARTUPINFO siG;
 			PROCESS_INFORMATION piG;
 
@@ -175,7 +169,7 @@ int main(int argc, TCHAR* argv[])
 			DWORD errorExitCode = 0;
 			MyNamespace::bRequestTimerStart = true;
 			// some strange architecture
-			std::pair<bool, UINT> a{ false, 0 }, b{false, 0};
+			std::pair<bool, double> a{ false, 0 }, b{false, 0};
 			while (!a.first||!b.first)
 			{
 				if (MyNamespace::bEscapeRequest||MyNamespace::bIsTimerDone)
@@ -229,17 +223,17 @@ int main(int argc, TCHAR* argv[])
 				//const BOOL bRet = GetMessage(&msg, NULL, 0,UINT32_MAX);
 				if (bRet)
 				{
-					const UINT Message = msg.message - msg.wParam;
+					const UINT Message = msg.message - WM_USER - 1;
 					//std::cout << "Got new Message! " << Message << std::endl;
 					if (!a.first && msg.lParam == 0)
 					{
 						a.first = true;
-						a.second = Message;
+						a.second = Message / std::pow(10.0, msg.wParam);
 					}
 					if (!b.first && msg.lParam == 1)
 					{
 						b.first = true;
-						b.second = Message;
+						b.second = Message / std::pow(10.0, msg.wParam);
 					}
 					if (Message == MyNamespace::ExitParam)
 					{
@@ -259,7 +253,7 @@ int main(int argc, TCHAR* argv[])
 			CloseHandle(piF.hProcess);
 			CloseHandle(piG.hProcess);			
 			//std::cout << "Program finished successfully!" << std::endl;
-			std::cout << "Output is " << a.second * b.second << std::endl;
+			std::cout << "Output is " << a.second << " " << b.second << std::endl;
 			if (!a.first)
 			{
 				std::cout << "f wasn't calculated" << std::endl;
@@ -273,18 +267,7 @@ int main(int argc, TCHAR* argv[])
 			std::cin.get();
 			std::cin.get();
 			//_getch();
-			break;
-		}
-		case 2:
-		{
-			std::exit(42);
-			return 0;			
-		}
-		default:
-		{
-			std::cout << "You broke my program..." << std::endl;
-			MyNamespace::cleanUpCin();
-		}
 		}
 	}
+	return 0;
 }

@@ -15,17 +15,20 @@ int main(int argc, TCHAR* argv[])
 
 	// here go function
 
-	uint32_t answer = spos::lab1::demo::g_func<spos::lab1::demo::INT>(x);
+	double answerInDouble = spos::lab1::demo::g_func<spos::lab1::demo::DOUBLE>(x);
+	std::cout << "calc = " << answerInDouble << std::endl;
+	UINT answer = 0;
 	uint32_t wParam = 0;
-	if (answer<=WM_USER)
+	while (answerInDouble!=static_cast<int>(answerInDouble) || wParam != 32)
 	{
-		wParam = WM_USER + 1;
-		answer += wParam;
+		answerInDouble *= 10.0;
+		wParam++;
 	}
+	answer += WM_USER + 1;
 	const BOOL success = PostThreadMessageW(processID, answer, wParam, 1);
 	if (success)
 	{
-		//std::cout << "process G ended successfully" << std::endl;
+		std::cout << "process G ended successfully with " << answerInDouble << std::endl;
 	}
 	else
 	{
