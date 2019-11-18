@@ -4,6 +4,9 @@
 #include <iomanip>
 #include <windows.h>
 
+template <class T>
+using Matrix = std::vector<std::vector<T>>;
+
 namespace Global
 {
 	int32_t minRand = 1;
@@ -22,7 +25,7 @@ enum class MatrixType:uint8_t
 };
 
 template <MatrixType type, class T>
-void generateMatrix(std::vector<std::vector<T>>& matrix, uint32_t size = Global::defaultSize)
+void generateMatrix(Matrix<T>& matrix, uint32_t size = Global::defaultSize)
 {
 	matrix.resize(size);
 	for (auto& line : matrix)
@@ -82,7 +85,7 @@ void generateMatrix(std::vector<std::vector<T>>& matrix, uint32_t size = Global:
 }
 
 template <class T>
-void printMatrix(const std::vector<std::vector<T>>& matrix)
+void printMatrix(const Matrix<T>& matrix)
 {
 	for (const auto& line : matrix)
 	{
@@ -106,6 +109,10 @@ int main()
 	std::cout << "Gilbert matrix:\n";
 	generateMatrix<MatrixType::gilbert, float>(matrix);
 	printMatrix<float>(matrix);
+
+
+
+
 	_getch();
 	return 0;
 }
