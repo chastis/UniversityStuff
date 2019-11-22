@@ -328,5 +328,8 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+<<<<<<< HEAD
 /Programming/Lab1_jME/nbproject/private/
 /Programming/Lab1_jME/build/
+=======
+>>>>>>> Algorithms_Fourth_Semester/master
