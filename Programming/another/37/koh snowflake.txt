@@ -1,0 +1,22 @@
+8
+F++F++F
+F-F++F-F
++
+-
+
+const string ALPHABET = "F+-";
+string FILENAME = "koh snowflake.txt";
+const int MAXX = 500, MAXY = 500;
+const float X = 150, Y = 350, A = 0;
+
+void f0(Turtle& t, int g) {
+	t.forward(pow((float)3, -g) * 150);
+}
+
+void f1(Turtle& t, int g) {
+	t.rotate(60);
+}
+
+void f2(Turtle& t, int g) {
+	t.rotate(-60);
+}
