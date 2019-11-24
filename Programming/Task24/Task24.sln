@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Task24", "Task24\Task24.vcxproj", "{FB74F6FA-5CCE-42C5-80F0-08A1F6E85EFD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FB74F6FA-5CCE-42C5-80F0-08A1F6E85EFD}.Debug|x64.ActiveCfg = Debug|x64
+		{FB74F6FA-5CCE-42C5-80F0-08A1F6E85EFD}.Debug|x64.Build.0 = Debug|x64
+		{FB74F6FA-5CCE-42C5-80F0-08A1F6E85EFD}.Debug|x86.ActiveCfg = Debug|Win32
+		{FB74F6FA-5CCE-42C5-80F0-08A1F6E85EFD}.Debug|x86.Build.0 = Debug|Win32
+		{FB74F6FA-5CCE-42C5-80F0-08A1F6E85EFD}.Release|x64.ActiveCfg = Release|x64
+		{FB74F6FA-5CCE-42C5-80F0-08A1F6E85EFD}.Release|x64.Build.0 = Release|x64
+		{FB74F6FA-5CCE-42C5-80F0-08A1F6E85EFD}.Release|x86.ActiveCfg = Release|Win32
+		{FB74F6FA-5CCE-42C5-80F0-08A1F6E85EFD}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AB597995-A04A-45A7-9C4A-CA76A9AB5826}
+	EndGlobalSection
+EndGlobal
