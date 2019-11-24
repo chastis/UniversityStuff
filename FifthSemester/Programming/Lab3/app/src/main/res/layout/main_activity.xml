@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="battleship.MainActivity">
+
+    <LinearLayout
+        android:id="@+id/layout_top"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/text_view_game_stage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="game stage..." />
+
+        <TextView
+            android:id="@+id/text_view_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="message... well a message can be pretty long and span two lines" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/layout_top"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your Board" />
+
+        <GridView
+            android:id="@+id/gridViewBoard1"
+            style="@style/StyleGridViewBoard"></GridView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bot's Board" />
+
+        <GridView
+            android:id="@+id/gridViewBoard2"
+            style="@style/StyleGridViewBoard"></GridView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/layout_top"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ACTION" />
+
+            <Button
+                android:id="@+id/button_attack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ATTACK" />
+
+            <Button
+                android:id="@+id/button_initialize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="RESTART" />
+
+            <Button
+                android:id="@+id/button_upgrade"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0"
+                android:text="UPGRADE" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="appearance" />
+
+            <Button
+                style="@style/StyleButtonColor"
+                android:background="@color/colorVacant"
+                android:text="@string/cell_status_vacant" />
+
+            <Button
+                style="@style/StyleButtonColor"
+                android:background="@color/colorOccupied"
+                android:text="@string/cell_status_occupied" />
+
+            <Button
+                style="@style/StyleButtonColor"
+                android:background="@color/colorUnknown"
+                android:text="unknown" />
+
+            <Button
+                style="@style/StyleButtonColor"
+                android:background="@color/colorHit"
+                android:text="@string/cell_status_hit" />
+
+            <Button
+                style="@style/StyleButtonColor"
+                android:background="@color/colorMissed"
+                android:text="@string/cell_status_missed" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

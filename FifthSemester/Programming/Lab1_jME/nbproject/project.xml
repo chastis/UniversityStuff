@@ -8,11 +8,13 @@
             </extension>
         </buildExtensions>
         <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
-            <name>Lab1_jME</name>
+            <name>BallsCollisions</name>
             <source-roots>
                 <root id="src.dir"/>
             </source-roots>
-            <test-roots/>
+            <test-roots>
+                <root id="test.JUnit%20tests.dir"/>
+            </test-roots>
         </data>
     </configuration>
 </project>
