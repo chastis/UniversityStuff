@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<style>
+body
+{
+	
+}
+.right_image, .middle_image, .left_image
+{
+	border: solid black 1px;
+	position: absolute;
+	width:50%;
+	height: 50%;
+	background-size: 100%;
+	left: 3%;
+	top: 3%
+}
+.left_image
+{
+	background-image: url(snake.png);
+}
+.middle_image
+{
+	background-image: url(fox.jpg);
+}
+.right_image
+{
+	background-image: url(bug.png);
+}
+#left, #middle, #right 
+{
+	position: absolute;
+	width: 40%;
+	height: 70%;
+	margin: 10px;
+	border: solid black 1px;
+	background-image: url(bubble.jpg);
+	background-repeat: no-repeat;
+	background-size: 100%;
+}
+#left
+{
+	top: 0;
+	left: 0;
+}
+#middle
+{
+	left: 30%;
+	top: 20%;
+}
+#right
+{
+	right: 0;
+	top: 0;
+}
+.right_text, .middle_text, .left_text
+{
+	border: solid black 1px;
+	position: absolute;
+	width:50%;
+	height: 40%;
+	background-color: white;
+	background-size: 100%;
+	left: 3%;
+	bottom: 3%
+}
+.hr
+{
+	margin: 1%;
+    padding: 1%;
+}	
+.hr2
+{
+	margin: 1%;
+    padding: 1%;
+}	
+.hr2 li
+{
+	display: inline-block; /* Отображать как строчный элемент */
+	width: 31%;
+	text-align: center;
+	color: red;
+    border: 1px solid black;
+    padding: 0%;
+	background-color: yellow;
+}
+.hr li
+{
+    display: inline-block; /* Отображать как строчный элемент */
+	width: 31%;
+	text-align: center;
+	color: blue;
+    border: 1px solid black;
+    padding: 0%;
+ }
+.input_img
+{
+	margin: 3%;
+	border: solid black 1px;
+	width: 50%;
+	height: 100px;
+	float: left;
+	background-color: white;
+	background-image: url(animals.png);
+	background-size: 100%;
+}
+.list
+{
+	position: absolute;
+	display: block;
+	list-style-type: none;
+	left: 50%;
+	top: 0;
+	margin: 3%;
+}
+.list2
+{
+	position: absolute;
+	display: block;
+	list-style-type: none;
+	left: 65%;
+	top: 0;
+	margin: 3%;
+}
+.img
+{
+width: 30%;
+background-color: white;
+border: solid black 1px;
+}
+.img2
+{
+width: 50%;
+background-color: white;
+border: solid black 1px;
+}
+.img3
+{
+width: 50%;
+background-color: white;
+border: solid black 1px;
+}
+a:link {
+color:red;
+}
+    
+a:visited {
+color:darkred;
+}
+    
+a:hover {
+color:black;
+}
+</style>
+
+
+<head>
+</head>
+
+<body>
+<div id = "left">
+<div class = "left_image">
+</div>
+<div class = "left_text">
+	<ul class = "hr">
+	<li>one</li>
+	<li>two</li>
+	<li>three</li>
+	</ul>
+	<div>
+	<div class = "input_img"></div>
+	sample of text
+	</div>
+</div>
+<ul class = "list">
+<li><img src = "picture.png" class = "img"></img><div>one</div></li>
+<li><img src = "picture.png" class = "img"></img><div>one</div></li>
+<li><img src = "picture.png" class = "img"></img><div>one</div></li>
+<li><img src = "picture.png" class = "img"></img><div>one</div></li>
+</ul>
+<ul class = "list2">
+<li><img src = "picture.png" class = "img2"></img><div>one</div></li>
+<li><img src = "picture.png" class = "img2"></img><div>one</div></li>
+<li><img src = "picture.png" class = "img2"></img><div>one</div></li>
+<li><img src = "picture.png" class = "img2"></img><div>one</div></li>
+</ul>
+</div>
+
+<div id = "right">
+<div class = "right_image">
+</div>
+<div class = "right_text">
+<ul class = "hr">
+	<li>one</li>
+	<li>two</li>
+	<li>three</li>
+	</ul>
+	<div>
+	<div class = "input_img"></div>
+	sample of text
+	</div>
+</div>
+<ul class = "list">
+<li><img src = "picture.png" class = "img3"></img><div>one</div></li>
+<li><img src = "picture.png" class = "img3"></img><div>one</div></li>
+<li><img src = "picture.png" class = "img3"></img><div>one</div></li>
+<li><img src = "picture.png" class = "img3"></img><div>one</div></li>
+</ul>
+</div>
+
+<div id = "middle">
+<div class = "middle_image">
+</div>
+<div class = "middle_text">
+<ul class = "hr2">
+	<li><a href "#">one</a></li>
+	<li><a href "#">two</a></li>
+	<li><a href "#">three</a></li>
+	
+	</ul>
+	<div>
+	<div class = "input_img"></div>
+	sample of text
+	</div>
+</div>
+</div>
+
+
+</body> 
