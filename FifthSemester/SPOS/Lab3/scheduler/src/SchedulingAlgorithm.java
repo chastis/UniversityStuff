@@ -7,12 +7,29 @@ import java.io.*;
 
 public class SchedulingAlgorithm {
 
+  public static int GetNextReadyProcess(Vector<sProcess> processesVector, int comptime)
+  {
+    int bestI = -1;
+    for (int i = 0; i < processesVector.size(); i++)
+    {
+      if (processesVector.get(i).state == sProcessState.RUNNING )
+      {
+        return i;
+      }
+      if (processesVector.get(i).state == sProcessState.BLOCKED && processesVector.get(i).blockedTimestamp+processesVector.get(i).delayTime > comptime)
+      {
+        if (bestI == -1 || processesVector.get(i).blockedTimestamp+processesVector.get(i).delayTime > processesVector.get(bestI).blockedTimestamp+processesVector.get(bestI).delayTime ) {
+          processesVector.get(i).unBlock(comptime);
+          bestI = i;
+        }
+      }
+    }
+    return bestI;
+  }
   public static Results Run(int runtime, Vector allProcessVector, Results result) {
-    int i = 0;
     int allComptime = 0;
     int currentComptime = 0;
     int currentProcess = 0;
-    int previousProcess = 0;
     int allSize = allProcessVector.size();
     int completed = 0;
     String resultsFile = "Summary-Processes";
@@ -37,58 +54,84 @@ public class SchedulingAlgorithm {
 
     result.schedulingType = "Batch (Nonpreemptive)";
     result.schedulingName = "First-Come First-Served";
+    try
+    {
+      PrintStream out = new PrintStream(new FileOutputStream(resultsFile));
+      for (Vector<sProcess> processVector : usersProcesses.values()) {
+          System.out.println( " id = " + processVector.get(0).userID);
+          int size = processVector.size();
+          currentComptime = 0;
+          currentProcess = 0;
+          sProcess process = (sProcess) processVector.get(currentProcess);
+          out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
 
-    for (Vector<sProcess> processVector : usersProcesses.values()) {
-      System.out.println( " id = " + processVector.get(0).userID);
-      try {
-        int size = processVector.size();
-        currentComptime = 0;
-        PrintStream out = new PrintStream(new FileOutputStream(resultsFile));
-        sProcess process = (sProcess) processVector.elementAt(currentProcess);
-        out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
-        while (currentComptime < currentRunTime) {
-          if (process.cpudone == process.cputime) {
-            completed++;
-            out.println("Process: " + currentProcess + " in user " + process.userID + " completed... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
-            if (completed == allSize) {
-              result.compuTime = allComptime;
-              out.close();
-              return result;
+          while (currentComptime < currentRunTime) {
+            switch (process.state)
+            {
+              case BLOCKED:
+                if (process.blockedTimestamp+process.delayTime>=currentComptime)
+                {
+                  process.unBlock(currentComptime);
+                  out.println("Process: " + currentProcess + " in user " + process.userID + " was unblocked... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
+                }
+                else
+                {
+                  int newProcess = GetNextReadyProcess(processVector,currentComptime);
+                  if (newProcess == -1)
+                  {
+                    break;
+                  }
+                  currentProcess = newProcess;
+                }
+              case RUNNING:
+                {
+                  if (process.cpudone == process.cputime)
+                  {
+                    completed++;
+                    process.state = sProcessState.DONE;
+                    out.println("Process: " + currentProcess + " in user " + process.userID + " completed... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
+                    if (completed == allSize) {
+                      result.compuTime = allComptime;
+                      out.close();
+                      return result;
+                    }
+                    int newProcess = GetNextReadyProcess(processVector,currentComptime);
+                    if (newProcess == -1)
+                    {
+                      break;
+                    }
+                    currentProcess = newProcess;
+                    process = (sProcess) processVector.elementAt(currentProcess);
+                    out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
+                  }
+                  else if (process.blockedTimestamp+process.ioblocking==currentComptime)
+                  {
+                    out.println("Process: " + currentProcess + " in user " + process.userID + " I/O blocked... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
+                    process.block(currentComptime);
+                    int newProcess = GetNextReadyProcess(processVector,currentComptime);
+                    if (newProcess == -1)
+                    {
+                      break;
+                    }
+                    currentProcess = newProcess;
+                    process = (sProcess) processVector.elementAt(currentProcess);
+                    out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
+                  }
+                }
+              case DONE:
+              default:
+                {
+                  //System.out.println( "something go wrong...");
+                  break;
+                }
             }
-            for (i = size - 1; i >= 0; i--) {
-              process = (sProcess) processVector.elementAt(i);
-              if (process.cpudone < process.cputime) {
-                currentProcess = i;
-              }
-            }
-            process = (sProcess) processVector.elementAt(currentProcess);
-            out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
+            process.cpudone++;
+            allComptime++;
+            currentComptime++;
           }
-          if (process.ioblocking == process.ionext) {
-            out.println("Process: " + currentProcess + " in user " + process.userID + " I/O blocked... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
-            process.numblocked++;
-            process.ionext = -process.delayTime;
-            previousProcess = currentProcess;
-            for (i = size - 1; i >= 0; i--) {
-              process = (sProcess) processVector.elementAt(i);
-              if (process.cpudone < process.cputime && previousProcess != i) {
-                currentProcess = i;
-              }
-            }
-            process = (sProcess) processVector.elementAt(currentProcess);
-            out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
-          }
-          process.cpudone++;
-          if (process.ioblocking > 0) {
-            process.ionext++;
-          }
-          allComptime++;
-          currentComptime++;
-        }
-
-        out.close();
-      } catch (IOException e) { /* Handle exceptions */ }
-    }
+      }
+      out.close();
+    } catch (IOException e) { /* Handle exceptions */ }
     result.compuTime = allComptime;
     return result;
   }
