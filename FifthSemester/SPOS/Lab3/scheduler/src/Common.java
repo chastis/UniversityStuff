@@ -12,6 +12,7 @@ public class Common {
     return i;
   }
 
+  // return value from (0 to 1] by smth deviation
   static public double R1 () {
 
     double U = generator.nextDouble();
