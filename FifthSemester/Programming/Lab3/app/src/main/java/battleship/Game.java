@@ -25,6 +25,9 @@ public class Game {
     private AdapterBoard adapterBoard1, adapterBoard2;
     private Player player1, player2;
 
+    Cell checkL1, checkL2, checkL3, checkL4, checkL5;
+    Cell checkM1, checkM2, checkM3;
+
     private Game() {
     }
 
@@ -111,7 +114,6 @@ public class Game {
     }
 
     private boolean checkArrange() {
-        ShipArrangement shipArr = new ShipArrangement();
         AdapterBoard adapterBoard = adapterBoard1;
         int c = 0;
         for (int i = 0; i < adapterBoard.getCount(); i++) {
@@ -119,9 +121,9 @@ public class Game {
             if (cell.getStatus() == Cell.Status.OCCUPIED) {
                 c = c + 1;
                 if (c == 10) {
-                    if (((shipArr.checkArrangeLH(adapterBoard)) || (shipArr.checkArrangeLV(adapterBoard)))) {
-                        if (((shipArr.checkArrangeMH(adapterBoard)) || (shipArr.checkArrangeMV(adapterBoard)))) {
-                            if (((shipArr.checkArrangeSH(adapterBoard)) || (shipArr.checkArrangeSV(adapterBoard)))) {
+                    if (((checkArrangeLH(adapterBoard)) || (checkArrangeLV(adapterBoard)))) {
+                        if (((checkArrangeMH(adapterBoard)) || (checkArrangeMV(adapterBoard)))) {
+                            if (((checkArrangeSH(adapterBoard)) || (checkArrangeSV(adapterBoard)))) {
                                 return true;
                             }
                         }
@@ -242,24 +244,179 @@ public class Game {
         return (int) Math.pow(numCells1side, 2);
     }
 
-    //    Vu's naive approach to weakly randomizing bot's fleet arrangement
-    //    Now use Zach's approach instead
-    private void generateShipPlacementDeprecated() {
-        Random random = new Random();
-        for (int i = 0; i < player2.getNumShips(); i++) {
-            Ship ship = player2.getShips().get(i);
-            int randomRow = i * 2 + random.nextInt(2),
-                    randomColumn = random.nextInt(2),
-                    randomPosition = randomRow * numCells1side + randomColumn;
-            for (int j = 0; j < ship.getNumCells(); j++) {
-                Cell cell = adapterBoard2.getItem(randomPosition + j);
-                cell.setStatus(Cell.Status.OCCUPIED);
-                ship.addCell(cell);
-            }
-        }
-    }
-
     private enum Stage {
         ARRANGING, BATTLING, ATTACKING
+    }
+
+    //checks to see if there is a valid Large Horizontal arrangement
+    public boolean checkArrangeLH(AdapterBoard board) {
+        int boardSize = (int) Math.sqrt(board.getCount());
+        for (int i = 0; i < board.getCount() - 4; i++) {
+            Cell cell = board.getItem(i);
+            if (cell.getStatus() == Cell.Status.OCCUPIED) {
+                if (((i + 1) % boardSize == boardSize - 1) ||
+                        ((i + 2) % boardSize == boardSize - 1) ||
+                        ((i + 3) % boardSize == boardSize - 1)) {
+                    //loop continues
+                } else {
+                    Cell cell2 = board.getItem(i + 1);
+                    if (cell2.getStatus() == Cell.Status.OCCUPIED) {
+                        Cell cell3 = board.getItem(i + 2);
+                        if (cell3.getStatus() == Cell.Status.OCCUPIED) {
+                            Cell cell4 = board.getItem(i + 3);
+                            if (cell4.getStatus() == Cell.Status.OCCUPIED) {
+                                Cell cell5 = board.getItem(i + 4);
+                                if (cell5.getStatus() == Cell.Status.OCCUPIED) {
+                                    checkL1 = board.getItem(i);
+                                    checkL2 = board.getItem(i + 1);
+                                    checkL3 = board.getItem(i + 2);
+                                    checkL4 = board.getItem(i + 3);
+                                    checkL5 = board.getItem(i + 4);
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    //checks to see if there is a valid Large Vertical arrangement
+    public boolean checkArrangeLV(AdapterBoard board) {
+        int boardSize = (int) Math.sqrt(board.getCount());
+        for (int i = 0; i < (board.getCount() - (boardSize * 4)); i++) {
+            Cell cell = board.getItem(i);
+            if (cell.getStatus() == Cell.Status.OCCUPIED) {
+                Cell cell2 = board.getItem(i + boardSize);
+                if (cell2.getStatus() == Cell.Status.OCCUPIED) {
+                    Cell cell3 = board.getItem(i + boardSize * 2);
+                    if (cell3.getStatus() == Cell.Status.OCCUPIED) {
+                        Cell cell4 = board.getItem(i + boardSize * 3);
+                        if (cell4.getStatus() == Cell.Status.OCCUPIED) {
+                            Cell cell5 = board.getItem(i + boardSize * 4);
+                            if (cell5.getStatus() == Cell.Status.OCCUPIED) {
+                                checkL1 = board.getItem(i);
+                                checkL2 = board.getItem(i + boardSize);
+                                checkL3 = board.getItem(i + boardSize * 2);
+                                checkL4 = board.getItem(i + boardSize * 3);
+                                checkL5 = board.getItem(i + boardSize * 4);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    //checks to see if there is a valid Medium Horizontal arrangement
+    public boolean checkArrangeMH(AdapterBoard board) {
+        int boardSize = (int) Math.sqrt(board.getCount());
+        for (int i = 0; i < board.getCount() - 2; i++) {
+            Cell cell = board.getItem(i);
+            if (cell.getStatus() == Cell.Status.OCCUPIED) {
+                if ((board.getItem(i) != checkL1) && (board.getItem(i) != checkL2) && (board.getItem(i) != checkL3) && (board.getItem(i) != checkL4) && (board.getItem(i) != checkL5)) {
+                    if (((i + 1) % boardSize == boardSize - 1) ||
+                            ((i + 2) % boardSize == boardSize - 1)) {
+                        //loop continues
+                    } else {
+                        Cell cell2 = board.getItem(i + 1);
+                        if (cell2.getStatus() == Cell.Status.OCCUPIED) {
+                            Cell cell3 = board.getItem(i + 2);
+                            if (cell3.getStatus() == Cell.Status.OCCUPIED) {
+                                if ((cell3 != checkL1) && (cell3 != checkL2) && (cell3 != checkL3)
+                                        && (cell3 != checkL4) && (cell3 != checkL5)) {
+                                    checkM1 = board.getItem(i);
+                                    checkM2 = board.getItem(i + 1);
+                                    checkM3 = board.getItem(i + 2);
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+    //checks to see if there is a valid Medium Vertical arrangement
+    public boolean checkArrangeMV(AdapterBoard board) {
+        int boardSize = (int) Math.sqrt(board.getCount());
+        for (int i = 0; i < (board.getCount() - (boardSize * 2)); i++) {
+            Cell cell = board.getItem(i);
+            if (cell.getStatus() == Cell.Status.OCCUPIED) {
+                if ((board.getItem(i) != checkL1) && (board.getItem(i) != checkL2) && (board.getItem(i) != checkL3) && (board.getItem(i) != checkL4) && (board.getItem(i) != checkL5)) {
+                    Cell cell2 = board.getItem(i + boardSize);
+                    if (cell2.getStatus() == Cell.Status.OCCUPIED) {
+                        Cell cell3 = board.getItem(i + boardSize * 2);
+                        if (cell3.getStatus() == Cell.Status.OCCUPIED) {
+                            if ((cell3 != checkL1) && (cell3 != checkL2) && (cell3 != checkL3)
+                                    && (cell3 != checkL4) && (cell3 != checkL5)) {
+                                checkM1 = board.getItem(i);
+                                checkM2 = board.getItem(i + boardSize);
+                                checkM3 = board.getItem(i + boardSize * 2);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+    //checks to see if there is a valid Small Horizontal arrangement
+    public boolean checkArrangeSH(AdapterBoard board) {
+        int boardSize = (int) Math.sqrt(board.getCount());
+        for (int i = 0; i < board.getCount(); i++) {
+            Cell cell = board.getItem(i);
+            if (cell.getStatus() == Cell.Status.OCCUPIED) {
+                if ((board.getItem(i) != checkM1) && (board.getItem(i) != checkM2) && (board.getItem(i) != checkM3)
+                        && ((board.getItem(i) != checkL1) && (board.getItem(i) != checkL2) && (board.getItem(i) != checkL3) && (board.getItem(i) != checkL4) && (board.getItem(i) != checkL5))) {
+                    if ((i + 1) % boardSize == boardSize - 1) {
+                        //loop continues
+                    } else {
+                        Cell cell2 = board.getItem(i + 1);
+                        if (cell2.getStatus() == Cell.Status.OCCUPIED) {
+                            if ((cell2 != checkM1) && (cell2 != checkM2) && (cell2 != checkM3)
+                                    && (cell2 != checkL1) && (cell2 != checkL2) && (cell2 != checkL3)
+                                    && (cell2 != checkL4) && (cell2 != checkL5)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+    //checks to see if there is a valid Small Vertical arrangement
+    public boolean checkArrangeSV(AdapterBoard board) {
+        int boardSize = (int) Math.sqrt(board.getCount());
+        for (int i = 0; i < (board.getCount() - boardSize); i++) {
+            Cell cell = board.getItem(i);
+            if (cell.getStatus() == Cell.Status.OCCUPIED) {
+                if ((board.getItem(i) != checkM1) && (board.getItem(i) != checkM2) && (board.getItem(i) != checkM3)
+                        && ((board.getItem(i) != checkL1) && (board.getItem(i) != checkL2) && (board.getItem(i) != checkL3) && (board.getItem(i) != checkL4) && (board.getItem(i) != checkL5))) {
+                    Cell cell2 = board.getItem(i + boardSize);
+                    if (cell2.getStatus() == Cell.Status.OCCUPIED) {
+                        if ((cell2 != checkM1) && (cell2 != checkM2) && (cell2 != checkM3)
+                                && (cell2 != checkL1) && (cell2 != checkL2) && (cell2 != checkL3)
+                                && (cell2 != checkL4) && (cell2 != checkL5)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

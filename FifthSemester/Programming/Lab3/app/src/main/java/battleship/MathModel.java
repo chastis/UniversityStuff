@@ -24,11 +24,6 @@ public class MathModel {
         return ourInstance;
     }
 
-    private static void setXYFromPos(int cols, int pos) {
-        x = pos % cols;
-        y = pos / cols;
-    }
-
     private static int getPosFromXY() {
         return x * cols + y;
     }
@@ -174,20 +169,7 @@ public class MathModel {
         setPlacement(2); //small
         setPlacement(3); //medium
         setPlacement(5); //large
-        //testPlacement();
 
         MathModel.adapterBoard.notifyDataSetChanged();
-    }
-
-    public static void testPlacement() {
-        getEmptyCell();
-        //x = 0;
-        //y = 0;
-        if (isEastValid(5)) {
-            setEastPlacement(5);
-        }
-        if (isWestValid(5)) {
-            setWestPlacement(5);
-        }
     }
 }

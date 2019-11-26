@@ -1,9 +1,7 @@
 <resources>
-    <string name="app_name">ShattleBip</string>
-
+    <string name="app_name">BattleShip</string>
 
     <string name="button_play">Play vs Bot</string>
-    <string name="button_credits">credits</string>
 
     <string name="cell_status_vacant">vacant</string>
     <string name="cell_status_occupied">occupied</string>

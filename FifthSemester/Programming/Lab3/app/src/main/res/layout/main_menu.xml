@@ -34,14 +34,5 @@
             android:layout_margin="10dp"
             android:background="#BBDEFB"
             android:text="@string/button_play" />
-
-        <Button
-            android:id="@+id/button5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:alpha="0"
-            android:background="#BBDEFB"
-            android:text="@string/button_credits" />
     </LinearLayout>
 </RelativeLayout>

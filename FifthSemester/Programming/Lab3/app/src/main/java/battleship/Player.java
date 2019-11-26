@@ -14,13 +14,6 @@ public class Player {
     private int playerNum;
     private List<Ship> ships = new ArrayList<>(numShips);
 
-    /**
-     * fleet:
-     * - little guy: occupies 2 cells, has 1 attack initially
-     * - middle man: 3, 2
-     * - big boy: 5, 3
-     * each upgrade increments attack count of each (alive) ship
-     */
     public Player(int playerNum) {
         this.playerNum = playerNum;
 

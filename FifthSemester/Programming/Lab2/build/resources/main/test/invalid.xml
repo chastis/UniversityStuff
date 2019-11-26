@@ -1,0 +1,33 @@
+<Planes>
+    <Plane>
+        <id>841</id>
+        <model>model1</model>
+        <origin>country1</origin>
+        <Chars>
+            <type>spy</type>
+            <seats>1</seats>
+            <radar>true</radar>
+        </Chars>
+        <Parameters>
+            <length>10</length>
+            <height>2</height>
+            <width>4</width>
+        </Parameters>
+    </Plane>
+
+    <Plane>
+        <id>321</id>
+        <model>MODEL</model>
+        <origin>COUNTRY</origin>
+        <Chars>
+            <type>plane</type>
+            <seats>1</seats>
+            <radar>false</radar>
+        </Chars>
+        <Parameters>
+            <length>15</length>
+            <height>15</height>
+            <width>15</width>
+        </Parameters>
+    </Plane>
+</Planes>

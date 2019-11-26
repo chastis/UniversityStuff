@@ -11,7 +11,6 @@ import android.widget.Button;
  */
 public class MainMenu extends AppCompatActivity implements View.OnClickListener {
     Button button1;
-    Button button11;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,16 +19,10 @@ public class MainMenu extends AppCompatActivity implements View.OnClickListener 
 
         button1 = (Button) findViewById(R.id.button2);
         button1.setOnClickListener(this);
-        button11 = (Button) findViewById(R.id.button5);
-        button11.setOnClickListener(this);
     }
 
     private void button2Click() {
         startActivity(new Intent("battleship.MainActivity"));
-    }
-
-    private void button5Click() {
-        startActivity(new Intent("battleship.Credits"));
     }
 
     @Override
@@ -37,10 +30,6 @@ public class MainMenu extends AppCompatActivity implements View.OnClickListener 
         switch (v.getId()) {
             case R.id.button2:
                 button2Click();
-                break;
-
-            case R.id.button5:
-                button5Click();
                 break;
         }
     }
