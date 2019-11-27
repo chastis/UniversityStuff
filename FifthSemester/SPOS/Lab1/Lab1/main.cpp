@@ -13,6 +13,7 @@ namespace MyNamespace
 	{
 		Yes,
 		No,
+		Esc,
 		None
 	};
 
@@ -21,7 +22,7 @@ namespace MyNamespace
 	uint32_t DefaultSize = 100;
 	uint32_t ExitParam = 0;
 	uint32_t SecondsToTryTerminate = 10;
-	bool bEscapeRequest = false;
+	//bool bEscapeRequest = false;
 	bool bIsErrorMessageCreated = false;
 	InputKey inputKey = InputKey::None;
 	bool bRequestTimerStart = false;
@@ -55,28 +56,44 @@ namespace MyNamespace
 			startupInfo,             // Pointer to STARTUPINFO structure
 			processInfo);           // Pointer to PROCESS_INFORMATION structure
 	}
+
+	double getDoubleFromMessage(std::pair<UINT, LPARAM> msg)
+	{
+		union T
+		{
+			struct
+			{
+				UINT ui;
+				LPARAM lp;
+			} s;
+			double d;
+		} u;
+		u.s.ui = msg.first;
+		u.s.lp = msg.second;
+		return u.d;
+	}
+
+
 }
- 
+
 
 int main(int argc, TCHAR* argv[])
 {
 	auto f_proc = std::async(std::launch::async, []()
-	{
+		{
 			while (true)
 			{
-				// TODO : make bEscape to enum
-				MyNamespace::bEscapeRequest = (GetAsyncKeyState(VK_ESCAPE) == -32767);
-
-				if (GetAsyncKeyState(0x59) == -32767)
+				if (GetAsyncKeyState(VK_ESCAPE) == -32767)
+					MyNamespace::inputKey = MyNamespace::InputKey::Esc;
+				else if (GetAsyncKeyState(0x59) == -32767)
 					MyNamespace::inputKey = MyNamespace::InputKey::Yes;
 				else if (GetAsyncKeyState(0x4E) == -32767)
 					MyNamespace::inputKey = MyNamespace::InputKey::No;
-				else
-					MyNamespace::inputKey = MyNamespace::InputKey::None;
+				//MyNamespace::inputKey = MyNamespace::InputKey::None;
 			}
-	});
-	
-	auto timer = std::async(std::launch::async,([]()
+		});
+
+	auto timer = std::async(std::launch::async, ([]()
 		{
 			while (true)
 			{
@@ -89,7 +106,7 @@ int main(int argc, TCHAR* argv[])
 					}
 					else
 					{
-						if (std::chrono::duration_cast<std::chrono::seconds>((std::chrono::high_resolution_clock::now() - MyNamespace::startTimerPoint)).count()>MyNamespace::SecondsToTryTerminate)
+						if (std::chrono::duration_cast<std::chrono::seconds>((std::chrono::high_resolution_clock::now() - MyNamespace::startTimerPoint)).count() > MyNamespace::SecondsToTryTerminate)
 						{
 							MyNamespace::bIsTimerDone = true;
 						}
@@ -109,13 +126,10 @@ int main(int argc, TCHAR* argv[])
 		MyNamespace::bRequestTimerStart = false;
 		MyNamespace::bIsTimerStart = false;
 		MyNamespace::bIsTimerDone = false;
-		MyNamespace::inputKey = MyNamespace::InputKey::None;
-		MyNamespace::bEscapeRequest = false;
 		MyNamespace::bIsErrorMessageCreated = false;
 
 		system("cls");
 		{
-
 			int32_t x;
 			std::cout << "Enter the x" << std::endl;
 			while (!(std::cin >> x))
@@ -126,6 +140,7 @@ int main(int argc, TCHAR* argv[])
 			{
 				exit(0);
 			}
+			MyNamespace::inputKey = MyNamespace::InputKey::None;
 			STARTUPINFO siG;
 			PROCESS_INFORMATION piG;
 
@@ -169,10 +184,10 @@ int main(int argc, TCHAR* argv[])
 			DWORD errorExitCode = 0;
 			MyNamespace::bRequestTimerStart = true;
 			// some strange architecture
-			std::pair<bool, double> a{ false, 0 }, b{false, 0};
-			while (!a.first||!b.first)
+			std::pair<bool, double> a{ false, 0 }, b{ false, 0 };
+			while (!a.first || !b.first)
 			{
-				if (MyNamespace::bEscapeRequest||MyNamespace::bIsTimerDone)
+				if (MyNamespace::inputKey == MyNamespace::InputKey::Esc || MyNamespace::bIsTimerDone)
 				{
 					MyNamespace::bRequestTimerStart = false;
 					MyNamespace::bIsTimerStart = false;
@@ -191,12 +206,12 @@ int main(int argc, TCHAR* argv[])
 						}
 						MyNamespace::bIsErrorMessageCreated = true;
 					}
-					MyNamespace::bEscapeRequest = false;
+					MyNamespace::inputKey = MyNamespace::InputKey::None;
 				}
 				if (MyNamespace::bIsErrorMessageCreated)
 				{
 					GetExitCodeProcess(piError.hProcess, &errorExitCode);
-					if (MyNamespace::inputKey == MyNamespace::InputKey::Yes || errorExitCode!=STILL_ACTIVE)
+					if (MyNamespace::inputKey == MyNamespace::InputKey::Yes || errorExitCode != STILL_ACTIVE)
 					{
 						errorExitCode != STILL_ACTIVE ? std::cout << "Calculation was stopped because time for answer has left" << std::endl : std::cout << "Calculation was stopped by User" << std::endl;
 						MyNamespace::bIsErrorMessageCreated = false;
@@ -210,9 +225,8 @@ int main(int argc, TCHAR* argv[])
 					else if (MyNamespace::inputKey == MyNamespace::InputKey::No)
 					{
 						MyNamespace::bRequestTimerStart = true;
-						MyNamespace::bIsTimerStart = false; 
+						MyNamespace::bIsTimerStart = false;
 						MyNamespace::bIsTimerDone = false;
-						MyNamespace::bEscapeRequest = false;
 						MyNamespace::bIsErrorMessageCreated = false;
 						TerminateProcess(piError.hProcess, 0);
 						CloseHandle(piError.hProcess);
@@ -223,17 +237,17 @@ int main(int argc, TCHAR* argv[])
 				//const BOOL bRet = GetMessage(&msg, NULL, 0,UINT32_MAX);
 				if (bRet)
 				{
-					const UINT Message = msg.message - WM_USER - 1;
+					const double Message = MyNamespace::getDoubleFromMessage(std::pair<UINT, LPARAM>(msg.message - WM_USER - 1, msg.wParam));
 					//std::cout << "Got new Message! " << Message << std::endl;
 					if (!a.first && msg.lParam == 0)
 					{
 						a.first = true;
-						a.second = Message / std::pow(10.0, msg.wParam);
+						a.second = Message;
 					}
 					if (!b.first && msg.lParam == 1)
 					{
 						b.first = true;
-						b.second = Message / std::pow(10.0, msg.wParam);
+						b.second = Message;
 					}
 					if (Message == MyNamespace::ExitParam)
 					{
@@ -241,7 +255,7 @@ int main(int argc, TCHAR* argv[])
 						TerminateProcess(piG.hProcess, 0);
 						//std::cout << "Program end , because one of params is " << MyNamespace::ExitParam << std::endl;
 						break;
-					}				
+					}
 				}
 			}
 
@@ -251,16 +265,27 @@ int main(int argc, TCHAR* argv[])
 				CloseHandle(piError.hProcess);
 			}
 			CloseHandle(piF.hProcess);
-			CloseHandle(piG.hProcess);			
+			CloseHandle(piG.hProcess);
 			//std::cout << "Program finished successfully!" << std::endl;
-			std::cout << "Output is " << a.second << " " << b.second << std::endl;
-			if (!a.first)
+			//std::this_thread::sleep_for(std::chrono::seconds(2));
+			if (!a.first && !b.first)
 			{
-				std::cout << "f wasn't calculated" << std::endl;
+				std::cout << "f and g wasn't calculated" << std::endl;
 			}
-			if (!b.first)
+			else if (a.first && b.first)
 			{
-				std::cout << "g wasn't calculated" << std::endl;
+				std::cout << "f = " << a.second << " and g = " << b.second << std::endl;
+			}
+			else
+			{
+				if (!a.first)
+				{
+					std::cout << "g = " << b.second <<" and f wasn't calculated" << std::endl;
+				}
+				if (!b.first)
+				{
+					std::cout << "f = " << a.second << " and g wasn't calculated" << std::endl;
+				}
 			}
 			//std::cout << "Output is " << (a.first ? std::to_string(a.second) : "f wasn't calculated") << " and " << (b.first ? std::to_string(b.second) : "g wasn't calculated") << std::endl;
 			std::cout << "Enter smth to continue..." << std::endl;

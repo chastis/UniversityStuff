@@ -3,6 +3,22 @@
 #include <thread>
 #include "demofuncs"
 
+std::pair<UINT, LPARAM> makeMessageFromDouble(double msg)
+{
+  union T
+  {
+    struct
+    {
+      UINT uint;
+	  LPARAM lparam;
+    } s;
+    double d;
+  } u;
+  u.d = msg;
+
+  return { u.s.uint, u.s.lparam };
+}
+
 int main(int argc, TCHAR* argv[])
 {
 	if (argc < 2)
@@ -15,24 +31,9 @@ int main(int argc, TCHAR* argv[])
 	
 	// here go function
 
-	double answerInDouble = spos::lab1::demo::f_func<spos::lab1::demo::DOUBLE>(x);
-	std::cout << "calc = " << answerInDouble << std::endl;
-	UINT answer = 0;
-	uint32_t wParam = 0;
-	while (answerInDouble != static_cast<int>(answerInDouble) || wParam != 32)
-	{
-		answerInDouble *= 10.0;
-		wParam++;
-	}
-	answer += WM_USER + 1;
-	const BOOL success = PostThreadMessageW(processID, answer, wParam, 0);
-	if (success)
-	{
-		std::cout << "process F ended successfully with " <<  answerInDouble << std::endl;
-	}
-	else
-	{
-		std::cout << "process F ended with code " << GetLastError() << std::endl;
-	}
+	const double answerInDouble = spos::lab1::demo::f_func<spos::lab1::demo::DOUBLE>(x);
+	//std::cout << "calc = " << answerInDouble << std::endl;
+	const std::pair<UINT, LPARAM> separateAnswer = makeMessageFromDouble(answerInDouble);
+	PostThreadMessageW(processID, separateAnswer.first + WM_USER + 1, separateAnswer.second, 0);
 	return 0;
 }
