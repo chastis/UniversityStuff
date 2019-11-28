@@ -1,0 +1,70 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="Planes">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Plane" type="plane" maxOccurs="unbounded" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="plane">
+        <xs:sequence>
+            <xs:element name="id" type="idType"/>
+            <xs:element name="model" type="xs:string"/>
+            <xs:element name="origin" type="xs:string"/>
+
+            <xs:element name="Chars" type="charsType"/>
+            <xs:element name="Parameters" type="parametersType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="idType">
+        <xs:restriction base="xs:integer">
+            <xs:pattern value="[0-9][0-9][0-9]"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+
+
+    <xs:complexType name="charsType">
+        <xs:sequence>
+            <xs:element name="type" type="planeType"/>
+            <xs:element name="seats" type="seatsType"/>
+            <xs:element name="radar" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="planeType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="support"/>
+            <xs:enumeration value="escort"/>
+            <xs:enumeration value="fighter"/>
+            <xs:enumeration value="interceptor"/>
+            <xs:enumeration value="reconnaissance"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="seatsType">
+        <xs:restriction base="xs:integer">
+            <xs:pattern value="[1-2]"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+
+    <xs:complexType name="parametersType">
+        <xs:sequence>
+            <xs:element name="length" type="valueType"/>
+            <xs:element name="height" type="valueType"/>
+            <xs:element name="width" type="valueType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="valueType">
+        <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+            <xs:maxExclusive value="90"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>
