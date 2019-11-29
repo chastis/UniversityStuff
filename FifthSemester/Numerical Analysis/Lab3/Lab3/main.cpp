@@ -79,10 +79,11 @@ void printMatrix(const Matrix<T>& matrix)
 	}
 }
 
-int main()
+int32_t main()
 {
 	// https://www.cs.usfca.edu/~cruse/math202s11/pagerank.cpp
-	// https://en.wikipedia.org/wiki/PageRank
+	// best video about this algorithm https://www.youtube.com/watch?v=kSmQbVxqOJc 
+	// good pdf presentation by google https://web.stanford.edu/class/cs54n/handouts/24-GooglePageRankAlgorithm.pdf
 	std::vector<std::vector<bool>> digraph;
 	std::vector<std::vector<float>> transition;
 	std::cout << "Graph:\n";
