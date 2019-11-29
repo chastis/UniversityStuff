@@ -191,8 +191,8 @@ int main()
 			for (uint32_t j = 0; j < RED[i].size(); j++)
 			{
 				const float valueRED = RED[i][j] * xRED[j] * 255.f;
-				const float valueBLUE = BLUE[i][j] * xBLUE[j] * 255.f;
-				const float valueGREEN = GREEN[i][j] * xGREEN[j] * 255.f;
+				const float valueBLUE = 0.f;// BLUE[i][j] * xBLUE[j] * 255.f;
+				const float valueGREEN = 0.f; //GREEN[i][j] * xGREEN[j] * 255.f;
 				sf::RectangleShape rectangle;
 				rectangle.setSize(sf::Vector2f(Global::squareSize, Global::squareSize));
 				rectangle.setPosition(i * Global::squareSize, j * Global::squareSize);

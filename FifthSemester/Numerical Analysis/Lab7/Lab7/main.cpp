@@ -14,7 +14,7 @@ namespace Global
 	float function(float x)
 	{
 		//return x * x * x + 3 * x * x + 3 * x + 1;
-		return sin(x);
+		return x * sin(5 * x);
 	}
 	int32_t GaussMethod(std::vector<std::vector<float>>& A, std::vector<float>& answer)
 	{
@@ -270,8 +270,8 @@ int main()
 			}
 		};
 		findMaxMin(coordinates, maxX, maxY, minX, minY);
-		findMaxMin(lagrangeInterpCoordinates, maxX, maxY, minX, minY);
-		findMaxMin(newtonInterpCoordinates, maxX, maxY, minX, minY);
+		//findMaxMin(lagrangeInterpCoordinates, maxX, maxY, minX, minY);
+		//findMaxMin(newtonInterpCoordinates, maxX, maxY, minX, minY);
 		findMaxMin(cubeInterpCoordinates, maxX, maxY, minX, minY);
 		const float scaleX = (maxX - minX) ? Global::modeWith / (maxX - minX) : 1.f;
 		const float scaleY = (maxY - minY) ? Global::modeHeight / (maxY - minY) : 1.f;

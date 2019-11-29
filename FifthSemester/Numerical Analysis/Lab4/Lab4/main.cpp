@@ -12,10 +12,10 @@ namespace Global
 {
 	int32_t minRand = 1;
 	int32_t maxRand = 10;
-	uint32_t defaultSize = 5;
+	uint32_t defaultSize = 3;
 	uint32_t setW = 7;
 	uint32_t precision = 3;
-	float e = 0.0001f;
+	float e = 0.00001f;
 }
 
 enum class MatrixType :uint8_t
@@ -23,6 +23,7 @@ enum class MatrixType :uint8_t
 	random,
 	diagonalDominant,
 	gilbert,
+	cin,
 	none
 };
 
@@ -65,6 +66,11 @@ void generateMatrix(Matrix<T>& outMatrix, uint32_t sizeLines = Global::defaultSi
 				outMatrix[i][j] = 1.0 / (i + j + 1);
 				break;
 			}
+			case MatrixType::cin:
+			{
+				std::cin >> outMatrix[i][j];
+				break;
+			}
 			default:
 			{
 				// no entry
@@ -87,19 +93,24 @@ void generateMatrix(Matrix<T>& outMatrix, uint32_t sizeLines = Global::defaultSi
 }
 
 template <class T>
-void generateVector(std::vector<T>& outVector, uint32_t size = Global::defaultSize)
+void generateVector(bool isRandom, std::vector<T>& outVector, uint32_t size = Global::defaultSize)
 {
 	outVector.resize(size);
 	for (auto& element : outVector)
 	{
-		if (std::is_floating_point_v<T>)
+		if (isRandom)
 		{
-			element = std::rand() * 1.0 / RAND_MAX * (Global::maxRand - Global::minRand) + Global::minRand;
+			if (std::is_floating_point_v<T>)
+			{
+				element = std::rand() * 1.0 / RAND_MAX * (Global::maxRand - Global::minRand) + Global::minRand;
+			}
+			else if (std::is_integral_v<T>)
+			{
+				element = std::rand() % (Global::maxRand - Global::minRand) + Global::minRand;
+			}
 		}
-		else if (std::is_integral_v<T>)
-		{
-			element = std::rand() % (Global::maxRand - Global::minRand) + Global::minRand;
-		}
+		else
+			element = static_cast<T>(1.f);
 	}
 }
 template <class T>
@@ -139,12 +150,13 @@ public:
 	void init(uint32_t size = Global::defaultSize)
 	{
 		generateMatrix<type, T>(a, size, size);
-		generateVector<T>(x, size);
+		generateVector<T>(false, x, size);
 		b.resize(size);
 		for (uint32_t i = 0; i < size; i++)
 		{
 			b[i] = x * a[i];
 		}
+		generateVector<T>(true, x, size);
 	}
 	int32_t GaussMethod()
 	{
@@ -168,7 +180,7 @@ public:
 			for (uint32_t i = row; i < rowCount; ++i)
 				if (std::abs(extended[i][col]) > std::abs(extended[sel][col]))
 					sel = i;
-			if (std::abs(extended[sel][col]) < Global::e)
+			if (std::abs(extended[sel][col]) < Global::e * Global::e * Global::e)
 				continue;
 			for (uint32_t i = col; i <= columnCount; ++i)
 				std::swap(extended[sel][i], extended[row][i]);
@@ -262,24 +274,39 @@ public:
 				p[i] = x[i];
 				x[i] = (b[i] - var) / a[i][i];
 			}
-		}
-		while (!converge(x, p));
+			for (const auto& el : x)
+			{
+				std::cout << el << " ";
+			}
+			std::cout << std::endl;
+		} while (!converge(x, p));
 		return 1;
+	}
+	void compareSolutions()
+	{
+		std::cout << "b - a" << std::endl;
+		for (uint32_t i = 0; i < a.size(); i++)
+		{
+			T temp = a[i] * x;
+			std::cout << b[i] - temp << " ";
+		}
+		std::cout << std::endl;
 	}
 };
 
 int main()
 {
 	SLE<float> sle;
-	sle.init<MatrixType::random>();
+	sle.init<MatrixType::gilbert>();
 	std::vector<float> answer;
-	std::cout << sle.SeidelMethod() << std::endl;
+	std::cout << "Answer's count " << sle.SeidelMethod() << std::endl;
 	for (const auto& element : sle.x)
 	{
 		std::cout << element << " ";
 	}
-	//printMatrix<float>(sle.a);
-
+	std::cout << std::endl << "Matrix:" << std::endl;
+	printMatrix<float>(sle.a);
+	sle.compareSolutions();
 
 	_getch();
 	return 0;

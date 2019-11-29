@@ -156,6 +156,8 @@ int32_t JacobiRotation(Matrix<float>& coefficients, Matrix<float>& solution)
 	}
 	fault = sqrt(2 * fault);
 	while (fault > Global::e) {
+		std::cout << "it" << std::endl;
+		printMatrix(coefficients);
 		float max = 0.f;
 		for (i = 0; i < n; i++)
 		{
@@ -280,7 +282,8 @@ int main()
 	if (!isSymmetrical(coefficients)) {
 		std::cout << "Matrix is not symmetrical\n";
 	}
-	else {
+	else
+	{
 		std::cout << "In Matrix :" << std::endl;
 		printMatrix(coefficients);
 		const int32_t steps = JacobiRotation(coefficients, solution);
