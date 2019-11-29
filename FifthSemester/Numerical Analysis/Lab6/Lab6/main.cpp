@@ -11,17 +11,17 @@ namespace Global
 	// gen param
 	int32_t minRand = 0;
 	int32_t maxRand = 1;
-	uint32_t defaultSize = 10;
+	uint32_t defaultSize = 100;
 	// std out param
 	uint32_t setW = 7;
 	uint32_t precision = 3;
 	// draw param
-	float squareSize = 60.f;
-	uint32_t modeWith = 800;
-	uint32_t modeHeight = 600;
+	float squareSize = 10.f;
+	uint32_t modeWith = 1000;
+	uint32_t modeHeight = 1000;
 	// calc param
 	float e = 0.0001f;
-	float lambda = 0.001f;
+	float lambda = 0.01f;
 	enum class MatrixType :uint8_t
 	{
 		random,
