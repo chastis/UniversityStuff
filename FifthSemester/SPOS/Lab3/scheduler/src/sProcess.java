@@ -1,6 +1,7 @@
 enum sProcessState {
   BLOCKED,
   RUNNING,
+  READY,
   DONE
 };
 
@@ -22,7 +23,7 @@ public class sProcess {
     this.cpudone = 0;
     this.blockedTimestamp = 0;
     this.numblocked = 0;
-    this.state = sProcessState.RUNNING;
+    this.state = sProcessState.READY;
   }
   public void block(int currentTime)
   {
@@ -31,6 +32,11 @@ public class sProcess {
     this.numblocked++;
   }
   public void unBlock(int currentTime)
+  {
+    this.blockedTimestamp = currentTime;
+    this.state = sProcessState.READY;
+  }
+  public void run(int currentTime)
   {
     this.blockedTimestamp = currentTime;
     this.state = sProcessState.RUNNING;

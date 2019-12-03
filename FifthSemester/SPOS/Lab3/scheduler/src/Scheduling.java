@@ -13,6 +13,7 @@ import java.util.*;
 public class Scheduling {
 
   private static int processnum = 5;
+  private static int quantumNum = 10;
   private static int meanDev = 1000;
   private static int standardDev = 100;
   private static int runtime = 1000;
@@ -48,6 +49,14 @@ public class Scheduling {
           StringTokenizer st = new StringTokenizer(line);
           st.nextToken();
           standardDev = Common.s2i(st.nextToken());
+        }
+        if (line.startsWith("quantumsnum")) {
+          StringTokenizer st = new StringTokenizer(line);
+          st.nextToken();
+          int quantN = Common.s2i(st.nextToken());
+          if (quantN != 0) {
+            quantumNum = quantN;
+          }
         }
         if (line.startsWith("process")) {
           StringTokenizer st = new StringTokenizer(line);
@@ -118,7 +127,7 @@ public class Scheduling {
         i++;
       }
     }
-    result = SchedulingAlgorithm.Run(runtime, processVector, result);    
+    result = SchedulingAlgorithm.Run(runtime, processVector, result, quantumNum);
     try {
       //BufferedWriter out = new BufferedWriter(new FileWriter(resultsFile));
       PrintStream out = new PrintStream(new FileOutputStream(resultsFile));

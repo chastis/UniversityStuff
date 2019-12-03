@@ -12,21 +12,33 @@ public class SchedulingAlgorithm {
     int bestI = -1;
     for (int i = 0; i < processesVector.size(); i++)
     {
-      if (processesVector.get(i).state == sProcessState.RUNNING )
+      if (processesVector.get(i).state == sProcessState.BLOCKED && processesVector.get(i).blockedTimestamp + processesVector.get(i).delayTime < comptime)
       {
-        return i;
-      }
-      if (processesVector.get(i).state == sProcessState.BLOCKED && processesVector.get(i).blockedTimestamp+processesVector.get(i).delayTime > comptime)
-      {
-        if (bestI == -1 || processesVector.get(i).blockedTimestamp+processesVector.get(i).delayTime > processesVector.get(bestI).blockedTimestamp+processesVector.get(bestI).delayTime ) {
-          processesVector.get(i).unBlock(comptime);
+        if (bestI == -1 || processesVector.get(i).blockedTimestamp+processesVector.get(i).delayTime > processesVector.get(bestI).blockedTimestamp+processesVector.get(bestI).delayTime )
+        {
+          //processesVector.get(i).unBlock(comptime);
           bestI = i;
+        }
+        processesVector.get(i).unBlock(comptime);
+      }
+    }
+    // All process are ready
+    if (bestI == -1)
+    {
+      for (int i = 0; i < processesVector.size(); i++)
+      {
+        if (processesVector.get(i).state == sProcessState.READY)
+        {
+          if (bestI == -1 || processesVector.get(i).blockedTimestamp < processesVector.get(bestI).blockedTimestamp)
+          {
+            bestI = i;
+          }
         }
       }
     }
     return bestI;
   }
-  public static Results Run(int runtime, Vector allProcessVector, Results result) {
+  public static Results Run(int runtime, Vector allProcessVector, Results result, int quantumNum) {
     int allComptime = 0;
     int currentComptime = 0;
     int currentProcess = 0;
@@ -50,6 +62,10 @@ public class SchedulingAlgorithm {
     }
 
     int currentRunTime = runtime / usersProcesses.size();
+    int currentQuantum = runtime / quantumNum;
+
+    System.out.println( "currentQuantum " + currentQuantum);
+
     // myChanging }
 
     result.schedulingType = "Batch (Nonpreemptive)";
@@ -63,7 +79,7 @@ public class SchedulingAlgorithm {
           currentComptime = 0;
           currentProcess = 0;
           sProcess process = (sProcess) processVector.get(currentProcess);
-          out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
+          //out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
 
           while (currentComptime < currentRunTime)
           {
@@ -82,8 +98,14 @@ public class SchedulingAlgorithm {
                   }
                   currentProcess = newProcess;
                   process = (sProcess) processVector.get(currentProcess);
-                  out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
+                  //process.unBlock(currentComptime);
+                  //out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
                 }
+              case READY:
+              {
+                process.run(currentComptime);
+                out.println("Process: " + currentProcess + " in user " + process.userID + " launched... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
+              }
               case RUNNING:
                 {
                 if (process.cpudone == process.cputime)
@@ -104,10 +126,13 @@ public class SchedulingAlgorithm {
                   }
                   currentProcess = newProcess;
                   process = (sProcess) processVector.get(currentProcess);
-                  out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
+                  //out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
                 }
-                else if (process.blockedTimestamp + process.ioblocking == currentComptime) {
-                  out.println("Process: " + currentProcess + " in user " + process.userID + " I/O blocked... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
+                else if (process.blockedTimestamp + process.ioblocking == currentComptime || process.blockedTimestamp + currentQuantum == currentComptime) {
+                  if (process.blockedTimestamp + process.ioblocking == currentComptime)
+                    out.println("Process: " + currentProcess + " in user " + process.userID + " I/O blocked (time)... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
+                  else
+                    out.println("Process: " + currentProcess + " in user " + process.userID + " I/O blocked (quantum)... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
                   process.block(currentComptime);
                   int newProcess = GetNextReadyProcess(processVector, currentComptime);
                   if (newProcess == -1)
@@ -116,7 +141,7 @@ public class SchedulingAlgorithm {
                   }
                   currentProcess = newProcess;
                   process = (sProcess) processVector.get(currentProcess);
-                  out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
+                  //out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
                 }
               }
               case DONE:
