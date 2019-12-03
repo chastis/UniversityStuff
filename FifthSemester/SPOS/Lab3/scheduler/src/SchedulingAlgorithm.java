@@ -36,7 +36,7 @@ public class SchedulingAlgorithm {
 
     // { myChanging
 
-    Map<Integer,Vector<sProcess>> usersProcesses = new HashMap<>();
+    Map<Integer, Vector<sProcess>> usersProcesses = new HashMap<>();
     for (int j = 0; j < allSize; j++)
     {
       sProcess process = (sProcess) allProcessVector.elementAt(j);

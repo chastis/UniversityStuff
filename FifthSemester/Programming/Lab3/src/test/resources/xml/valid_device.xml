@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<device id="id-1" critical="true"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="../xsd/device.xsd">
+	<name>Display AGK-1203, 20 inch, IPS</name>
+	<origin>USA</origin>
+	<price>200.75</price>
+	<type>
+		<periphery>true</periphery>
+		<energyConsumption>50</energyConsumption>
+		<withCooler>false</withCooler>
+		<componentGroup>OUTPUT_DEVICE</componentGroup>
+		<port>VGA</port>
+	</type>
+</device>

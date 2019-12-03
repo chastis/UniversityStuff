@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.andlvovsky.parser.XmlDeviceParserDomTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2019-12-03T07:46:49" hostname="LAPTOP-V76O4EIE" time="0.038">
+  <properties/>
+  <testcase name="shouldParseDevice" classname="com.andlvovsky.parser.XmlDeviceParserDomTest" time="0.038"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

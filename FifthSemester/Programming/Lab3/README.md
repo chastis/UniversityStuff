@@ -1,3 +1,2 @@
-# Lab 3
-
-Battleship game for android
+# XML parser
+Laboratory for OOP subject
