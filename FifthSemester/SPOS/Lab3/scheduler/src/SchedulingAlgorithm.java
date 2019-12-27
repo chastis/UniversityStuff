@@ -2,6 +2,8 @@
 // the scheduling algorithm written by the user resides.
 // User modification should occur within the Run() function.
 
+import javafx.util.Pair;
+
 import java.util.*;
 import java.io.*;
 
@@ -38,7 +40,14 @@ public class SchedulingAlgorithm {
     }
     return bestI;
   }
-  public static Results Run(int runtime, Vector allProcessVector, Results result, int quantumNum) {
+  public static Results Run(int runtime, Vector allProcessVector, Results result, int quantum) {
+
+    class GroupCache
+    {
+        int comptime = 0;
+        int process = 0;
+    }
+
     int allComptime = 0;
     int currentComptime = 0;
     int currentProcess = 0;
@@ -48,21 +57,24 @@ public class SchedulingAlgorithm {
 
     // { myChanging
 
-    Map<Integer, Vector<sProcess>> usersProcesses = new HashMap<>();
+    Map<Integer, Pair<GroupCache, Vector<sProcess>>> usersProcesses = new HashMap<>();
+    Vector<GroupCache> processCaches = new Vector<>();
+
     for (int j = 0; j < allSize; j++)
     {
       sProcess process = (sProcess) allProcessVector.elementAt(j);
 
       if (!usersProcesses.containsKey(process.userID))
       {
-        usersProcesses.put(process.userID, new Vector<sProcess>());
+        Pair<GroupCache, Vector<sProcess>> pair = new Pair<>(new GroupCache(), new Vector<>());
+        usersProcesses.put(process.userID, pair);
       }
-      usersProcesses.get(process.userID).add(process);
+      usersProcesses.get(process.userID).getValue().add(process);
 
     }
 
     int currentRunTime = runtime / usersProcesses.size();
-    int currentQuantum = runtime / quantumNum;
+    int currentQuantum = quantum;
 
     System.out.println( "currentQuantum " + currentQuantum);
 
@@ -73,27 +85,29 @@ public class SchedulingAlgorithm {
     try
     {
       PrintStream out = new PrintStream(new FileOutputStream(resultsFile));
-      for (Vector<sProcess> processVector : usersProcesses.values()) {
+
+      while (allComptime < runtime) {
+
+        for (Pair<GroupCache, Vector<sProcess>> processPairVector : usersProcesses.values()) {
+          Vector<sProcess> processVector = processPairVector.getValue();
           //System.out.println( " id = " + processVector.get(0).userID);
           int size = processVector.size();
-          currentComptime = 0;
-          currentProcess = 0;
+          currentComptime = processPairVector.getKey().comptime;
+          currentProcess = processPairVector.getKey().process;
           sProcess process = (sProcess) processVector.get(currentProcess);
           //out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
 
-          while (currentComptime < currentRunTime)
-          {
+          boolean groupAvailable = true;
+          while (groupAvailable && currentComptime < currentRunTime && currentComptime < currentQuantum) {
             switch (process.state) {
               case BLOCKED:
-                if (process.blockedTimestamp + process.delayTime >= currentComptime)
-                {
+                if (process.blockedTimestamp + process.delayTime >= currentComptime) {
                   process.unBlock(currentComptime);
                   out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
-                }
-                else {
+                } else {
                   int newProcess = GetNextReadyProcess(processVector, currentComptime);
-                  if (newProcess == -1)
-                  {
+                  if (newProcess == -1) {
+                    groupAvailable = false;
                     break;
                   }
                   currentProcess = newProcess;
@@ -101,42 +115,39 @@ public class SchedulingAlgorithm {
                   //process.unBlock(currentComptime);
                   //out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
                 }
-              case READY:
-              {
+              case READY: {
                 process.run(currentComptime);
                 out.println("Process: " + currentProcess + " in user " + process.userID + " launched... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
               }
-              case RUNNING:
-                {
-                if (process.cpudone == process.cputime)
-                {
+              case RUNNING: {
+                if (process.cpudone == process.cputime) {
                   completed++;
                   process.state = sProcessState.DONE;
                   out.println("Process: " + currentProcess + " in user " + process.userID + " completed... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
-                  if (completed == allSize)
-                  {
+                  if (completed == allSize) {
                     result.compuTime = allComptime;
                     out.close();
                     return result;
                   }
                   int newProcess = GetNextReadyProcess(processVector, currentComptime);
-                  if (newProcess == -1)
-                  {
+                  if (newProcess == -1) {
+                    groupAvailable = false;
                     break;
                   }
                   currentProcess = newProcess;
                   process = (sProcess) processVector.get(currentProcess);
                   //out.println("Process: " + currentProcess + " in user " + process.userID + " registered... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
-                }
-                else if (process.blockedTimestamp + process.ioblocking == currentComptime || process.blockedTimestamp + currentQuantum == currentComptime) {
-                  if (process.blockedTimestamp + process.ioblocking == currentComptime)
+                } else if (process.blockedTimestamp + process.ioblocking == currentComptime || process.blockedTimestamp + currentQuantum == currentComptime) {
+                  if (process.blockedTimestamp + process.ioblocking == currentComptime) {
                     out.println("Process: " + currentProcess + " in user " + process.userID + " I/O blocked (time)... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
-                  else
+                    process.block(currentComptime);
+                  } else {
                     out.println("Process: " + currentProcess + " in user " + process.userID + " I/O blocked (quantum)... (" + process.cputime + " " + process.ioblocking + " " + process.cpudone + " " + process.cpudone + ")");
-                  process.block(currentComptime);
+                    process.ready(currentComptime);
+                  }
                   int newProcess = GetNextReadyProcess(processVector, currentComptime);
-                  if (newProcess == -1)
-                  {
+                  if (newProcess == -1) {
+                    groupAvailable = false;
                     break;
                   }
                   currentProcess = newProcess;
@@ -145,8 +156,7 @@ public class SchedulingAlgorithm {
                 }
               }
               case DONE:
-              default:
-                {
+              default: {
                 //System.out.println( "something go wrong...");
                 break;
               }
@@ -155,12 +165,16 @@ public class SchedulingAlgorithm {
             allComptime++;
             currentComptime++;
           }
-        for (int i = 0; i < processVector.size(); i++)
-        {
-          if (processVector.get(i).state == sProcessState.RUNNING)
+          for (int i = 0; i < processVector.size(); i++) {
+            if (processVector.get(i).state == sProcessState.RUNNING) {
+              processVector.get(i).block(currentComptime);
+              out.println("Process: " + i + " in user " + processVector.get(i).userID + " I/O blocked... (" + processVector.get(i).cputime + " " + processVector.get(i).ioblocking + " " + processVector.get(i).cpudone + " " + processVector.get(i).cpudone + ")");
+            }
+          }
+          if (!groupAvailable)
           {
-            processVector.get(i).block(currentComptime);
-            out.println("Process: " + i + " in user " + processVector.get(i).userID + " I/O blocked... (" + processVector.get(i).cputime + " " + processVector.get(i).ioblocking + " " + processVector.get(i).cpudone + " " + processVector.get(i).cpudone + ")");
+            processPairVector.getKey().comptime = currentComptime;
+            processPairVector.getKey().process = currentProcess;
           }
         }
       }

@@ -36,6 +36,11 @@ public class sProcess {
     this.blockedTimestamp = currentTime;
     this.state = sProcessState.READY;
   }
+  public void ready(int currentTime)
+  {
+    this.blockedTimestamp = currentTime;
+    this.state = sProcessState.READY;
+  }
   public void run(int currentTime)
   {
     this.blockedTimestamp = currentTime;
