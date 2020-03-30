@@ -1,9 +1,13 @@
+package game;
+
+import game.Const.EObjType;
+import game.components.*;
+import game.singletons.ObjManager;
 import java.util.ArrayList;
 
-public class Obj
-{
-    Obj()
-    {
+public class Obj implements ObjType {
+    public Obj() {
+        UID = ObjManager.instance().register(this);
         components = new ArrayList<>();
         Drawable drawable = new Drawable();
         Transform transform = new Transform();
@@ -11,20 +15,32 @@ public class Obj
         addComponent(transform);
     }
 
-    public void Update()
+    @Override
+    public EObjType getObjType()
+    {
+        return Const.EObjType.None;
+    }
+
+    @Override
+    public int getUID()
+    {
+        return UID;
+    }
+
+    public void update()
     {
         for (Component component : components)
         {
-            component.Update();
+            component.update();
         }
     }
 
-    protected void addComponent(Component component)
+    public void addComponent(Component component)
     {
         if (component != null)
         {
             components.add(component);
-            component.Init(this);
+            component.init(this);
         }
     }
 
@@ -41,5 +57,12 @@ public class Obj
         return null;
     }
 
+    public void kill()
+    {
+        ObjManager.instance().remove(UID);
+    }
+
     protected ArrayList<Component> components;
+    protected int UID;
+
 }

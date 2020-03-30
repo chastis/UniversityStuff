@@ -1,3 +1,5 @@
+package game.components;
+
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
@@ -7,16 +9,16 @@ import javax.swing.ImageIcon;
 public class Drawable extends Component
 {
 
-    Drawable()
+    public Drawable()
     {
         sprite = new ImageIcon().getImage();
     }
 
-    public void InitDrawable(String path)
+    public void initDrawable(String path, int width, int height)
     {
         try
         {
-            sprite = ImageIO.read(new File(path)).getScaledInstance(400, 300, 0);
+            sprite = ImageIO.read(new File(path)).getScaledInstance(width, height, 0);
         }
         catch (IOException e)
         {
@@ -27,6 +29,16 @@ public class Drawable extends Component
     public Image getSprite()
     {
         return sprite;
+    }
+
+    public int getSpriteHeight()
+    {
+        return sprite.getHeight(null);
+    }
+
+    public int getSpriteWitdh()
+    {
+        return sprite.getWidth(null);
     }
 
     protected Image sprite;
