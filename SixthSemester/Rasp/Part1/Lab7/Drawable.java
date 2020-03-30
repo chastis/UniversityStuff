@@ -1,34 +1,33 @@
 import java.awt.Image;
-import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
-public class Drawable
+public class Drawable extends Component
 {
-    public void Init(String path)
+
+    Drawable()
+    {
+        sprite = new ImageIcon().getImage();
+    }
+
+    public void InitDrawable(String path)
     {
         try
         {
-            sprite = ImageIO.read(new File(path));
+            sprite = ImageIO.read(new File(path)).getScaledInstance(400, 300, 0);
         }
         catch (IOException e)
         {
-            sprite = null;
             e.printStackTrace();
         }
-        coordinates = null;
     }
+
     public Image getSprite()
     {
         return sprite;
     }
-    public Point getCoordinates()
-    {
-        return coordinates;
-    }
-
 
     protected Image sprite;
-    protected Point coordinates;
 }
