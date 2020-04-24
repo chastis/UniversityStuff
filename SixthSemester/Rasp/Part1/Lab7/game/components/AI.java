@@ -16,7 +16,7 @@ public class AI extends Component
     public void initDefaultAI()
     {
         Random random = new Random();
-        speed = new Vector2D(1, 0);
+        speed = new Vector2D(random.nextInt(3)-1, random.nextInt(3)-1);
         speed = speed.multiply(random.nextInt(Const.MaxDuckSpeed)+1);
         updateSpeed();
     }
@@ -33,7 +33,7 @@ public class AI extends Component
         }
         if (speed.sizeSqr()==0 && Const.isChangeGood(Const.EChance.Medium));
         {
-
+            initDefaultAI();
         }
     }
     
