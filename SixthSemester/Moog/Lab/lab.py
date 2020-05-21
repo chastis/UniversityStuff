@@ -2,9 +2,6 @@
 import matplotlib.pyplot as plt
 
 import math
-def Mod(x, y):
-  if y==0:  return x
-  return x-y*math.floor(x/y)
 
 class TCubicHermiteSpline:
   class TKeyPoint:
@@ -53,7 +50,7 @@ class TCubicHermiteSpline:
     t0= self.KeyPts[0].T
     te= self.KeyPts[-1].T
     T= te-t0
-    mod= Mod(t-t0,T)
+    mod= (t-t0) % T
     tp= t0+mod  #Phase
     n= (t-t0-mod)/T
     return n, tp
