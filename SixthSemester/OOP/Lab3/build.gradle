@@ -1,0 +1,134 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.liquibase:liquibase-core:3.4.1'
+        classpath "org.liquibase:liquibase-gradle-plugin:2.0.1"
+        classpath 'com.bmuschko:gradle-cargo-plugin:2.6.1'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'war'
+}
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'com.bmuschko.cargo'
+apply plugin: 'liquibase'
+
+
+group 'lab2'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    liquibase
+}
+dependencies {
+
+    compile 'org.hibernate:hibernate-core:5.2.6.Final'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.15'
+    compile 'org.apache.commons:commons-dbcp2:2.1.1'
+    compile 'jstl:jstl:1.2'
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat:1.5.1.RELEASE'
+    def cargoVersion = '1.6.5'
+    cargo "org.codehaus.cargo:cargo-core-uberjar:$cargoVersion",
+            "org.codehaus.cargo:cargo-ant:$cargoVersion"
+    compile('org.springframework:spring-webmvc:5.0.1.RELEASE')
+    compile group: 'org.springframework', name: 'spring-orm', version: '5.1.6.RELEASE'
+    compile group: 'org.springframework', name: 'spring-tx', version: '5.1.6.RELEASE'
+    compile group: 'org.springframework', name: 'spring-context', version: '5.1.6.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.1.5.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.1.5.RELEASE'
+    compile group: 'org.springframework.security', name: 'spring-security-web', version: '5.1.5.RELEASE'
+    compileOnly group: 'javax.servlet', name: 'servlet-api', version:'2.5'
+    compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    liquibaseRuntime 'org.liquibase:liquibase-core:3.6.1'
+    liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:2.0.1'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.27.0'
+    testCompile group: 'org.powermock', name: 'powermock-mockito-release-full', version: '1.6.4', ext: 'pom'
+    compile group: 'org.springframework.data', name: 'spring-data-jpa', version: '2.1.6.RELEASE'
+    testCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.8.0-beta4'
+    testCompile group: 'org.springframework', name: 'spring-test', version: '5.1.6.RELEASE'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+cargo {
+    containerId = 'tomcat9x'
+    port = 8080
+
+
+    deployable {
+        context = 'webbankSpring'
+    }
+
+    remote {
+        hostname = 'localhost'
+        username =  'tomcat'
+        password =  'tomcat'
+    }
+}
+
+/*task updateDb(type: JavaExec) {
+    group = "Liquibase"
+    classpath configurations.liquibase
+    main = "liquibase.integration.commandline.Main"
+    args "--changeLogFile=$projectDir/src/main/java/com/onlineshop/db/changelog.xml"
+    args "--username=root"
+    args "--password=max12398"
+    args "--url=jdbc:mysql://localhost:3306/onlineshop"
+    args "--driver=com.mysql.cj.jdbc.Driver"
+    args "--logLevel=debug"
+    args "--defaultSchemaName=public"
+    args "update"
+}*/
+
+def changeLog = "$projectDir/src/main/java/com/onlineshop/db/changelog.xml"
+task todb() {
+    doFirst {
+        println "executing todb"
+
+        liquibase {
+            activities {
+                main {
+                    changeLogFile changeLog
+                    url 'jdbc:mysql://localhost:3306/onlineshop'
+                    username 'root'
+                    password 'max12398'
+                }
+            }
+        }
+    }
+}
+/*diff.dependsOn compileJava
+diffChangeLog.dependsOn compileJava
+generateChangelog.dependsOn compileJava
+liquibase {
+    activities {
+        main {
+            changeLogFile '$projectDir/db/changelog.xml'
+            url 'jdbc:mysql://localhost:3306/onlineshop'
+            username 'root'
+            password 'max12398'
+            update
+        }
+        runList = 'main'
+    }
+}
+
+task updateDB()  {
+    group = 'develop'
+    doLast {
+        println "executing todb"
+        liquibase.runList = 'main'
+        tasks.update.execute()
+    }
+}*/
