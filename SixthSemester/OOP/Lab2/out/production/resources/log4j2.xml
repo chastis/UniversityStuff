@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration status="info">
+
+    <Properties>
+        <Property name="logdir">CATALINA_LOG</Property>
+        <Property name="layout">%d [%t] %-5p %c- %m%n</Property>
+    </Properties>
+
+    <Appenders>
+
+        <RollingFile name="LOCALHOST"
+                     fileName="home/alex/localhost.log"
+                     filePattern="${logdir}/localhost.%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${layout}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="1 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="10" />
+        </RollingFile>
+
+    </Appenders>
+
+    <Loggers>
+
+        <Logger name="com.zetcode"
+                level="info" additivity="false">
+            <AppenderRef ref="LOCALHOST" />
+        </Logger>
+
+        <Root level="error">
+        </Root>
+
+    </Loggers>
+</Configuration>
