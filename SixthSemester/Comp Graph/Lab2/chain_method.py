@@ -141,5 +141,5 @@ for j in range(num_chains):
     create_chain(j)
 
 print(chains)
-point_to_find = Point(10, 7)
-print(find(point_to_find))
+#point_to_find = Point(10, 7)
+print(find(Point(-2, -2)))
