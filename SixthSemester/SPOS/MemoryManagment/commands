@@ -8,4 +8,16 @@ READ bin 100000000000000
 READ bin 100000000000000
 WRITE bin 110000000000001
 WRITE random
+WRITE random
+WRITE random
+WRITE random
+WRITE random
+WRITE random
+WRITE random
+WRITE random
+WRITE random
+WRITE random
+WRITE random
+WRITE random
+WRITE random
 

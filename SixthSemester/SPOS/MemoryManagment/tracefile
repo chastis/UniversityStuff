@@ -4,4 +4,16 @@ WRITE cc32 ... okay
 READ 4000 ... okay
 READ 4000 ... okay
 WRITE 6001 ... okay
-WRITE b663d ... page fault
+WRITE cea0c ... page fault
+WRITE 271e8 ... okay
+WRITE b2169 ... page fault
+WRITE 9a6a9 ... page fault
+WRITE 9a6a9 ... okay
+WRITE 9a6a9 ... okay
+WRITE 9a6a9 ... okay
+WRITE 9a6a9 ... okay
+WRITE 9a6a9 ... okay
+WRITE 9a6a9 ... okay
+WRITE 9aa46 ... okay
+WRITE 9aa46 ... okay
+WRITE 9aa46 ... okay
