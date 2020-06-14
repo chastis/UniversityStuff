@@ -25,6 +25,8 @@ public class Kernel extends Thread
   public long block = (int) Math.pow(2,12);
   public static byte addressradix = 10;
 
+  private int timer = 0;
+
   public void init( String commands , String config )  
   {
     File f = new File( commands );
@@ -47,7 +49,7 @@ public class Kernel extends Thread
     long high = 0;
     long low = 0;
     long addr = 0;
-    long address_limit = (block * virtPageNum+1)-1;
+    long address_limit = (block * (virtPageNum+1))-1;
   
     if ( config != null )
     {
@@ -69,7 +71,7 @@ public class Kernel extends Thread
                 System.out.println("MemoryManagement: numpages out of bounds.");
                 System.exit(-1);
               }
-              address_limit = (block * virtPageNum+1)-1;
+              address_limit = (block * (virtPageNum+1))-1;
             }
           }
         }
@@ -186,7 +188,7 @@ public class Kernel extends Thread
               {
                 block = Long.parseLong(tmp,10);             
               }
-              address_limit = (block * virtPageNum+1)-1;
+              address_limit = (block * (virtPageNum+1))-1;
             }
             if ( block < 64 || block > Math.pow(2,26))
             {
@@ -283,14 +285,14 @@ public class Kernel extends Thread
       trace.delete();
     }
     runs = 0;
-    for (i = 0; i < virtPageNum; i++) 
+    for (i = 0; i <= virtPageNum; i++)
     {
       Page page = (Page) memVector.elementAt(i);
       if ( page.physical != -1 )
       {
         map_count++;
       }
-      for (j = 0; j < virtPageNum; j++) 
+      for (j = 0; j <= virtPageNum; j++)
       {
         Page tmp_page = (Page) memVector.elementAt(j);
         if (tmp_page.physical == page.physical && page.physical >= 0)
@@ -307,7 +309,7 @@ public class Kernel extends Thread
     }
     if ( map_count < ( virtPageNum +1 ) / 2 )
     {
-      for (i = 0; i < virtPageNum; i++) 
+      for (i = 0; i <= virtPageNum; i++)
       {
         Page page = (Page) memVector.elementAt(i);
         if ( page.physical == -1 && map_count < ( virtPageNum + 1 ) / 2 )
@@ -317,7 +319,7 @@ public class Kernel extends Thread
         }
       }
     }
-    for (i = 0; i < virtPageNum; i++) 
+    for (i = 0; i <= virtPageNum; i++)
     {
       Page page = (Page) memVector.elementAt(i);
       if (page.physical == -1) 
@@ -326,12 +328,12 @@ public class Kernel extends Thread
       } 
       else
       {
-        controlPanel.addPhysicalPage( i , page.physical );
+        controlPanel.addPhysicalPage( page.physical, i );
       }
     }
     for (i = 0; i < instructVector.size(); i++) 
     {
-      high = block * virtPageNum;
+      high = block * (virtPageNum + 1);
       Instruction instruct = ( Instruction ) instructVector.elementAt( i );
       if ( instruct.addr < 0 || instruct.addr > high )
       {
@@ -463,6 +465,7 @@ public class Kernel extends Thread
       else 
       {
         page.M = 1;
+        page.R = 1;
         page.lastTouchTime = 0;
         if ( doFileLog )
         {
@@ -474,7 +477,7 @@ public class Kernel extends Thread
         }
       }
     }
-    for ( i = 0; i < virtPageNum; i++ ) 
+    /*for ( i = 0; i <= virtPageNum; i++ )
     {
       Page page = ( Page ) memVector.elementAt( i );
       if ( page.R == 1 && page.lastTouchTime == 10 ) 
@@ -486,6 +489,16 @@ public class Kernel extends Thread
         page.inMemTime = page.inMemTime + 10;
         page.lastTouchTime = page.lastTouchTime + 10;
       }
+    }*/
+    if(timer == 15) {
+      for (i = 0; i <= virtPageNum; i++) {
+        Page page = (Page) memVector.elementAt(i);
+        page.R = 0;
+      }
+      timer = 0;
+    }
+    else {
+      timer+=5;
     }
     runs++;
     controlPanel.timeValueLabel.setText( Integer.toString( runs*10 ) + " (ns)" );
