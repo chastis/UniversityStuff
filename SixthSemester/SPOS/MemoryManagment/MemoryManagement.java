@@ -4,11 +4,11 @@ import java.applet.*;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
-import ControlPanel;
-import PageFault;
-import Virtual2Physical;
-import Common;
-import Page;
+//import ControlPanel.*;
+//import PageFault.*;
+//import Virtual2Physical.*;
+//import Common.*;
+//import Page.*;
 
 public class MemoryManagement 
 {
