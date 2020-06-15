@@ -13,13 +13,18 @@ Token::Token(size_t row, size_t column, TokenType type)
     symbol = TokenValue[static_cast<size_t>(type)];
 }
 
+Lexer::Lexer()
+{
+    FA.owner = this;
+}
+
 void Lexer::parse(const std::string& file)
 {
     fin.open(file);
 
     while (nextChar())
     {
-        if (c == ' ')
+        if (c == ' ' || c == '\t')
         {
             continue;
         }
@@ -34,7 +39,7 @@ void Lexer::parse(const std::string& file)
             {
                 if (c == '$')
                 {
-                    Token startToken(row - 2, column, TokenType::StartPreprocessorCommand);
+                    Token startToken(row, column - 2, TokenType::StartPreprocessorCommand);
                     tokens.push_back(std::forward<Token>(startToken));
 
                     while (nextChar())
@@ -55,11 +60,13 @@ void Lexer::parse(const std::string& file)
                             if (isCorrectIdentifierStart(c))
                             {
                                 prevChar();
-                                const size_t startRow = row;
+                                const size_t startColumn = column;
                                 const auto nextIdentifierType = getNextIdentifier();
-                                if (nextIdentifierType != TokenType::Identifier)
+                                if (static_cast<size_t>(nextIdentifierType) < static_cast<size_t>(TokenType::Identifier)
+                                    || static_cast<size_t>(nextIdentifierType) > static_cast<size_t>(TokenType::FalseValue)
+                                    || static_cast<size_t>(nextIdentifierType) == static_cast<size_t>(TokenType::OneLineComment))
                                 {
-                                    expectedError("}", startRow, column);
+                                    expectedError("}", row, startColumn);
                                     break;
                                 }
                             }
@@ -77,15 +84,67 @@ void Lexer::parse(const std::string& file)
             getNextComment(TokenType::MultiLineBraceComment, row, column);
             continue;
         }
+        if (c == '(')
+        {
+            if (nextChar())
+            {
+                if (c == '*')
+                {
+                    getNextComment(TokenType::MultiLineParenthesesComment, row, column);
+                    continue;
+                }
+                else
+                {
+                    prevChar();
+                }
+            }
+            Token newToken(row, column - 1, TokenType::ParenthesesL);
+            tokens.push_back(std::forward<Token>(newToken));
+            continue;
+        }
         if (isCorrectIdentifierStart(c))
         {
             prevChar();
             getNextIdentifier();
             continue;
         }
+        if (isdigit(c))
+        {
+            const size_t startColumn = column - 1;
+            std::string tokenString(&c);
+            bool bMetPeriod = false;
+            while (nextChar())
+            {
+                if (isdigit(c))
+                {
+                    tokenString+=c;
+                    continue;
+                }
+                if (c == '.')
+                {
+                    if (!bMetPeriod)
+                    {
+                        bMetPeriod = true;
+                        tokenString+=c;
+                        continue;
+                    }
+                    else
+                    {
+                        invalidError(".", row, column);
+                        break;
+                    }
+                }
+                prevChar();
+                break;
+            }
+            const auto it = symbols.insert(tokenString);
+            Token newToken(row, startColumn, bMetPeriod ? TokenType::RealValue : TokenType::IntegerValue, *it.first);
+            tokens.push_back(std::forward<Token>(newToken));
+            continue;
+        }
         if (c == '\'')
         {
-            const size_t rowStart = row;
+            const size_t startColumn = column;
             std::string tokenString;
             while (nextChar())
             {
@@ -100,23 +159,75 @@ void Lexer::parse(const std::string& file)
             }
 
             const auto it = symbols.insert(tokenString);
-            Token newToken(rowStart, column, TokenType::StringValue, *it.first);
+            Token newToken(row, startColumn, TokenType::StringValue, *it.first);
             tokens.push_back(std::forward<Token>(newToken));
             continue;
         }
         if (c == ';')
         {
-            Token newToken(row - 1, column, TokenType::Semicolon);
+            Token newToken(row, column - 1, TokenType::Semicolon);
             tokens.push_back(std::forward<Token>(newToken));
             continue;
         }
         if (c == '.')
         {
-            Token newToken(row - 1, column, TokenType::Period);
+            Token newToken(row, column - 1, TokenType::Period);
             tokens.push_back(std::forward<Token>(newToken));
             continue;
         }
-
+        if (c == '[')
+        {
+            Token newToken(row, column - 1, TokenType::BracketL);
+            tokens.push_back(std::forward<Token>(newToken));
+            continue;
+        }
+        if (c == ']')
+        {
+            Token newToken(row, column - 1, TokenType::BracketR);
+            tokens.push_back(std::forward<Token>(newToken));
+            continue;
+        }
+        if (c == ')')
+        {
+            Token newToken(row, column - 1, TokenType::ParenthesesR);
+            tokens.push_back(std::forward<Token>(newToken));
+            continue;
+        }
+        if (c == ',')
+        {
+            Token newToken(row, column - 1, TokenType::Comma);
+            tokens.push_back(std::forward<Token>(newToken));
+            continue;
+        }
+        if (c == '/')
+        {
+            if (nextChar())
+            {
+                if (c == '/')
+                {
+                    getNextComment(TokenType::OneLineComment, row, column);
+                    continue;
+                }
+                else if (c == '*')
+                {
+                    getNextComment(TokenType::MultiLineSlashComment, row, column);
+                    continue;
+                }
+                else
+                {
+                    prevChar();
+                }
+            }
+            Token newToken(row, column - 1, TokenType::Divide);
+            tokens.push_back(std::forward<Token>(newToken));
+            continue;
+        }
+        if (FA.parse(c))
+        {
+            continue;
+        }
+        // We did not find any symbol
+        invalidError(&c, row, column);
     }
 
     fin.close();
@@ -130,11 +241,11 @@ void Lexer::printTokens(std::ostream& fout)
         if (static_cast<size_t>(token.type) >= static_cast<size_t>(TokenType::Identifier) &&
             static_cast<size_t>(token.type) <= static_cast<size_t>(TokenType::MultiLineSlashComment))
         {
-            fout << std::setw(24) << TokenValue[static_cast<size_t>(token.type)] << ": " << token.symbol << '\n';
+            fout << std::setw(16) << TokenValue[static_cast<size_t>(token.type)] << ": " << std::setw(16) << token.symbol << '\n';
         }
         else
         {
-            fout << std::setw(24) << TokenValue[static_cast<size_t>(token.type)] << '\n';
+            fout << std::setw(16) << TokenValue[static_cast<size_t>(token.type)] << '\n';
         }
     }
     fout << "------------------------------------------\n";
@@ -201,16 +312,16 @@ bool Lexer::isCorrectIdentifierStart(char inChar)
     return std::isalpha(inChar) || inChar == '_';
 }
 
-TokenType Lexer::isDefaultToken(const std::string& tokenString)
+TokenType Lexer::isKeyWord(const std::string& tokenString)
 {
-    for (size_t i = static_cast<size_t>(TokenType::Var); i < static_cast<size_t>(TokenType::Count); ++i)
+    for (size_t i = static_cast<size_t>(TokenType::TrueValue); i <= static_cast<size_t>(TokenType::Real); ++i)
     {
         if (TokenValue[i] == tokenString)
         {
             return static_cast<TokenType>(i);
         }
     }
-    return TokenType::Invalid;
+    return TokenType::Identifier;
 }
 
 void Lexer::getNextComment(TokenType commentType, size_t startRow, size_t startColumn)
@@ -320,7 +431,7 @@ TokenType Lexer::getNextIdentifier()
     {
         if (isCorrectIdentifierChar(c))
         {
-            tokenString += c;
+            tokenString += static_cast<char>(tolower(c));
         }
         else
         {
@@ -330,8 +441,8 @@ TokenType Lexer::getNextIdentifier()
     }
     if (!tokenString.empty())
     {
-        const TokenType tokenType = isDefaultToken(tokenString);
-        if (tokenType != TokenType::Invalid)
+        const TokenType tokenType = isKeyWord(tokenString);
+        if (tokenType != TokenType::Identifier)
         {
             Token newToken(startRow, startColumn, tokenType);
             tokens.push_back(std::forward<Token>(newToken));

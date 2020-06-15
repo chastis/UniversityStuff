@@ -125,15 +125,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FiniteAutomaton.cpp" />
     <ClCompile Include="Lexer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FiniteAutomaton.h" />
     <ClInclude Include="Lexer.h" />
     <ClInclude Include="TokenType.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="HelloWorld.pas" />
+    <None Include="Tokens.out" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

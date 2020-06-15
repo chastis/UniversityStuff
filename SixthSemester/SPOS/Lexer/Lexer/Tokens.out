@@ -1,0 +1,82 @@
+------------------Tokens------------------
+              {$
+      identifier:      ioexception
+            true
+               }
+         program
+      identifier:        myprogram
+               ;
+             var
+      identifier:                a
+               :
+         integer
+               ;
+      identifier:                b
+               :
+            real
+               ;
+           begin
+      identifier:                a
+              :=
+   integer value:                0
+               ;
+one line comment:         one line
+      identifier:                b
+              :=
+      real value:               1.
+               ;
+multi line slash comment:  multi
+
+	line
+
+	
+      identifier:          writeln
+               (
+      identifier:                b
+               ,
+    string value:                 
+               ,
+      identifier:                b
+               :
+   integer value:                8
+               :
+   integer value:                4
+               )
+               ;
+              if
+               (
+      identifier:                b
+              >=
+   integer value:               42
+               )
+            then
+      identifier:                b
+              >>
+   integer value:                1
+               ;
+            else
+      identifier:                b
+               =
+      identifier:                a
+               |
+      identifier:                b
+               ;
+           while
+               (
+            true
+             and
+             not
+           false
+               )
+      identifier:          writeln
+               (
+    string value:    Hello, world!
+               )
+               ;
+             end
+               .
+multi line brace comment:   end of program
+------------------------------------------
+------------Error-Tokens------------------
+     Expected } at 35 17
+------------------------------------------

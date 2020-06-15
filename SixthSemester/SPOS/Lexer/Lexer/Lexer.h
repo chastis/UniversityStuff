@@ -1,5 +1,6 @@
 #pragma once
 
+#include "FiniteAutomaton.h"
 #include "TokenType.h"
 #include <string>
 #include <string_view>
@@ -20,7 +21,11 @@ struct Token
 
 class Lexer
 {
+     friend  class FiniteAutomaton;
 public:
+   
+    Lexer();
+
     void parse(const std::string& file);
     void printTokens(std::ostream& fout);
     void printErrorTokens(std::ostream& fout);
@@ -33,7 +38,7 @@ private:
 
     static bool isCorrectIdentifierChar(char inChar);
     static bool isCorrectIdentifierStart(char inChar);
-    static TokenType isDefaultToken(const std::string& tokenString);
+    static TokenType isKeyWord(const std::string& tokenString);
 
     void getNextComment(TokenType commentType, size_t startRow, size_t startColumn);
     TokenType getNextIdentifier();
@@ -46,9 +51,10 @@ private:
     std::vector<std::pair<Token, std::string>> errorTokens;
     std::ifstream fin;
 
+    FiniteAutomaton FA;
+
     char c = ' ';
     size_t position = 0;
     size_t row = 0;
     size_t column = 0;
-    bool openedComment = false;
 };
