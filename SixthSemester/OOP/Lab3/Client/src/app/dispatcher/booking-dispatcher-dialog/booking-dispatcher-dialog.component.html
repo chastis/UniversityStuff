@@ -1,0 +1,29 @@
+<h1 matDialogTitle>Add booking</h1>
+
+<mat-dialog-content>
+  <p>Car class: {{booking.minClass}}</p>
+  <p>Depart: {{booking.depart}}</p>
+  <p>Destination: {{booking.destination}}</p>
+  <p>Min car seats: {{booking.minSeats}}</p>
+  <form [formGroup]="form">
+    <mat-form-field appearance="outline">
+      <mat-label>Car</mat-label>
+      <mat-select formControlName="car">
+        <mat-option *ngFor="let car of cars | async" [value]="car">
+          Car class: {{car.carClass}}  Car seats number: {{car.seatsNumber}}  Last inspection: {{car.lastInspection}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Price</mat-label>
+      <input matInput formControlName="price" required min="0">
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button (click)="submit()" color="accent">Submit</button>
+  <button mat-button (click)="reject()" color="accent">Reject</button>
+  <button mat-button matDialogClose>Close dialog</button>
+
+</mat-dialog-actions>

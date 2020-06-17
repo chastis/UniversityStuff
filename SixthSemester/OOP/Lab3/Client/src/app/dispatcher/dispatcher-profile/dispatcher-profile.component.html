@@ -1,0 +1,7 @@
+<mat-card>
+  <mat-card-content>
+    <div *ngFor="let booking of pendingBookings | async">
+      <app-booking-dispatcher-item [booking]="booking" (changed)="loadBookings()"></app-booking-dispatcher-item>
+    </div>
+  </mat-card-content>
+</mat-card>

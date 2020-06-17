@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Start-Class: com.webbank.Application
-Main-Class: org.springframework.boot.loader.WarLauncher
-

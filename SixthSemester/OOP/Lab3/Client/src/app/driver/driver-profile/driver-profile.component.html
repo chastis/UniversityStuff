@@ -1,0 +1,41 @@
+<div class="container" fxLayout.gt-sm="row" fxLayout.gt-xs="column" fxLayoutWrap fxLayoutGap="3rem"
+     fxLayoutAlign="center">
+  <div fxLayout="column" fxLayoutGap="1rem">
+    <mat-card id="profile-card">
+      <mat-card-content fxLayout="column" fxLayoutAlign="space-around">
+        <h3>Email: {{(userData|async)?.email}}</h3>
+        <h3>Name: {{(userData|async)?.name}}</h3>
+        <h3>Surname: {{(userData|async)?.surname}}</h3>
+      </mat-card-content>
+    </mat-card>
+    <mat-card *ngIf="(userData|async)?.car">
+      <mat-card-content>
+        <h3>Car class:{{(userData|async)?.car.carClass}}</h3>
+        <h3>Seats number:{{(userData|async)?.car.seatsNumber}}</h3>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button *ngIf="(userData|async)?.car.serviceable" color="accent"
+                (click)="setServiceable(false)">Set
+          broken
+        </button>
+        <button mat-raised-button *ngIf="(userData|async)?.car.serviceable==false" color="accent"
+                (click)="setServiceable(true)">
+          Set serviceable
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card *ngIf="!(userData|async)?.car">
+      <mat-card-content>
+        <button mat-raised-button color="accent" (click)="addCar()">Add car</button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-card class="rides">
+    <div *ngFor="let booking of bookings | async">
+      <app-ride-driver-item [booking]="booking" (changed)="loadBookings()"></app-ride-driver-item>
+    </div>
+  </mat-card>
+
+</div>

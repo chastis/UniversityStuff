@@ -1,0 +1,7 @@
+<mat-card>
+  <mat-card-content fxLayout="row" fxLayoutAlign="space-between">
+    <p>Client: {{booking.userEmail}}</p>
+    <p>{{booking.depart}} - {{booking.destination}}</p>
+    <button mat-raised-button color="accent" (click)="updateRide()">Complete</button>
+  </mat-card-content>
+</mat-card>

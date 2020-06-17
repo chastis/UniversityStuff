@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "keycloak.realm",
+      "type": "java.lang.String",
+      "description": "Description for keycloak.realm."
+  }
+] }

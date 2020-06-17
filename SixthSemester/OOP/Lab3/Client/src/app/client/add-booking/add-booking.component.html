@@ -1,0 +1,37 @@
+<h1 matDialogTitle>Add booking</h1>
+
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field appearance="outline">
+      <mat-label>Min class</mat-label>
+      <mat-select formControlName="minClass">
+        <mat-option *ngFor='let carClass of classList?(classList |async):(loadClassList() | async)'
+                [value]="carClass">{{carClass |titlecase}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Depart</mat-label>
+      <input matInput formControlName="depart" placeholder="Enter depart" required maxlength="30">
+      <mat-error *ngIf="form.get('depart').errors?.required">Depart cannot be empty</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Destination</mat-label>
+      <input matInput formControlName="destination" placeholder="Enter destination" required maxlength="30">
+      <mat-error *ngIf="form.get('destination').errors?.required">Destination cannot be empty</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Min seats</mat-label>
+      <input matInput type="text" formControlName="minSeats" placeholder="Enter min seats" required min="0">
+      <mat-error *ngIf="form.get('minSeats').errors?.required">Min seats cannot be empty</mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button (click)="submit()" color="accent">Add</button>
+  <button mat-button matDialogClose>Close dialog</button>
+
+</mat-dialog-actions>

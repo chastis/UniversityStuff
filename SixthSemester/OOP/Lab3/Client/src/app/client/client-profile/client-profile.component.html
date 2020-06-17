@@ -1,0 +1,22 @@
+<div class="container" fxLayout.gt-sm="row" fxLayout.gt-xs="column" fxLayoutWrap fxLayoutGap="3rem"
+     fxLayoutAlign="center">
+  <div fxLayout="column" fxLayoutGap="1rem">
+    <mat-card id="profile-card">
+      <mat-card-content fxLayout="column" fxLayoutAlign="space-around">
+        <h3>Email: {{(userData|async)?.email}}</h3>
+        <h3>Name: {{(userData|async)?.name}}</h3>
+        <h3>Surname: {{(userData|async)?.surname}}</h3>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-card class="bookings">
+    <div *ngFor="let booking of bookings | async">
+      <app-booking-simple-item [booking]="booking"></app-booking-simple-item>
+    </div>
+    <button mat-fab (click)="openDialog()">
+      <mat-icon class="mat-18">add</mat-icon>
+    </button>
+  </mat-card>
+
+</div>

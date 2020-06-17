@@ -1,0 +1,26 @@
+<h1 matDialogTitle>Add booking</h1>
+
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field appearance="outline">
+      <mat-label>Car class</mat-label>
+      <mat-select formControlName="carClass">
+        <mat-option *ngFor='let carClass of classList?(classList |async):(loadClassList() | async)'
+                    [value]="carClass">{{carClass |titlecase}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Seats number</mat-label>
+      <input matInput type="text" formControlName="seatsNumber" placeholder="Enter number of seats" required min="0">
+      <mat-error *ngIf="form.get('seatsNumber').errors?.required"> Seats number cannot be empty
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button (click)="submit()" color="accent">Add</button>
+  <button mat-button matDialogClose>Close dialog</button>
+
+</mat-dialog-actions>
