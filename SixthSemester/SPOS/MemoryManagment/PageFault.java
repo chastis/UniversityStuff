@@ -75,7 +75,7 @@ public class PageFault {
           }
           else
           {
-            page.R = 1;
+            page.R = 0;
           }
         }
         clockArrow++;
