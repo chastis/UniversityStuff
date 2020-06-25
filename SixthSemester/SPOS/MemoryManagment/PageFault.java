@@ -51,26 +51,25 @@ public class PageFault {
    *   simulator, and allows one to modify the current display.
    */
 
-  int ClockArrow = 0;
+  static int ClockArrow = 0;
 
   public static void replacePage ( Vector mem , int virtPageNum , int replacePageNum , ControlPanel controlPanel ) 
   {
-    int count = 0;
     int oldestPage = -1;
     boolean mapped = false;
 
     while (!mapped)
     {
-      if (count == virtPageNum)
+      if (ClockArrow == virtPageNum)
       {
-        count = 0;
+        ClockArrow = 0;
       }
-      Page page = ( Page ) mem.elementAt( count );
+      Page page = ( Page ) mem.elementAt( ClockArrow );
       if ( page.physical != -1 )
       {
         if (page.R == 0)
         {
-          oldestPage = count;
+          oldestPage = ClockArrow;
           mapped = true;
         }
         else
@@ -78,7 +77,7 @@ public class PageFault {
           page.R = 0;
         }
       }
-      count++;
+      ClockArrow++;
     }
     System.out.println( "We replace :" + oldestPage + " to " + replacePageNum );
     Page page = ( Page ) mem.elementAt( oldestPage );
