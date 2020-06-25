@@ -51,44 +51,67 @@ public class PageFault {
    *   simulator, and allows one to modify the current display.
    */
 
-  static int ClockArrow = 0;
-
-  public static void replacePage ( Vector mem , int virtPageNum , int replacePageNum , ControlPanel controlPanel ) 
+  static class Clock
+  {
+    int clockArrow = 0;
+    Vector clockFace = new Vector();
+    public Page replacePage(Page newPage)
+    {
+      while (true)
+      {
+        if (clockArrow == clockFace.size())
+        {
+          clockArrow = 0;
+        }
+        Page page = ( Page ) clockFace.elementAt( clockArrow );
+        if (page.physical != -1)
+        {
+          if (page.R == 0)
+          {
+            Page oldPage = page;
+            page = newPage;
+            clockArrow++;
+            return oldPage;
+          }
+          else
+          {
+            page.R = 1;
+          }
+        }
+        clockArrow++;
+      }
+    }
+  }
+  static Clock clock = new Clock();
+  public static void initClock(Vector mem, int virtPageNum)
+  {
+    for (int i = 0; i <= virtPageNum; i++)
+    {
+      clock.clockFace.addElement(mem.elementAt(i));
+    }
+  }
+  public static void replacePage ( Vector mem , int virtPageNum , int replacePageNum , ControlPanel controlPanel )
   {
     int oldestPage = -1;
-    boolean mapped = false;
-
-    while (!mapped)
+    Page nextpage = ( Page ) mem.elementAt( replacePageNum );
+    Page oldPage = clock.replacePage(nextpage);
+    for (int i = 0; i <= virtPageNum; i++)
     {
-      if (ClockArrow == virtPageNum)
+      Page page = ( Page ) mem.elementAt( i );
+      if (page.id == oldPage.id)
       {
-        ClockArrow = 0;
+        oldestPage = i;
+        break;
       }
-      Page page = ( Page ) mem.elementAt( ClockArrow );
-      if ( page.physical != -1 )
-      {
-        if (page.R == 0)
-        {
-          oldestPage = ClockArrow;
-          mapped = true;
-        }
-        else
-        {
-          page.R = 0;
-        }
-      }
-      ClockArrow++;
     }
     System.out.println( "We replace :" + oldestPage + " to " + replacePageNum );
-    Page page = ( Page ) mem.elementAt( oldestPage );
-    Page nextpage = ( Page ) mem.elementAt( replacePageNum );
     controlPanel.removePhysicalPage( oldestPage );
-    nextpage.physical = page.physical;
+    nextpage.physical = oldPage.physical;
     controlPanel.addPhysicalPage( nextpage.physical , replacePageNum );
-    page.inMemTime = 0;
-    page.lastTouchTime = 0;
-    page.R = 0;
-    page.M = 0;
-    page.physical = -1;
+    oldPage.inMemTime = 0;
+    oldPage.lastTouchTime = 0;
+    oldPage.R = 0;
+    oldPage.M = 0;
+    oldPage.physical = -1;
   }
 }

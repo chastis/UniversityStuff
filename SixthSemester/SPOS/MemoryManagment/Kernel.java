@@ -217,6 +217,7 @@ public class Kernel extends Thread
               }
             }
           }
+          PageFault.initClock(memVector, virtPageNum);
         }
         in.close();
       } catch (IOException e) { /* Handle exceptions */ }
