@@ -53,32 +53,31 @@ public class PageFault {
 
   static class Clock
   {
-    int clockArrow = 0;
+    int hand = 0;
     Vector clockFace = new Vector();
     public Page replacePage(Page newPage)
     {
       while (true)
       {
-        if (clockArrow == clockFace.size())
+        if (hand == clockFace.size())
         {
-          clockArrow = 0;
+          hand = 0;
         }
-        Page page = ( Page ) clockFace.elementAt( clockArrow );
-        if (page.physical != -1)
-        {
+        Page page = ( Page ) clockFace.elementAt( hand );
+
           if (page.R == 0)
           {
             Page oldPage = page;
             page = newPage;
-            clockArrow++;
+            hand++;
             return oldPage;
           }
           else
           {
             page.R = 0;
           }
-        }
-        clockArrow++;
+
+        hand++;
       }
     }
   }
@@ -87,7 +86,11 @@ public class PageFault {
   {
     for (int i = 0; i <= virtPageNum; i++)
     {
-      clock.clockFace.addElement(mem.elementAt(i));
+      Page page = ( Page ) mem.elementAt( i );
+      if (page.physical != -1)
+      {
+        clock.clockFace.addElement(mem.elementAt(i));
+      }
     }
   }
   public static void replacePage ( Vector mem , int virtPageNum , int replacePageNum , ControlPanel controlPanel )
