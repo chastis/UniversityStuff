@@ -57,6 +57,15 @@ public class PageFault {
     Vector clockFace = new Vector();
     public Page replacePage(Page newPage)
     {
+
+      //System.out.println( "<clock pages>");
+      //for (int i = 0; i < clockFace.size(); i++)
+      //{
+      //  Page page = ( Page ) clockFace.elementAt( i );
+      //  System.out.println( "page :  id =" + page.id + "  r = " + page.R + " phys = " + page.physical );
+      //}
+      //System.out.println( "</clock pages>");
+
       while (true)
       {
         if (hand == clockFace.size())
@@ -64,13 +73,12 @@ public class PageFault {
           hand = 0;
         }
         Page page = ( Page ) clockFace.elementAt( hand );
-
+        //System.out.println( "page " + hand + ", r = " + page.R );
           if (page.R == 0)
           {
-            Page oldPage = page;
-            page = newPage;
+            clockFace.set(hand, newPage);
             hand++;
-            return oldPage;
+            return page;
           }
           else
           {
@@ -98,6 +106,16 @@ public class PageFault {
     int oldestPage = -1;
     Page nextpage = ( Page ) mem.elementAt( replacePageNum );
     Page oldPage = clock.replacePage(nextpage);
+
+
+    //System.out.println( "<pages>");
+    //for (int i = 0; i <= virtPageNum; i++)
+    //{
+    //  Page page = ( Page ) mem.elementAt( i );
+    //  System.out.println( "page :  id =" + page.id + "  r = " + page.R + " phys = " + page.physical );
+    //}
+    //System.out.println( "</pages>");
+
     for (int i = 0; i <= virtPageNum; i++)
     {
       Page page = ( Page ) mem.elementAt( i );

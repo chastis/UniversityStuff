@@ -1,19 +1,2 @@
-READ 4 ... okay
-READ 13 ... okay
-WRITE cc32 ... okay
-READ 4000 ... okay
-READ 4000 ... okay
-WRITE 6001 ... okay
-WRITE cc2d6 ... page fault
-WRITE 3ba4e ... okay
-WRITE 33a60 ... okay
-WRITE 33a60 ... okay
-WRITE 33a60 ... okay
-WRITE 33a60 ... okay
-WRITE 9f14 ... okay
-WRITE 9f14 ... okay
-WRITE 9f14 ... okay
-WRITE fea47 ... page fault
-WRITE fea47 ... page fault
-WRITE fea47 ... okay
-WRITE fea47 ... okay
+READ 84000 ... page fault
+READ 88000 ... page fault

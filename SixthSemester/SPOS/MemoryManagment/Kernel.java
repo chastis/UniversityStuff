@@ -217,8 +217,9 @@ public class Kernel extends Thread
               }
             }
           }
-          PageFault.initClock(memVector, virtPageNum);
+
         }
+        PageFault.initClock(memVector, virtPageNum);
         in.close();
       } catch (IOException e) { /* Handle exceptions */ }
     }
@@ -420,7 +421,9 @@ public class Kernel extends Thread
     }
     if ( instruct.inst.startsWith( "READ" ) ) 
     {
-      Page page = ( Page ) memVector.elementAt( Virtual2Physical.pageNum( instruct.addr , virtPageNum , block ) );
+      int index = Virtual2Physical.pageNum( instruct.addr , virtPageNum , block );
+      //System.out.println( "read index : " + index );
+      Page page = ( Page ) memVector.elementAt( index );
       if ( page.physical == -1 ) 
       {
         if ( doFileLog )
@@ -500,7 +503,7 @@ public class Kernel extends Thread
       timer = 0;
     }
     else {
-      timer+=5;
+      timer+=1;
     }
     runs++;
     controlPanel.timeValueLabel.setText( Integer.toString( runs*10 ) + " (ns)" );
