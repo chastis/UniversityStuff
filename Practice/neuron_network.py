@@ -53,7 +53,7 @@ model.compile(loss=keras.losses.categorical_crossentropy, optimizer=keras.optimi
 model.summary()
 
 
-early_stopper = EarlyStopping(patience=5, verbose=1)
+#early_stopper = EarlyStopping(patience=5, verbose=1)
 nn_save = 'model.h5'
 check_pointer = ModelCheckpoint(nn_save, verbose=1, save_best_only=True)
 train = model.fit(train_x, 
@@ -62,7 +62,7 @@ train = model.fit(train_x,
                   epochs=epochs,
                   verbose=1,
                   validation_data=(test_x, test_y),
-                  callbacks=[check_pointer, early_stopper]
+                  callbacks=[check_pointer]
                   )
 
 

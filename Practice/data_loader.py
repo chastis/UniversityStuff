@@ -24,17 +24,22 @@ def load_data():
     cats = [(f, 1) for f in listdir('cats') if isfile(join('cats', f))]
     notcats = [(f, 0) for f in listdir('notcats') if isfile(join('notcats', f))]
 
-    notcats = notcats[:1000]
-    cats = cats[:1000]
+    notcats = notcats[:2000]
+    cats = cats[:2000]
 
     all = cats + notcats
     random.shuffle(all)
 
     all_x = np.empty(0)
     all_y = np.empty(0)
+
+    temp_count = 0
     for a in all:
         all_x = np.append(all_x, load_photo(a[0], a[1]))
         all_y = np.append(all_y, a[1])
+        if (temp_count % 100 == 0):
+            print ('progress ... ' + str(temp_count) + ' from ' + str(len(all)))
+        temp_count += 1
 
     current_len = len(all_y)
     train_len_y = (int)(current_len * TRAIN_PART)//BATCH_SIZE*BATCH_SIZE
