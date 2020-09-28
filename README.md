@@ -3,12 +3,7 @@
 
 <a href = "https://t.me/sheva_quotes"><img src="sheva_quotes.png" width="200"></a> | <i> Make yourself <br> at your repository </i>
 --|--
-
-<br>
 <hr>
-
-<br>
-
 <table>
 <tr > 
 <th>Course 1</th>
