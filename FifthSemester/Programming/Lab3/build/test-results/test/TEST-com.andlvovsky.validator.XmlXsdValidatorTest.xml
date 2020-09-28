@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.andlvovsky.validator.XmlXsdValidatorTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2019-12-03T07:46:49" hostname="LAPTOP-V76O4EIE" time="0.078">
-  <properties/>
-  <testcase name="shouldNotThrowAnyExceptionWhenValidatingValidDevice" classname="com.andlvovsky.validator.XmlXsdValidatorTest" time="0.059"/>
-  <testcase name="shouldThrowXmlValidatorExceptionWhenValidatingInvalidDevice" classname="com.andlvovsky.validator.XmlXsdValidatorTest" time="0.019"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
