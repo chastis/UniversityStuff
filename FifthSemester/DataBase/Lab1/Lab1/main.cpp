@@ -22,9 +22,9 @@ void clearCin()
 struct Detail
 {
 	uint32_t id;
-	char name[Const::DefaultCharLen];
 	uint32_t amount;
 	uint32_t difficult;
+	char name[Const::DefaultCharLen];
 	void print() const
 	{
 		std::cout << "id = " << id << ", name = " << name << ", amount = " << amount << ", difficult = " << difficult << std::endl;
