@@ -47,7 +47,8 @@ class PunctType(Enum):
     MoreEq = 9,
     NotEq = 10,
     Plus = 11,
-    Minus = 12
+    Minus = 12,
+    Devide = 13
 
 class CommentType(Enum):
     MultiComment_Open = 0,
@@ -93,7 +94,8 @@ KEY_WORDS = {
         PunctType.MoreEq              :'>=',
         PunctType.NotEq               :'<>',
         PunctType.Plus                :'+',
-        PunctType.Minus               :'-'
+        PunctType.Minus               :'-',
+        PunctType.Devide              :'/'
     },
     TokenType.Comment: {
         CommentType.MultiComment_Open : '/*',
@@ -117,9 +119,11 @@ class Token:
     type = TokenType.Invalid
     value = ''
 
-    def __init__(self, in_type):
+    def __init__(self, in_type, in_value = ''):
         self.type = in_type
-
+        self.value = in_value
+    def __str__(self):
+        return str(self.type) + ' ' + str(self.value)
     @staticmethod
     def get_info(token):
         for token_dict in KEY_WORDS:

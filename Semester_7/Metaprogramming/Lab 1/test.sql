@@ -2,7 +2,7 @@ CREATE TABLE My_Table
 (
     Id   int         not null,
     Name varchar(60) not null,
-    Note varchar(2000)
+    Note varchar(2000.0)
 );
 
 
