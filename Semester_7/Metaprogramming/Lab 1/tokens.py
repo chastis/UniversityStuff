@@ -120,28 +120,30 @@ for a in TOKEN_DICT.values():
     ALL_TOKEN_DICT.update(a)
 
 class Token:
-    category_type = TokenType.Invalid
-    token_type = None
+    token_type = TokenType.Invalid
+    subtype = None
+    pos = 0
     value = ''
 
-    def __init__(self, in_type, in_value = ''):
-        self.category_type = in_type
+    def __init__(self, in_pos, in_type, in_value = ''):
+        self.token_type = in_type
         self.value = in_value
+        self.pos = in_pos
     def __str__(self):
-        return '{0:25} {1:20} {2:20}'.format(str(self.category_type), str(self.value), str(self.token_type))
+        return '{0:25} {1:20} {2:20}'.format(str(self.token_type), str(self.value), str(self.subtype))
     def set_type(self):
-        new_category_type, new_token_type = Token.get_info(self.value)
-        if new_category_type != None:
-            self.category_type = new_category_type
+        new_token_type, new_subtype = Token.get_info(self.value)
+        if new_token_type != None:
+            self.subtype = new_subtype
             self.token_type = new_token_type
 
     @staticmethod
     def get_info(token):
-        for kw_type in TOKEN_DICT:
-            for specific_type in TOKEN_DICT[kw_type]:
-                token_array = TOKEN_DICT[kw_type][specific_type]
+        for token_type in TOKEN_DICT:
+            for subtype in TOKEN_DICT[token_type]:
+                token_array = TOKEN_DICT[token_type][subtype]
                 if token == token_array:
-                    return kw_type, specific_type
+                    return token_type, subtype
         for space_type in SPACES:
             if token == SPACES[space_type]:
                 return TokenType.Spaces, space_type
