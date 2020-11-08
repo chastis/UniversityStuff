@@ -48,7 +48,8 @@ class PunctType(Enum):
     NotEq = 10,
     Plus = 11,
     Minus = 12,
-    Devide = 13
+    Devide = 13,
+    Quotes = 14
 
 class CommentType(Enum):
     MultiComment_Open = 0,
@@ -58,7 +59,7 @@ class CommentType(Enum):
 class SpacesType(Enum):
     Space = 0,
     Sym_n = 1,
-    Syn_t = 2,
+    Sym_t = 2,
 
 KEY_WORDS = {
     TokenType.KeyWord: {
@@ -95,7 +96,8 @@ KEY_WORDS = {
         PunctType.NotEq               :'<>',
         PunctType.Plus                :'+',
         PunctType.Minus               :'-',
-        PunctType.Devide              :'/'
+        PunctType.Devide              :'/',
+        PunctType.Quotes              :'"'
     },
     TokenType.Comment: {
         CommentType.MultiComment_Open : '/*',
@@ -107,13 +109,14 @@ KEY_WORDS = {
 SPACES = {
     SpacesType.Space: ' ',
     SpacesType.Sym_n: '\n',
-    SpacesType.Syn_t: '\t'
+    SpacesType.Sym_t: '\t'
 }
 
 ALL_KW = []
-for a in KEY_WORDS.values(): ALL_KW += a.values()
-
-
+ALL_KW_DICT = {}
+for a in KEY_WORDS.values():
+    ALL_KW += a.values()
+    ALL_KW_DICT.update(a)
 
 class Token:
     category_type = TokenType.Invalid
@@ -124,7 +127,7 @@ class Token:
         self.category_type = in_type
         self.value = in_value
     def __str__(self):
-        return '{0:20} {1:20} {2:20}'.format(str(self.category_type), str(self.value), str(self.token_type))
+        return '{0:25} {1:20} {2:20}'.format(str(self.category_type), str(self.value), str(self.token_type))
     def set_type(self):
         new_category_type, new_token_type = Token.get_info(self.value)
         if new_category_type != None:

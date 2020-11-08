@@ -36,11 +36,13 @@ class Lexer:
             # error ?
             return False
         return self.is_start_of_digit(char) or char.isdigit()
+    def is_eol(self, char):
+        return char == SPACES[SpacesType.Sym_n] or char == SPACES[SpacesType.Sym_t]
 
     def parse_next_word(self):
         current_token = self.file_chars[self.pos]
         i = self.pos + 1
-        while self.is_correct_pos(i) and self.file_chars[i]:
+        while self.is_correct_pos(i):
             if self.can_be_in_identifier(self.file_chars[i]):
                 current_token += self.file_chars[i]
                 i += 1
@@ -50,11 +52,25 @@ class Lexer:
     def parse_next_digit(self):
         current_token = self.file_chars[self.pos]
         i = self.pos + 1
-        while self.is_correct_pos(i) and self.file_chars[i]:
+        while self.is_correct_pos(i):
             if self.can_be_in_digit(i):
                 current_token += self.file_chars[i]
                 i += 1
             else:
+                break
+        return current_token
+    def parse_next_string(self):
+        current_token = self.file_chars[self.pos]
+        i = self.pos + 1
+        while self.is_correct_pos(i):
+            if self.file_chars[i] == ALL_KW_DICT[PunctType.Quotes]:
+                current_token += self.file_chars[i]
+                break
+            if not self.is_eol(self.file_chars[i]):
+                current_token += self.file_chars[i]
+                i += 1
+            else:
+                # error
                 break
         return current_token
 
@@ -86,6 +102,11 @@ class Lexer:
                 current_token = self.parse_next_digit()
                 current_type = TokenType.Real if '.' in current_token else TokenType.Integer
                 self.tokens.append(Token(current_type, current_token))
+                self.move_by_token(current_token)
+                continue
+            if c == ALL_KW_DICT[PunctType.Quotes]:
+                current_token = self.parse_next_string()
+                self.tokens.append(Token(TokenType.String, current_token))
                 self.move_by_token(current_token)
                 continue
             self.next_char()
