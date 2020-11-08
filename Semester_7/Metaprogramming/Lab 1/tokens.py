@@ -69,7 +69,7 @@ KEY_WORDS = {
         KeyWordType.Where : 'where',
         KeyWordType.Group : 'group',
         KeyWordType.By    : 'by',
-        KeyWordType.Having : 'having',
+        KeyWordType.Having: 'having',
         KeyWordType.Order : 'order',
         KeyWordType.Desc  : 'desc',
         KeyWordType.As    : 'as',
@@ -116,16 +116,29 @@ for a in KEY_WORDS.values(): ALL_KW += a.values()
 
 
 class Token:
-    type = TokenType.Invalid
+    category_type = TokenType.Invalid
+    token_type = None
     value = ''
 
     def __init__(self, in_type, in_value = ''):
-        self.type = in_type
+        self.category_type = in_type
         self.value = in_value
     def __str__(self):
-        return str(self.type) + ' ' + str(self.value)
+        return '{0:20} {1:20} {2:20}'.format(str(self.category_type), str(self.value), str(self.token_type))
+    def set_type(self):
+        new_category_type, new_token_type = Token.get_info(self.value)
+        if new_category_type != None:
+            self.category_type = new_category_type
+            self.token_type = new_token_type
+
     @staticmethod
     def get_info(token):
-        for token_dict in KEY_WORDS:
-            if token in token:
-                pass # todo
+        for kw_type in KEY_WORDS:
+            for specific_type in KEY_WORDS[kw_type]:
+                token_array = KEY_WORDS[kw_type][specific_type]
+                if token == token_array:
+                    return kw_type, specific_type
+        for space_type in SPACES:
+            if token == SPACES[space_type]:
+                return TokenType.Spaces, space_type
+        return None, None

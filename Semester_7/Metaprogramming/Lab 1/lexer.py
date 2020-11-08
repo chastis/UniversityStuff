@@ -63,18 +63,23 @@ class Lexer:
         with open(file_name, "r") as file:
             for line in file:
                 for char in line:
-                    self.file_chars += char
+                    self.file_chars += char.lower()
         if len(self.file_chars) == 0:
             print ("you are loh, as your file btw")
             return
         while self.is_correct_pos():
-            c = self.file_chars[self.pos] 
+            c = self.file_chars[self.pos]
             if c in SPACES:
                 self.next_char()
                 continue
             if self.is_start_of_identifier(c):
                 current_token = self.parse_next_word()
-                self.tokens.append(Token(TokenType.Identifier, current_token))
+                current_type = TokenType.Identifier
+                if current_token in ALL_KW:
+                    token_category, token_type =  Token.get_info(current_token)
+                    if token_type is not None:
+                        current_type = token_type
+                self.tokens.append(Token(current_type, current_token))
                 self.move_by_token(current_token)
                 continue
             if self.is_start_of_digit(c):
@@ -84,5 +89,8 @@ class Lexer:
                 self.move_by_token(current_token)
                 continue
             self.next_char()
+        
+        for token in self.tokens:
+            token.set_type()
 
 
