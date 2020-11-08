@@ -5,11 +5,16 @@ class Lexer:
     pos = 0
     file_chars = ''
     tokens = []
+    tokens_dict = {}
     error_token = []
     _shft_by_error = 0
     def reset(self):
-        pos = 0
-        file_chars = ''
+        self.pos = 0
+        self.file_chars = ''
+        self.tokens = []
+        self.tokens_dict = {}
+        self.error_token = []
+        self._shft_by_error = 0
     def __init__(self):
         self.reset()
     def is_correct_pos(self, i = None):
@@ -23,6 +28,30 @@ class Lexer:
             self.pos += len(token.value)
         else:
             self.pos += len(token)
+    def calculate_column_and_row(self):
+        column = 0
+        row = 0
+        cur_pos = 0
+        cur_token = 0
+        cur_error = 0
+        for char in self.file_chars:
+            if cur_token is not None and self.tokens[cur_token].pos == cur_pos:
+                self.tokens[cur_token].row = row
+                self.tokens[cur_token].column = column
+                cur_token += 1
+                if cur_token == len(self.tokens):
+                    cur_token = None
+            if cur_error is not None and self.error_token[cur_error].pos == cur_pos:
+                self.error_token[cur_error].row = row
+                self.error_token[cur_error].column = column
+                cur_error += 1
+                if cur_error == len(self.error_token):
+                    cur_error = None
+            column += 1
+            if char == SPACES[SpacesType.Sym_n]:
+                column = 0
+                row += 1
+            cur_pos += 1
     def is_start_of_identifier(self, char):
         return char == '_' or char.isalpha()
     def can_be_in_identifier(self, char):
@@ -50,7 +79,7 @@ class Lexer:
         return correct_digit
   
     def is_eol(self, char):
-        return char == SPACES[SpacesType.Sym_n] or char == SPACES[SpacesType.Sym_t]
+        return char == SPACES[SpacesType.Sym_n]
     def insert_token(self, token_value, token_type):
         new_token = Token(self.pos, token_type, token_value)
         new_token.set_type()
@@ -58,6 +87,11 @@ class Lexer:
         self.move_by_token(new_token)
         self.pos += self._shft_by_error
         self._shft_by_error = 0
+        if token_type not in self.tokens_dict.keys():
+            self.tokens_dict[token_type] = {}
+        if token_value not in self.tokens_dict[token_type].keys():
+            self.tokens_dict[token_type][token_value] = []
+        self.tokens_dict[token_type][token_value].append(new_token)
         return new_token
     def add_error(self, pos, message, error_shift = 1):
         new_token = Token(pos, TokenType.Invalid, message)
@@ -141,7 +175,7 @@ class Lexer:
                 current_token = self.parse_next_word()
                 current_type = TokenType.Identifier
                 if current_token in ALL_TOKEN:
-                    token_category, token_type =  Token.get_info(current_token)
+                    token_type, token_category =  Token.get_info(current_token)
                     if token_type is not None:
                         current_type = token_type
                 self.insert_token(current_token, current_type)
@@ -168,5 +202,13 @@ class Lexer:
                     self.insert_token(c, TokenType.Punctuaition)
                 continue
             self.next_char()
+        self.calculate_column_and_row()
 
+    def change_token_value(self, old_value, new_value):
+        for token_type in self.tokens_dict:
+            if old_value in self.tokens_dict[token_type]:
+                for token in self.tokens_dict[token_type][old_value]:
+                    token.value = new_value
+                self.tokens_dict[token_type][new_value] = self.tokens_dict[token_type].pop(old_value)
+                return
 

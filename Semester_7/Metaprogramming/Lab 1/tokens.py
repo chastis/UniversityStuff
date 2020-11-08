@@ -59,8 +59,7 @@ class CommentType(Enum):
 
 class SpacesType(Enum):
     Space = 0,
-    Sym_n = 1,
-    Sym_t = 2,
+    Sym_n = 1
 
 TOKEN_DICT = {
     TokenType.KeyWord: {
@@ -109,8 +108,7 @@ TOKEN_DICT = {
 
 SPACES = {
     SpacesType.Space: ' ',
-    SpacesType.Sym_n: '\n',
-    SpacesType.Sym_t: '\t'
+    SpacesType.Sym_n: '\n'
 }
 
 ALL_TOKEN = []
@@ -123,6 +121,8 @@ class Token:
     token_type = TokenType.Invalid
     subtype = None
     pos = 0
+    column = 0
+    row = 0
     value = ''
 
     def __init__(self, in_pos, in_type, in_value = ''):
@@ -130,7 +130,7 @@ class Token:
         self.value = in_value
         self.pos = in_pos
     def __str__(self):
-        return '{0:25} {1:20} {2:20}'.format(str(self.token_type), str(self.value), str(self.subtype))
+        return '{0:30} {1:30} {2:30} {3:4} {4:4}'.format(str(self.token_type), str(self.value), str(self.subtype), str(self.column), str(self.row))
     def set_type(self):
         new_token_type, new_subtype = Token.get_info(self.value)
         if new_token_type != None:
