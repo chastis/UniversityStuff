@@ -1,10 +1,10 @@
 {
 	"Case": {
 		"Keywords": "ToTittle",
-		"Types": "DoNotChange",
-		"Identifiers": "DoNotChange",
-		"Aliases": "DoNotChange",
-		"Quoted Identifiers": "DoNotChange",
-		"Identifier quotation": "DoNotChange"
+		"Types": "ToUpper",
+		"Identifiers": "ToUpper",
+		"Aliases": "ToUpper",
+		"QuotedIdentifiers": "ToTittle",
+		"IdentifierQuotation": "DoNotChange"
 	}
 }

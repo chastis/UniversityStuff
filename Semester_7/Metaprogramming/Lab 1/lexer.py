@@ -68,12 +68,12 @@ class Lexer:
                     if self.file_chars[i+1] in SPACES.values():
                         for sp_key, sp_value in SPACES.items():
                             if sp_value == self.file_chars[i+1]:
-                                self.add_error(i, "Expected Digit after . but find " + str(sp_key))
+                                self.add_error(i, "Expected [Digit] after [.] but find [" + str(sp_key) + "]")
                                 break
                     else:
-                        self.add_error(i, "Expected Digit after . but find " + self.file_chars[i+1])
+                        self.add_error(i, "Expected [Digit] after [.] but find [" + self.file_chars[i+1] + "]")
             else:
-                self.add_error(i, "Expected Digit after . but find EOF")
+                self.add_error(i, "Expected [Digit] after [.] but find [EOF]")
         else:
             correct_digit = self.is_start_of_digit(self.file_chars[i]) or self.file_chars[i].isdigit()      
         return correct_digit
@@ -83,6 +83,7 @@ class Lexer:
     def insert_token(self, token_value, token_type):
         new_token = Token(self.pos, token_type, token_value)
         new_token.set_type()
+        token_type = new_token.token_type # reinit type, it could change
         self.tokens.append(new_token)
         self.move_by_token(new_token)
         self.pos += self._shft_by_error
@@ -118,19 +119,21 @@ class Lexer:
             else:
                 break
         return current_token
-    def parse_next_string(self):
+    def parse_next_string(self, string_end):
         current_token = self.file_chars[self.pos]
         i = self.pos + 1
         while self.is_correct_pos(i):
-            if self.file_chars[i] == ALL_TOKEN_DICT[PunctType.Quotes]:
+            if self.file_chars[i] == ALL_TOKEN_DICT[string_end]:
                 current_token += self.file_chars[i]
                 break
             if not self.is_eol(self.file_chars[i]):
                 current_token += self.file_chars[i]
                 i += 1
             else:
-                self.add_error(i, 'Expected Quote ["] but find EOL')
+                self.add_error(i, "Expected [" + string_end.name + "], but find [EOL]")
                 break
+        if string_end == PunctType.DoubleQuotes and len(current_token) == 2:
+            self.add_error(self.pos + 1, "Expected [String Identifier], but find [empty]")
         return current_token
     def parse_next_comment(self):
         current_token = self.file_chars[self.pos] + self.file_chars[self.pos + 1]
@@ -151,7 +154,7 @@ class Lexer:
                         current_token += self.file_chars[i] + self.file_chars[i+1]
                         break
                 else:
-                    self.add_error(i, "Expected End_Of_Comment [*/], but find EOF")
+                    self.add_error(i, "Expected [*/], but find [EOF]")
                 current_token += self.file_chars[i]
                 i += 1
             return current_token, CommentType.MultiComment
@@ -173,21 +176,32 @@ class Lexer:
                 continue
             if self.is_start_of_identifier(c):
                 current_token = self.parse_next_word()
-                current_type = TokenType.Identifier
-                if current_token in ALL_TOKEN:
-                    token_type, token_category =  Token.get_info(current_token)
-                    if token_type is not None:
-                        current_type = token_type
-                self.insert_token(current_token, current_type)
+                # if this not identifier, it will wkow about this inside at token.set_type()
+                token = self.insert_token(current_token, TokenType.Identifier)
+                if current_token not in ALL_TOKEN:
+                    # if pre-previous token is AS, so we are find AliaS
+                    if len(self.tokens) > 1 and self.tokens[-2].token_type == TokenType.KeyWord and self.tokens[-2].subtype == KeyWordType.As:
+                        token.subtype = IdentifierType.AliasDefault
+                    else:
+                        token.subtype = IdentifierType.Default
                 continue
             if self.is_start_of_digit(c):
                 current_token = self.parse_next_digit()
                 current_type = TokenType.Real if '.' in current_token else TokenType.Integer
                 self.insert_token(current_token, current_type)
                 continue
-            if c == ALL_TOKEN_DICT[PunctType.Quotes]:
-                current_token = self.parse_next_string()
+            if c == ALL_TOKEN_DICT[PunctType.SingleQuotes]:
+                current_token = self.parse_next_string(PunctType.SingleQuotes)
                 self.insert_token(current_token, TokenType.String)
+                continue
+            if c == ALL_TOKEN_DICT[PunctType.DoubleQuotes]:
+                current_token = self.parse_next_string(PunctType.DoubleQuotes)
+                token_subtype = IdentifierType.Quoted
+                # if previous token is AS, so we are find AliaS
+                if len(self.tokens) > 0 and self.tokens[-1].token_type == TokenType.KeyWord and self.tokens[-1].subtype == KeyWordType.As:
+                    token_subtype = IdentifierType.AliasQuoted
+                token = self.insert_token(current_token, TokenType.Identifier)
+                token.subtype = token_subtype
                 continue
             if c in TOKEN_DICT[TokenType.Punctuaition].values():
                 if self.is_correct_pos(self.pos+1):
@@ -211,4 +225,18 @@ class Lexer:
                     token.value = new_value
                 self.tokens_dict[token_type][new_value] = self.tokens_dict[token_type].pop(old_value)
                 return
+    def change_token_type(self, old_type, new_type):
+        if old_type in self.tokens_dict:
+            for token_value in self.tokens_dict[old_type]:
+                for token in self.tokens_dict[old_type][token_value]:
+                    token.token_type = new_type
+        if new_type in self.tokens_dict:
+            self.tokens_dict[new_type].update(self.tokens_dict.pop(old_type))
+        else:
+            self.tokens_dict[new_type] = self.tokens_dict.pop(old_type)
+    def change_token_subtype(self, old_type, new_type):
+        for token in self.tokens:
+            if token.subtype == old_type:
+                token.subtype = new_type
+
 

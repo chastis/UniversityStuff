@@ -14,6 +14,12 @@ class TokenType(Enum):
     Other = 999
 
 
+class IdentifierType(Enum):
+    Default = 0
+    Quoted = 1
+    AliasDefault = 2
+    AliasQuoted = 3
+
 class KeyWordType(Enum):
     Create = 0
     Table = 1
@@ -49,7 +55,9 @@ class PunctType(Enum):
     Plus = 11,
     Minus = 12,
     Devide = 13,
-    Quotes = 14
+    Quotes = 14,
+    SingleQuotes = 15,
+    DoubleQuotes = 16
 
 class CommentType(Enum):
     MultiComment_Open = 0,
@@ -97,7 +105,8 @@ TOKEN_DICT = {
         PunctType.Plus                :'+',
         PunctType.Minus               :'-',
         PunctType.Devide              :'/',
-        PunctType.Quotes              :'"'
+        PunctType.SingleQuotes        :"'",
+        PunctType.DoubleQuotes        :'"'
     },
     TokenType.Comment: {
         CommentType.MultiComment_Open : '/*',
