@@ -54,14 +54,15 @@ class PunctType(Enum):
 class CommentType(Enum):
     MultiComment_Open = 0,
     MultiComment_Close = 1,
-    SingleComment = 2
+    MultiComment = 2, # for specific token
+    SingleComment = 3
 
 class SpacesType(Enum):
     Space = 0,
     Sym_n = 1,
     Sym_t = 2,
 
-KEY_WORDS = {
+TOKEN_DICT = {
     TokenType.KeyWord: {
         KeyWordType.Create: 'create',
         KeyWordType.Table : 'table',
@@ -112,11 +113,11 @@ SPACES = {
     SpacesType.Sym_t: '\t'
 }
 
-ALL_KW = []
-ALL_KW_DICT = {}
-for a in KEY_WORDS.values():
-    ALL_KW += a.values()
-    ALL_KW_DICT.update(a)
+ALL_TOKEN = []
+ALL_TOKEN_DICT = {}
+for a in TOKEN_DICT.values():
+    ALL_TOKEN += a.values()
+    ALL_TOKEN_DICT.update(a)
 
 class Token:
     category_type = TokenType.Invalid
@@ -136,9 +137,9 @@ class Token:
 
     @staticmethod
     def get_info(token):
-        for kw_type in KEY_WORDS:
-            for specific_type in KEY_WORDS[kw_type]:
-                token_array = KEY_WORDS[kw_type][specific_type]
+        for kw_type in TOKEN_DICT:
+            for specific_type in TOKEN_DICT[kw_type]:
+                token_array = TOKEN_DICT[kw_type][specific_type]
                 if token == token_array:
                     return kw_type, specific_type
         for space_type in SPACES:
