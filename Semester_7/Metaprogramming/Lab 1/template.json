@@ -5,6 +5,6 @@
 		"Identifiers": "ToUpper",
 		"Aliases": "ToUpper",
 		"QuotedIdentifiers": "ToTittle",
-		"IdentifierQuotation": "DoNotChange"
+		"IdentifierQuotation": "Quote"
 	}
 }

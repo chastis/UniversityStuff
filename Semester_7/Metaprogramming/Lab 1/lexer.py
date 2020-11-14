@@ -219,24 +219,53 @@ class Lexer:
         self.calculate_column_and_row()
 
     def change_token_value(self, old_value, new_value):
+        changed_tokens = []
         for token_type in self.tokens_dict:
             if old_value in self.tokens_dict[token_type]:
                 for token in self.tokens_dict[token_type][old_value]:
                     token.value = new_value
+                    changed_tokens.append(token)
                 self.tokens_dict[token_type][new_value] = self.tokens_dict[token_type].pop(old_value)
-                return
+                return changed_tokens
+        return changed_tokens
+    def find_token_by_value(self, old_value):
+        changed_tokens = []
+        for token in self.tokens:
+            if token.value == old_value:
+                changed_tokens.append(token)
+        return changed_tokens
+
     def change_token_type(self, old_type, new_type):
+        changed_tokens = []
         if old_type in self.tokens_dict:
             for token_value in self.tokens_dict[old_type]:
                 for token in self.tokens_dict[old_type][token_value]:
                     token.token_type = new_type
+                    changed_tokens.append(token)
         if new_type in self.tokens_dict:
             self.tokens_dict[new_type].update(self.tokens_dict.pop(old_type))
         else:
             self.tokens_dict[new_type] = self.tokens_dict.pop(old_type)
+        return changed_tokens
+    def find_token_by_type(self, old_type):
+        changed_tokens = []
+        for token in self.tokens:
+            if token.token_type == old_type:
+                changed_tokens.append(token)
+        return changed_tokens
+
     def change_token_subtype(self, old_type, new_type):
+        changed_tokens = []
         for token in self.tokens:
             if token.subtype == old_type:
                 token.subtype = new_type
+                changed_tokens.append(token)
+        return changed_tokens
+    def find_token_by_subtype(self, old_type):
+        changed_tokens = []
+        for token in self.tokens:
+            if token.subtype == old_type:
+                changed_tokens.append(token)
+        return changed_tokens
 
 

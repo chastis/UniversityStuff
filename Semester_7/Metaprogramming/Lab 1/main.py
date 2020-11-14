@@ -1,5 +1,5 @@
+from formatter import Formatter
 from lexer import Lexer
-from formatter import *
 from tokens import *
 
 l = Lexer()
@@ -35,3 +35,4 @@ if True:
 else:
     for token in l.tokens:
         print(token)
+f.print_format_errors('output.log')

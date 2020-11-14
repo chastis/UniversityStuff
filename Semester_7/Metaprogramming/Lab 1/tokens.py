@@ -139,7 +139,7 @@ class Token:
         self.value = in_value
         self.pos = in_pos
     def __str__(self):
-        return '{0:30} {1:30} {2:30} {3:4} {4:4}'.format(str(self.token_type), str(self.value), str(self.subtype), str(self.column), str(self.row))
+        return '{0:30} {1:30} {2:30} {3:4} {4:4}'.format(str(self.token_type), str(self.value), str(self.subtype), str(self.row), str(self.column))
     def set_type(self):
         new_token_type, new_subtype = Token.get_info(self.value)
         if new_token_type != None:
