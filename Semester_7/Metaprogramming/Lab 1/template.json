@@ -1,10 +1,17 @@
 {
 	"Case": {
-		"Keywords": "ToTittle",
+		"Keywords": "ToUpper",
 		"Types": "ToUpper",
 		"Identifiers": "ToUpper",
 		"Aliases": "ToUpper",
 		"QuotedIdentifiers": "ToTittle",
 		"IdentifierQuotation": "Quote"
+	},
+	"TabsAndIndents": {
+		"UseTabCharacter": "True",
+		"TabSize": "4",
+		"Indent": "5",
+		"ContinuationIndent": "10",
+		"KeepIndentsOnEmptyLines": "False"
 	}
 }

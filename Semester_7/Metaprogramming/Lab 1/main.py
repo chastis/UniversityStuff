@@ -24,6 +24,8 @@ for token in l.error_token:
 f = Formatter()
 f.load_template("template.json")
 f.format_lexer(l)
+l = f.formatted_lexer
+f.create_formatted_file('formatted test.sql')
 print ('modified tokens : --------------------------------------------------------------------------------------------------------------')
 if True:
     for token_type in l.tokens_dict:

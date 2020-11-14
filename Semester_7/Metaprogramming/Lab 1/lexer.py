@@ -3,14 +3,16 @@ from tokens import *
 
 class Lexer:
     pos = 0
-    file_chars = ''
+    prev_chars = ''
+    orig_chars = ''
+    changed_chars = ''
     tokens = []
     tokens_dict = {}
     error_token = []
     _shft_by_error = 0
     def reset(self):
         self.pos = 0
-        self.file_chars = ''
+        self.prev_chars = ''
         self.tokens = []
         self.tokens_dict = {}
         self.error_token = []
@@ -19,8 +21,8 @@ class Lexer:
         self.reset()
     def is_correct_pos(self, i = None):
         if i is None:
-            return self.pos < len(self.file_chars)
-        return i < len(self.file_chars)
+            return self.pos < len(self.prev_chars)
+        return i < len(self.prev_chars)
     def next_char(self):
         self.pos += 1
     def move_by_token(self, token):
@@ -28,13 +30,57 @@ class Lexer:
             self.pos += len(token.value)
         else:
             self.pos += len(token)
+    def merge_token_and_spaces(self):
+        cur_token = 0
+        cur_error = 0
+        i = 0
+        self.changed_chars = self.prev_chars.lower()
+        while i < len(self.changed_chars):
+            if cur_token is not None:
+                pos = i
+                is_token = True
+                for char in self.tokens[cur_token].old_value:
+                    if pos >= len(self.changed_chars) or char.lower() != self.changed_chars[pos]:
+                        is_token = False
+                        break
+                    pos += 1
+                if is_token:
+                    self.tokens[cur_token].pos = i
+                    token_v  = self.tokens[cur_token].value
+                    token_old_v  = self.tokens[cur_token].old_value
+                    self.tokens[cur_token].old_value = token_v
+                    self.changed_chars = self.changed_chars[0:i] + token_v + self.changed_chars[i+len(token_old_v):len(self.changed_chars)]
+                    i += len(token_v) - 1
+                    cur_token += 1
+                    if cur_token == len(self.tokens):
+                        cur_token = None
+            if cur_error is not None:
+                pos = i
+                is_token = True
+                for char in self.error_token[cur_error].orig_value:
+                    if pos >= len(self.changed_chars) or char.lower() != self.changed_chars[pos]:
+                        is_token = False
+                        break
+                    pos += 1
+                if is_token:
+                    self.error_token[cur_error].pos = i
+                    token_v  = self.error_token[cur_error].orig_value
+                    token_old_v  = self.tokens[cur_token].orig_value
+                    self.changed_chars = self.changed_chars[0:i] + token_v + self.changed_chars[i+len(token_old_v):len(self.changed_chars)]
+                    i += len(token_v) - 1
+                    cur_error += 1
+                    if cur_error == len(self.error_token):
+                        cur_error = None
+            i += 1
+        self.prev_chars = self.changed_chars
+        self.calculate_column_and_row()
     def calculate_column_and_row(self):
         column = 0
         row = 0
         cur_pos = 0
         cur_token = 0
         cur_error = 0
-        for char in self.file_chars:
+        for char in self.prev_chars:
             if cur_token is not None and self.tokens[cur_token].pos == cur_pos:
                 self.tokens[cur_token].row = row
                 self.tokens[cur_token].column = column
@@ -52,6 +98,17 @@ class Lexer:
                 column = 0
                 row += 1
             cur_pos += 1
+    def get_row_and_column_for_position(self, in_pos):
+        column = 0
+        row = 0
+        for i in range(len(self.prev_chars)):
+            if i == in_pos:
+                return row, column
+            column += 1
+            if self.prev_chars[i] == SPACES[SpacesType.Sym_n]:
+                column = 0
+                row += 1
+
     def is_start_of_identifier(self, char):
         return char == '_' or char.isalpha()
     def can_be_in_identifier(self, char):
@@ -60,27 +117,28 @@ class Lexer:
         return char.isdigit()
     def can_be_in_digit(self, i):
         correct_digit = False
-        if self.file_chars[i] == '.':
+        if self.prev_chars[i] == '.':
             if self.is_correct_pos(i+1):
-                if self.file_chars[i+1].isdigit():
+                if self.prev_chars[i+1].isdigit():
                     correct_digit = True
                 else:
-                    if self.file_chars[i+1] in SPACES.values():
+                    if self.prev_chars[i+1] in SPACES.values():
                         for sp_key, sp_value in SPACES.items():
-                            if sp_value == self.file_chars[i+1]:
+                            if sp_value == self.prev_chars[i+1]:
                                 self.add_error(i, "Expected [Digit] after [.] but find [" + str(sp_key) + "]")
                                 break
                     else:
-                        self.add_error(i, "Expected [Digit] after [.] but find [" + self.file_chars[i+1] + "]")
+                        self.add_error(i, "Expected [Digit] after [.] but find [" + self.prev_chars[i+1] + "]")
             else:
                 self.add_error(i, "Expected [Digit] after [.] but find [EOF]")
         else:
-            correct_digit = self.is_start_of_digit(self.file_chars[i]) or self.file_chars[i].isdigit()      
+            correct_digit = self.is_start_of_digit(self.prev_chars[i]) or self.prev_chars[i].isdigit()      
         return correct_digit
   
     def is_eol(self, char):
         return char == SPACES[SpacesType.Sym_n]
     def insert_token(self, token_value, token_type):
+        token_value = self.orig_chars[self.pos:self.pos+len(token_value)]
         new_token = Token(self.pos, token_type, token_value)
         new_token.set_type()
         token_type = new_token.token_type # reinit type, it could change
@@ -97,37 +155,38 @@ class Lexer:
     def add_error(self, pos, message, error_shift = 1):
         new_token = Token(pos, TokenType.Invalid, message)
         self.error_token.append(new_token)
+        new_token.old_value = '' if pos+error_shift>=len(self.prev_chars) else self.prev_chars[pos:pos+error_shift]
         self._shft_by_error += error_shift
 
     def parse_next_word(self):
-        current_token = self.file_chars[self.pos]
+        current_token = self.prev_chars[self.pos]
         i = self.pos + 1
         while self.is_correct_pos(i):
-            if self.can_be_in_identifier(self.file_chars[i]):
-                current_token += self.file_chars[i]
+            if self.can_be_in_identifier(self.prev_chars[i]):
+                current_token += self.prev_chars[i]
                 i += 1
             else:
                 break
         return current_token
     def parse_next_digit(self):
-        current_token = self.file_chars[self.pos]
+        current_token = self.prev_chars[self.pos]
         i = self.pos + 1
         while self.is_correct_pos(i):
             if self.can_be_in_digit(i):
-                current_token += self.file_chars[i]
+                current_token += self.prev_chars[i]
                 i += 1
             else:
                 break
         return current_token
     def parse_next_string(self, string_end):
-        current_token = self.file_chars[self.pos]
+        current_token = self.prev_chars[self.pos]
         i = self.pos + 1
         while self.is_correct_pos(i):
-            if self.file_chars[i] == ALL_TOKEN_DICT[string_end]:
-                current_token += self.file_chars[i]
+            if self.prev_chars[i] == ALL_TOKEN_DICT[string_end]:
+                current_token += self.prev_chars[i]
                 break
-            if not self.is_eol(self.file_chars[i]):
-                current_token += self.file_chars[i]
+            if not self.is_eol(self.prev_chars[i]):
+                current_token += self.prev_chars[i]
                 i += 1
             else:
                 self.add_error(i, "Expected [" + string_end.name + "], but find [EOL]")
@@ -136,26 +195,26 @@ class Lexer:
             self.add_error(self.pos + 1, "Expected [String Identifier], but find [empty]")
         return current_token
     def parse_next_comment(self):
-        current_token = self.file_chars[self.pos] + self.file_chars[self.pos + 1]
+        current_token = self.prev_chars[self.pos] + self.prev_chars[self.pos + 1]
         i = self.pos + 2
         if current_token == '--':
             # oneline
             while self.is_correct_pos(i):
-                if self.file_chars[i] == SPACES[SpacesType.Sym_n]:
+                if self.prev_chars[i] == SPACES[SpacesType.Sym_n]:
                     break
-                current_token += self.file_chars[i]
+                current_token += self.prev_chars[i]
                 i += 1
             return current_token, CommentType.SingleComment
         else:
             # multiline
             while self.is_correct_pos(i):
                 if self.is_correct_pos(i+1):
-                    if self.file_chars[i] + self.file_chars[i+1] == ALL_TOKEN_DICT[CommentType.MultiComment_Close]:
-                        current_token += self.file_chars[i] + self.file_chars[i+1]
+                    if self.prev_chars[i] + self.prev_chars[i+1] == ALL_TOKEN_DICT[CommentType.MultiComment_Close]:
+                        current_token += self.prev_chars[i] + self.prev_chars[i+1]
                         break
                 else:
                     self.add_error(i, "Expected [*/], but find [EOF]")
-                current_token += self.file_chars[i]
+                current_token += self.prev_chars[i]
                 i += 1
             return current_token, CommentType.MultiComment
         return None
@@ -165,12 +224,13 @@ class Lexer:
         with open(file_name, "r") as file:
             for line in file:
                 for char in line:
-                    self.file_chars += char.lower()
-        if len(self.file_chars) == 0:
+                    self.orig_chars += char
+                    self.prev_chars += char #.lower()
+        if len(self.prev_chars) == 0:
             print ("file is empty")
             return
         while self.is_correct_pos():
-            c = self.file_chars[self.pos]
+            c = self.prev_chars[self.pos]
             if c in SPACES.values():
                 self.next_char()
                 continue
@@ -205,7 +265,7 @@ class Lexer:
                 continue
             if c in TOKEN_DICT[TokenType.Punctuaition].values():
                 if self.is_correct_pos(self.pos+1):
-                    temp_c = c + self.file_chars[self.pos + 1]
+                    temp_c = c + self.prev_chars[self.pos + 1]
                     if temp_c in TOKEN_DICT[TokenType.Punctuaition].values() \
                         or temp_c in TOKEN_DICT[TokenType.Comment].values():
                         c = temp_c
@@ -268,4 +328,92 @@ class Lexer:
                 changed_tokens.append(token)
         return changed_tokens
 
+    def change_tab_to_space(self, tab_size):
+        i = 0
+        file_char_size = len(self.prev_chars)
+        while i < file_char_size:
+            if self.prev_chars[i] == SPACES[SpacesType.Sym_t]:
+                self.prev_chars = self.prev_chars[0:i] + ' '*tab_size + self.prev_chars[i+1:file_char_size]
+                file_char_size = len(self.prev_chars)
+            i += 1
+        self.merge_token_and_spaces()
+    def find_tabs(self, tab_size):
+        i = 0
+        tabs_pos = []
+        file_char_size = len(self.prev_chars)
+        while i < file_char_size:
+            if self.prev_chars[i] == SPACES[SpacesType.Sym_t]:
+                tabs_pos.append(i)
+            i += 1
+        return tabs_pos
 
+    def change_space_to_tab(self, tab_size):
+        i = 0
+        file_char_size = len(self.prev_chars)
+        is_new_line = True
+        while i < file_char_size:
+            if is_new_line:
+                pos = i
+                while self.prev_chars[pos] == SPACES[SpacesType.Space]:
+                    pos += 1
+                if pos - i >= tab_size:
+                    tab_num = (pos - i) // tab_size
+                    self.prev_chars = self.prev_chars[0:i] + '\t'*tab_num + self.prev_chars[i + tab_size * tab_num:file_char_size]
+                    file_char_size = len(self.prev_chars)
+                    i += tab_num - 1
+                is_new_line = False
+            i += 1
+            if i < file_char_size and self.prev_chars[i] == SPACES[SpacesType.Sym_n]:
+                is_new_line = True
+                i += 1
+        self.merge_token_and_spaces()
+    def find_spaces_tabs(self, tab_size):
+        i = 0
+        tabs_pos = []
+        file_char_size = len(self.prev_chars)
+        is_new_line = True
+        while i < file_char_size:
+            if is_new_line:
+                pos = i
+                while self.prev_chars[pos] == SPACES[SpacesType.Space]:
+                    pos += 1
+                if pos - i >= tab_size:
+                    tab_num = (pos - i) // tab_size
+                    for tab_pos in range(tab_num):
+                        tabs_pos.append(i + tab_pos * tab_size)
+                    i += tab_num * tab_size - 1
+                is_new_line = False
+            i += 1
+            if i < file_char_size and self.prev_chars[i] == SPACES[SpacesType.Sym_n]:
+                is_new_line = True
+                i += 1
+        return tabs_pos
+
+    def change_indent(self, indent, cont_indent):
+        open_brackets = 0
+        i = 0
+        file_char_size = len(self.prev_chars)
+        is_new_line = True
+        while i < file_char_size:
+            if is_new_line:
+                pos = i
+                while self.prev_chars[pos] == SPACES[SpacesType.Space]:
+                    pos += 1
+                if pos - i != indent:
+                    self.prev_chars = self.prev_chars[0:i] + ' '*indent + self.prev_chars[i + indent:file_char_size]
+                    file_char_size = len(self.prev_chars)
+                    i+= indent - 1
+                is_new_line = False
+            i += 1
+            if i < file_char_size:
+                if self.prev_chars[i] == SPACES[SpacesType.Sym_n]:
+                    is_new_line = True
+                    i += 1
+                elif self.prev_chars[i] == ALL_TOKEN_DICT[PunctType.RoundBracket_Open]:
+                    open_brackets += 1
+                elif self.prev_chars[i] == ALL_TOKEN_DICT[PunctType.RoundBracket_Close] and open_brackets > 0:
+                    open_brackets += 1
+
+        self.merge_token_and_spaces()
+    def find_indent(self, indent, cont_indent):
+        pass
