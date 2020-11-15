@@ -14,13 +14,15 @@ ENUMERAION = {
     PunctType.RoundBracket_Open : PunctType.RoundBracket_Close
 }
 
+ENUMERAION_ENDING_SKIP = [KeyWordType.Select, PunctType.RoundBracket_Open]
+
 # we suppose that we can insert round_brackets anywhere
 CONNECTED_TOKENS = {
-    None: [KeyWordType.Create, PunctType.Semicolon],
-    None: [KeyWordType.Select, KeyWordType.From, KeyWordType.Where],
-    None: [KeyWordType.Update, KeyWordType.Set],
-    None: [KeyWordType.Insert, KeyWordType.Into, KeyWordType.Values],
-    None: [TokenType.Identifier, KeyWordType.Constraint],
+    KeyWordType.Create: [TokenType.Identifier],
+    KeyWordType.Select: [TokenType.Identifier],
+    KeyWordType.Update: [TokenType.Identifier],
+    KeyWordType.Insert: [TokenType.Identifier],
+    PunctType.RoundBracket_Open: [TokenType.Identifier, KeyWordType.Constraint, TokenType.Value],
     TokenType.Identifier: [TokenType.VarType, KeyWordType.Not, KeyWordType.Null, TokenType.Value, TokenType.Operations],
     TokenType.Operations: [TokenType.Identifier, TokenType.Value],
     KeyWordType.Not: [KeyWordType.Null, KeyWordType.Exist],
@@ -29,7 +31,10 @@ CONNECTED_TOKENS = {
     KeyWordType.Join: [TokenType.Identifier, KeyWordType.On],
     KeyWordType.Case: [KeyWordType.When, KeyWordType.Else, KeyWordType.End],
     KeyWordType.When: [KeyWordType.Then, TokenType.Identifier, TokenType.Value]
+}
 
+PSEUDONONNECTED_TOKENS = {
+    PunctType.RoundBracket_Open: [PunctType.RoundBracket_Close]
 }
 
 TOKEN_RULES = [

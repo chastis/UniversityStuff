@@ -1,3 +1,4 @@
+from copy import copy
 import errno
 from typing import List
 from tokens import *
@@ -17,6 +18,47 @@ class TokenNode:
                 return None
             node = node.parent
         return node.token
+    def get_prev_childs(self):
+        if self.parent is not None:
+            index = self.parent.childes.index(self)
+            if index > 0:
+                return self.parent.childes[0:index]
+        return None
+    def get_prev_childs_with_blocks(self):
+        if self.parent is not None:
+            index = self.parent.childes.index(self)
+            if index > 0:
+                childes = self.parent.childes[0:index]
+                i = 0
+                while i < len(childes):
+                    if childes[i].is_block() or childes[i].is_sub_block():
+                        new_child = childes[i].get_first_child_token()
+                        childes[i] = new_child
+                    i += 1
+                return childes
+        return None
+    def get_first_child_token(self):
+        if self.childes is None:
+            return None
+        for child in self.childes:
+            if child.is_token():
+                return child
+            else:
+                child_token = child.get_first_child_token()
+                if child_token is not None:
+                    return child_token
+        return None
+    def get_closest_parent_token(self):
+        if self.parent is not None:
+            if self.parent.is_token():
+                return self.parent
+            else:
+                return self.parent.get_closest_parent_token()
+        return None
+    def get_closest_parent_in_block(self):
+        if TokenNode.node_is_token(self.parent):
+            return self.parent
+        return None
     def add_child(self, child):
         if self.childes is None:
             self.childes = [child]
@@ -39,10 +81,6 @@ class TokenNode:
                 child_token = child.find_node_by_token(token)
                 if child_token is not None:
                     return child_token
-        if self.parent is not None:
-            parent_token = self.parent.find_node_by_token(token)
-            if parent_token is not None:
-                return parent_token
         return None
     def is_sub_block(self):
         return self.token and self.token == 'sub-block'
@@ -93,6 +131,10 @@ class Lexer:
     def merge_token_and_spaces(self):
         cur_token = 0
         cur_error = 0
+        if cur_token == len(self.tokens):
+            cur_token = None
+        if cur_error == len(self.error_token):
+            cur_error = None
         i = 0
         self.changed_chars = self.prev_chars.lower()
         while i < len(self.changed_chars):
@@ -142,6 +184,10 @@ class Lexer:
         cur_pos = 0
         cur_token = 0
         cur_error = 0
+        if cur_error == len(self.error_token):
+            cur_error = None
+        if cur_token == len(self.tokens):
+            cur_token = None
         for char in self.prev_chars:
             if cur_token is not None and self.tokens[cur_token].pos == cur_pos:
                 self.tokens[cur_token].row = row
@@ -289,9 +335,6 @@ class Lexer:
                 for char in line:
                     self.orig_chars += char
                     self.prev_chars += char #.lower()
-        if len(self.prev_chars) == 0:
-            print ("file is empty")
-            return
         while self.is_correct_pos():
             c = self.prev_chars[self.pos]
             if c in SPACES.values():
@@ -550,13 +593,26 @@ class Lexer:
                 else:
                     start_type = token.subtype
                 start_i = i
-            elif is_find_coma and (token.token_type == ENUMERAION[start_type] \
+            elif start_type is not None \
+                and (is_find_coma and (token.token_type == ENUMERAION[start_type] \
                 or token.subtype == ENUMERAION[start_type])\
-                or token.subtype == PunctType.Coma:
+                or token.subtype == PunctType.Coma):
                 is_find_coma = True
                 block_node = TokenNode('sub-block', node)
-                block_node.childes = node.childes[start_i:i+1]
-                node.childes = node.childes[0:start_i] + [block_node] + node.childes[i+1:len(node.childes)]
+                if token.subtype != PunctType.Coma:
+                    if start_type in ENUMERAION_ENDING_SKIP:
+                        block_node.childes = node.childes[start_i:i]
+                        node.childes = node.childes[0:start_i] + [block_node] + node.childes[i:len(node.childes)]
+                    else:
+                        block_node.childes = node.childes[start_i:i+1]
+                        node.childes = node.childes[0:start_i] + [block_node] + node.childes[i+1:len(node.childes)]
+                    start_type = None
+                    is_find_coma = False
+                else:
+                    block_node.childes = node.childes[start_i:i+1]
+                    node.childes = node.childes[0:start_i] + [block_node] + node.childes[i+1:len(node.childes)]
+                for update_child in block_node.childes:
+                    update_child.parent = block_node
                 start_i += 1
                 i = start_i - 1
             i += 1              
@@ -572,7 +628,7 @@ class Lexer:
             if Lexer.is_token_start_of_block(token):
                 new_block = Lexer.parse_next_block(block, token)
                 block_node = TokenNode('block', start_block)
-                block_node.add_child(TokenNode(token, start_block))
+                block_node.add_child(TokenNode(token, block_node))
                 block_node = Lexer.build_tree_from_block(new_block, block_node)
                 Lexer.check_block_for_enumeration(block_node)
                 start_block.add_child(block_node)
@@ -588,20 +644,121 @@ class Lexer:
 
     # end tree tokens logic
 
+    # indents logic
+
+    @staticmethod
+    def token_connected_to_token(parent, child):
+         # a parent for b
+        if not isinstance(parent, Token) or not isinstance(child, Token):
+            return False
+        if parent.token_type is not None and parent.token_type in CONNECTED_TOKENS:
+            if child.token_type is not None and child.token_type in CONNECTED_TOKENS[parent.token_type] \
+                or child.subtype is not None and child.subtype in CONNECTED_TOKENS[parent.token_type]:
+                return True
+        elif parent.subtype is not None and parent.subtype in CONNECTED_TOKENS:
+            if child.token_type is not None and child.token_type in CONNECTED_TOKENS[parent.subtype] \
+                or child.subtype is not None and child.subtype in CONNECTED_TOKENS[parent.subtype]:
+                return True
+        return False
+    @staticmethod
+    def token_pseudoconnected_to_token(parent, child):
+        if not isinstance(parent, Token) or not isinstance(child, Token):
+            return False
+        if parent.token_type is not None and parent.token_type in PSEUDONONNECTED_TOKENS:
+            if child.token_type is not None and child.token_type in PSEUDONONNECTED_TOKENS[parent.token_type] \
+                or child.subtype is not None and child.subtype in PSEUDONONNECTED_TOKENS[parent.token_type]:
+                return True
+        elif parent.subtype is not None and parent.subtype in PSEUDONONNECTED_TOKENS:
+            if child.token_type is not None and child.token_type in PSEUDONONNECTED_TOKENS[parent.subtype] \
+                or child.subtype is not None and child.subtype in PSEUDONONNECTED_TOKENS[parent.subtype]:
+                return True
+        return False
     def calculate_token_indent(self, updated_tokens, indent, cont_indent, current_indent, node):
         pass
 
     def change_indent(self, indent, cont_indent):
-        updated_tokens = {}
-        current_indent = 0
-        cur_node = self.token_tree
-        if cur_node.token == 'block' or self.token is None:
-            print(indent * '    ' + 'block')
-        else:
-            print(indent * '    ' + self.token.value)
-        if self.childes is not None:
-            for child in self.childes:
-                child.print(indent + 1)
         self.merge_token_and_spaces()
+
+        cur_token = 0
+        i = 0
+        is_new_line = True
+        indented_tokens = {}
+        first_token_on_line = None
+        while i < len(self.prev_chars):
+            if cur_token is None:
+                i += 1
+                break
+            token = self.tokens[cur_token]
+            pos = i
+            is_token = True
+            for c in token.value:
+                if self.prev_chars[pos] != c:
+                    is_token = False
+                    break
+                else:
+                    pos += 1
+            if is_token:
+                if is_new_line:
+                    first_token_on_line = token
+                    node = self.token_tree.find_node_by_token(token)
+                    prev_childs = node.get_prev_childs_with_blocks()
+                    while prev_childs is None:
+                        if node.parent is None:
+                            break
+                        node = node.parent
+                        prev_childs = node.get_prev_childs_with_blocks()
+                    connected_prev_child = None
+                    need_add_indent = True
+                    if prev_childs is not None:
+                        for child in reversed(prev_childs):
+                            if child.is_token() and Lexer.token_connected_to_token(child.token, token):
+                                connected_prev_child = child
+                                break
+                        if connected_prev_child is None and len(prev_childs) > 0:
+                            for child in reversed(prev_childs):
+                                if child.is_token() and Lexer.token_pseudoconnected_to_token(child.token, token):
+                                    connected_prev_child = child
+                                    need_add_indent = False #@#############
+                                    break
+                        if connected_prev_child is None:    
+                            connected_prev_child = prev_childs[0]
+                            need_add_indent = False
+                    if connected_prev_child is not None:
+                        total_indent = indented_tokens[connected_prev_child.token]
+                        if need_add_indent:
+                            if connected_prev_child.token.subtype == PunctType.RoundBracket_Open:
+                                total_indent += cont_indent
+                            else:
+                                total_indent += indent
+                        indented_tokens[token] = total_indent
+                    else:
+                        prev_parent = node.get_closest_parent_token()
+                        if prev_parent is None:
+                            indented_tokens[token] = 0
+                        else:
+                            total_indent = indented_tokens[prev_parent.token]
+                            if prev_parent.token.subtype == PunctType.RoundBracket_Open:
+                                total_indent += cont_indent
+                            else:
+                                total_indent += indent
+                            indented_tokens[token] = total_indent
+                    pos = i
+                    while pos > 0 and self.prev_chars[pos-1] != SPACES[SpacesType.Sym_n]:
+                        pos -= 1
+                    self.prev_chars = self.prev_chars[0:pos] + ' ' * indented_tokens[token] + self.prev_chars[i:len(self.prev_chars)]
+                    i = pos + indented_tokens[token]
+                else:
+                    indented_tokens[token] = indented_tokens[first_token_on_line]
+                i += len(token.value) - 1
+                cur_token += 1
+                if cur_token == len(self.tokens):
+                    cur_token = None
+            if self.prev_chars[i] == SPACES[SpacesType.Sym_n]:
+                is_new_line = True
+            elif self.prev_chars[i] not in SPACES.values():
+                is_new_line = False
+            i += 1
+        self.merge_token_and_spaces()
+        return indented_tokens
     def find_indent(self, indent, cont_indent):
         pass

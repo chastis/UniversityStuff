@@ -189,10 +189,27 @@ class Formatter:
         indent_options = self.options[FormatPartition.TabsAndIndents]    
 
         tab_size = CONST_TAB_SIZE
-
+        indent_size = CONST_TAB_SIZE
+        cont_indent_size = CONST_TAB_SIZE
         if TabsAndIndentsParam.TabSize in indent_options.keys():
             if indent_options[TabsAndIndentsParam.TabSize].isdigit():
-                tab_size = int(indent_options[TabsAndIndentsParam.TabSize])
+                new_tab_size = int(indent_options[TabsAndIndentsParam.TabSize])
+                tab_size = 1 if new_tab_size < 0 or new_tab_size > 32 else new_tab_size
+
+        if TabsAndIndentsParam.Indent in indent_options.keys():
+            if indent_options[TabsAndIndentsParam.Indent].isdigit():
+                new_indent_size = int(indent_options[TabsAndIndentsParam.Indent])
+                indent_size = 1 if new_indent_size < 0 or new_indent_size > 32 else new_indent_size
+
+        if TabsAndIndentsParam.ContinuationIndent in indent_options.keys():
+            if indent_options[TabsAndIndentsParam.ContinuationIndent].isdigit():
+                new_cont_indent_size = int(indent_options[TabsAndIndentsParam.ContinuationIndent])
+                cont_indent_size = 1 if new_cont_indent_size < 0 or new_cont_indent_size > 32 else new_cont_indent_size
+
+        if self.changing:
+            self.formatted_lexer.change_tab_to_space(tab_size)
+
+            self.formatted_lexer.change_indent(indent_size, cont_indent_size)
 
         if TabsAndIndentsParam.UseTabCharacter in indent_options.keys():
             if indent_options[TabsAndIndentsParam.UseTabCharacter] == str(True):
