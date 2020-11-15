@@ -39,7 +39,10 @@ class Lexer:
             if cur_token is not None:
                 pos = i
                 is_token = True
-                for char in self.tokens[cur_token].old_value:
+                # if there is multi-line comment, it can have changed value (coz tabs can be replaced to spaces)
+                is_check_old_value = self.tokens[cur_token].subtype != CommentType.MultiComment
+                check_value = self.tokens[cur_token].old_value if is_check_old_value else self.tokens[cur_token].value
+                for char in check_value:
                     if pos >= len(self.changed_chars) or char.lower() != self.changed_chars[pos]:
                         is_token = False
                         break
@@ -47,9 +50,8 @@ class Lexer:
                 if is_token:
                     self.tokens[cur_token].pos = i
                     token_v  = self.tokens[cur_token].value
-                    token_old_v  = self.tokens[cur_token].old_value
                     self.tokens[cur_token].old_value = token_v
-                    self.changed_chars = self.changed_chars[0:i] + token_v + self.changed_chars[i+len(token_old_v):len(self.changed_chars)]
+                    self.changed_chars = self.changed_chars[0:i] + token_v + self.changed_chars[i+len(check_value):len(self.changed_chars)]
                     i += len(token_v) - 1
                     cur_token += 1
                     if cur_token == len(self.tokens):
@@ -113,8 +115,9 @@ class Lexer:
         return char == '_' or char.isalpha()
     def can_be_in_identifier(self, char):
         return self.is_start_of_identifier(char) or char.isdigit()
-    def is_start_of_digit(self, char):
-        return char.isdigit()
+    def is_start_of_digit(self, i):
+        return self.is_correct_pos(i) and (self.prev_chars[i].isdigit() or \
+            self.prev_chars[i] == ALL_TOKEN_DICT[PunctType.Minus] and self.is_correct_pos(i+1) and self.prev_chars[i+1].isdigit())
     def can_be_in_digit(self, i):
         correct_digit = False
         if self.prev_chars[i] == '.':
@@ -132,7 +135,7 @@ class Lexer:
             else:
                 self.add_error(i, "Expected [Digit] after [.] but find [EOF]")
         else:
-            correct_digit = self.is_start_of_digit(self.prev_chars[i]) or self.prev_chars[i].isdigit()      
+            correct_digit = self.is_start_of_digit(i) or self.prev_chars[i].isdigit()      
         return correct_digit
   
     def is_eol(self, char):
@@ -245,7 +248,7 @@ class Lexer:
                     else:
                         token.subtype = IdentifierType.Default
                 continue
-            if self.is_start_of_digit(c):
+            if self.is_start_of_digit(self.pos):
                 current_token = self.parse_next_digit()
                 current_type = TokenType.Real if '.' in current_token else TokenType.Integer
                 self.insert_token(current_token, current_type)
@@ -327,15 +330,26 @@ class Lexer:
             if token.subtype == old_type:
                 changed_tokens.append(token)
         return changed_tokens
-
-    def change_tab_to_space(self, tab_size):
+    @staticmethod
+    def change_tab_to_space_in_string(string, tab_size):
         i = 0
-        file_char_size = len(self.prev_chars)
-        while i < file_char_size:
-            if self.prev_chars[i] == SPACES[SpacesType.Sym_t]:
-                self.prev_chars = self.prev_chars[0:i] + ' '*tab_size + self.prev_chars[i+1:file_char_size]
-                file_char_size = len(self.prev_chars)
+        string_size = len(string)
+        while i < string_size:
+            if string[i] == SPACES[SpacesType.Sym_t]:
+                string = string[0:i] + ' '*tab_size + string[i+1:string_size]
+                string_size = len(string)
             i += 1
+        return string
+    def change_tab_to_space(self, tab_size):
+        self.prev_chars = self.change_tab_to_space_in_string(self.prev_chars, tab_size)
+        multi_comment_token_for_change = []
+        for token_value in self.tokens_dict[TokenType.Comment]:
+            token = self.tokens_dict[TokenType.Comment][token_value][0]
+            if token.subtype == CommentType.MultiComment:
+                new_token_value = self.change_tab_to_space_in_string(token.value, tab_size)
+                multi_comment_token_for_change.append((token.value, new_token_value))
+        for t_v in multi_comment_token_for_change:
+            self.change_token_value(t_v[0], t_v[1])
         self.merge_token_and_spaces()
     def find_tabs(self, tab_size):
         i = 0
@@ -346,26 +360,37 @@ class Lexer:
                 tabs_pos.append(i)
             i += 1
         return tabs_pos
-
-    def change_space_to_tab(self, tab_size):
+    @staticmethod
+    def change_space_to_tab_in_string(string, tab_size):
         i = 0
-        file_char_size = len(self.prev_chars)
+        file_char_size = len(string)
         is_new_line = True
         while i < file_char_size:
             if is_new_line:
                 pos = i
-                while self.prev_chars[pos] == SPACES[SpacesType.Space]:
+                while string[pos] == SPACES[SpacesType.Space]:
                     pos += 1
                 if pos - i >= tab_size:
                     tab_num = (pos - i) // tab_size
-                    self.prev_chars = self.prev_chars[0:i] + '\t'*tab_num + self.prev_chars[i + tab_size * tab_num:file_char_size]
-                    file_char_size = len(self.prev_chars)
+                    string = string[0:i] + '\t'*tab_num + string[i + tab_size * tab_num:file_char_size]
+                    file_char_size = len(string)
                     i += tab_num - 1
                 is_new_line = False
             i += 1
-            if i < file_char_size and self.prev_chars[i] == SPACES[SpacesType.Sym_n]:
+            if i < file_char_size and string[i] == SPACES[SpacesType.Sym_n]:
                 is_new_line = True
                 i += 1
+        return string
+    def change_space_to_tab(self, tab_size):
+        self.prev_chars = self.change_space_to_tab_in_string(self.prev_chars, tab_size)
+        multi_comment_token_for_change = []
+        for token_value in self.tokens_dict[TokenType.Comment]:
+            token = self.tokens_dict[TokenType.Comment][token_value][0]
+            if token.subtype == CommentType.MultiComment:
+                new_token_value = self.change_space_to_tab_in_string(token.value, tab_size)
+                multi_comment_token_for_change.append((token.value, new_token_value))
+        for t_v in multi_comment_token_for_change:
+            self.change_token_value(t_v[0], t_v[1])
         self.merge_token_and_spaces()
     def find_spaces_tabs(self, tab_size):
         i = 0
@@ -412,7 +437,7 @@ class Lexer:
                 elif self.prev_chars[i] == ALL_TOKEN_DICT[PunctType.RoundBracket_Open]:
                     open_brackets += 1
                 elif self.prev_chars[i] == ALL_TOKEN_DICT[PunctType.RoundBracket_Close] and open_brackets > 0:
-                    open_brackets += 1
+                    open_brackets -= 1
 
         self.merge_token_and_spaces()
     def find_indent(self, indent, cont_indent):

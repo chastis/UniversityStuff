@@ -16,14 +16,17 @@ CREATE TABLE My_Table
 create table a;
 
 -- comment
-	
+
+/* 
+    another comment 
+*/
+
+
 SELECT T.table_name as "The Table Name",
         count(I.id)  as "Number of Fields"
 FROM sys."tables" T,
      sys."indices" I
-/* 
-      another comment 
-*/
+
 WHERE T.table_name = I.table_name
 GROUP BY T.table_name
 HAVING count(I.id) >= 0

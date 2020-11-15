@@ -35,6 +35,26 @@ class KeyWordType(Enum):
     Not = 11
     Null = 12
     Star = 13
+    Left = 14
+    Outer = 15
+    Join = 16
+    Natural = 17
+    Inner = 18
+    On = 19
+    Using = 20
+    Cross = 21
+    Is = 22
+    Forreign = 23
+    Key = 24
+    View = 25
+    References = 26
+    Delete = 27
+    Cascade = 28
+    Constraint = 29
+    Unique = 30
+    Case = 31
+    Else = 32
+    Then = 33
 
 class VarTypeType(Enum):
     Int = 0,
@@ -72,20 +92,40 @@ class SpacesType(Enum):
 
 TOKEN_DICT = {
     TokenType.KeyWord: {
-        KeyWordType.Create: 'create',
-        KeyWordType.Table : 'table',
-        KeyWordType.Select: 'select',
-        KeyWordType.From  : 'from',
-        KeyWordType.Where : 'where',
-        KeyWordType.Group : 'group',
-        KeyWordType.By    : 'by',
-        KeyWordType.Having: 'having',
-        KeyWordType.Order : 'order',
-        KeyWordType.Desc  : 'desc',
-        KeyWordType.As    : 'as',
-        KeyWordType.Not   : 'not',
-        KeyWordType.Null  : 'null',
-        KeyWordType.Star  : '*'
+        KeyWordType.Create    : 'create',
+        KeyWordType.Table     : 'table',
+        KeyWordType.Select    : 'select',
+        KeyWordType.From      : 'from',
+        KeyWordType.Where     : 'where',
+        KeyWordType.Group     : 'group',
+        KeyWordType.By        : 'by',
+        KeyWordType.Having    : 'having',
+        KeyWordType.Order     : 'order',
+        KeyWordType.Desc      : 'desc',
+        KeyWordType.As        : 'as',
+        KeyWordType.Not       : 'not',
+        KeyWordType.Null      : 'null',
+        KeyWordType.Star      : '*',
+        KeyWordType.Left      : "left",
+        KeyWordType.Outer     : "outer",
+        KeyWordType.Join      : "join",
+        KeyWordType.Natural   : "natural",
+        KeyWordType.Inner     : "inner",
+        KeyWordType.On        : "on",
+        KeyWordType.Using     : "using",
+        KeyWordType.Cross     : "cross",
+        KeyWordType.Is        : "is",
+        KeyWordType.Forreign  : "foreign",
+        KeyWordType.Key       : "key",
+        KeyWordType.View      : "view",
+        KeyWordType.References: "references",
+        KeyWordType.Delete    : "delete",
+        KeyWordType.Cascade   : "cascade",
+        KeyWordType.Constraint: "constraint",
+        KeyWordType.Unique    : "unique",
+        KeyWordType.Case      : "case",
+        KeyWordType.Else      : "else",
+        KeyWordType.Then      : "then"
     },
     TokenType.Type: {
         VarTypeType.Int    : 'int',

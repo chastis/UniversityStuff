@@ -146,13 +146,15 @@ class Formatter:
             if case_options[CaseParam.IdentifierQuotation] == CaseOption.Quote:
                 self.change_case(case_options[CaseParam.IdentifierQuotation], TokenType.Identifier, IdentifierType.Default)
                 self.change_case(case_options[CaseParam.IdentifierQuotation], TokenType.Identifier, IdentifierType.AliasDefault)
-                self.formatted_lexer.change_token_subtype(IdentifierType.Default, IdentifierType.Quoted)
-                self.formatted_lexer.change_token_subtype(IdentifierType.AliasDefault, IdentifierType.AliasQuoted)
+                if self.changing:
+                    self.formatted_lexer.change_token_subtype(IdentifierType.Default, IdentifierType.Quoted)
+                    self.formatted_lexer.change_token_subtype(IdentifierType.AliasDefault, IdentifierType.AliasQuoted)
             if case_options[CaseParam.IdentifierQuotation] == CaseOption.Unquote:
                 self.change_case(case_options[CaseParam.IdentifierQuotation], TokenType.Identifier, IdentifierType.Quoted)
                 self.change_case(case_options[CaseParam.IdentifierQuotation], TokenType.Identifier, IdentifierType.AliasQuoted)
-                self.formatted_lexer.change_token_subtype(IdentifierType.Default, IdentifierType.Default)
-                self.formatted_lexer.change_token_subtype(IdentifierType.AliasDefault, IdentifierType.AliasDefault)
+                if self.changing:
+                    self.formatted_lexer.change_token_subtype(IdentifierType.Default, IdentifierType.Default)
+                    self.formatted_lexer.change_token_subtype(IdentifierType.AliasDefault, IdentifierType.AliasDefault)
 
         if CaseParam.Keywords in case_options.keys() and case_options[CaseParam.Keywords] != CaseOption.DoNotChange:
             self.change_case(case_options[CaseParam.Keywords], TokenType.KeyWord)
