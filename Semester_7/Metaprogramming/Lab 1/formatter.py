@@ -75,32 +75,37 @@ class Formatter:
                 self.unformatted_tokens[(row, column)] = (None, None, [])
                 self.unformatted_tokens[(row, column)][2].append(message)
 
-    def load_template(self, file_name):
+    def load_template(self, file_name, template_name):
         with open(file_name, "r") as json_file:
             self.data = json.load(json_file)
-            for category in self.data:
-                category_name = category
-                for category_enum in FormatPartition:
-                    if category_name == category_enum.name:
-                        category_name = category_enum
-                        break
-                if category_name in FormatLibrary:
-                    for key, value in self.data[category].items():
-                        key_name = key
-                        value_name = value
-                        for param_enum in FormatLibrary[category_name][0]:
-                            if key_name == param_enum.name:
-                                key_name = param_enum
-                                break
-                        for option_enum in FormatLibrary[category_name][1]:
-                            if value_name == option_enum.name:
-                                value_name = option_enum
-                                break
-                        if category_name not in self.options.keys():
-                            self.options[category_name] = {}
-                        self.options[category_name].update({key_name: value_name})
-                else:
-                    pass # error
+            for template in self.data:
+                if template != template_name:
+                    continue
+                for category in self.data[template]:
+                    category_name = category
+                    for category_enum in FormatPartition:
+                        if category_name == category_enum.name:
+                            category_name = category_enum
+                            break
+                    if category_name in FormatLibrary:
+                        for key, value in self.data[template][category].items():
+                            key_name = key
+                            value_name = value
+                            for param_enum in FormatLibrary[category_name][0]:
+                                if key_name == param_enum.name:
+                                    key_name = param_enum
+                                    break
+                            for option_enum in FormatLibrary[category_name][1]:
+                                if value_name == option_enum.name:
+                                    value_name = option_enum
+                                    break
+                            if category_name not in self.options.keys():
+                                self.options[category_name] = {}
+                            self.options[category_name].update({key_name: value_name})
+                    else:
+                        pass # error
+                return
+            print('Incorrect template name : ' + template_name)
     
     def change_case(self, case_option, token_type, token_subtype = None):
         if case_option != CaseOption.DoNotChange:
@@ -242,14 +247,14 @@ class Formatter:
         if not need_changing:
             self.formatted_lexer.merge_token_and_spaces()
     
-    def print_format_errors(self, file_name):
+    def print_format_errors(self, file_name, file_with_errors):
         with open(file_name, "w") as file:
             for token in self.unformatted_tokens:
                 for error in self.unformatted_tokens[token][2]:
                     if self.unformatted_tokens[token][0] is not None:
-                        file.write('at line {0:5} in {1:30} - {2:1}\n'.format(str(token[0]), str(self.unformatted_tokens[token][1]), error))
+                        file.write('At file {3:30} at line {0:5} in {1:30} - {2:1}\n'.format(str(token[0]), str(self.unformatted_tokens[token][1]), error, file_with_errors))
                     else:
-                        file.write('at line {0:5} at pos {1:26} - {2:1}\n'.format(str(token[0]), str(token[1]), error))
+                        file.write('At file {3:30} at line {0:5} at pos {1:26} - {2:1}\n'.format(str(token[0]), str(token[1]), error, file_with_errors))
             
             
     def create_formatted_file(self, file_name):
