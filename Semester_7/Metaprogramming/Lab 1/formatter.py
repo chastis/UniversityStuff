@@ -2,6 +2,7 @@ from enum import Enum
 import json
 from lexer import Lexer
 from tokens import *
+from formatblock import *
 import copy
 
 class FormatPartition(Enum):
@@ -162,9 +163,9 @@ class Formatter:
         if CaseParam.Types in case_options.keys() and case_options[CaseParam.Types] != CaseOption.DoNotChange:
             if case_options[CaseParam.Types] == CaseOption.AsKeyWords and \
                 CaseParam.Keywords in case_options.keys() and case_options[CaseParam.Keywords] != CaseOption.DoNotChange:
-                self.change_case(case_options[CaseParam.Keywords], TokenType.Type)
+                self.change_case(case_options[CaseParam.Keywords], TokenType.VarType)
             else:
-                self.change_case(case_options[CaseParam.Types], TokenType.Type)
+                self.change_case(case_options[CaseParam.Types], TokenType.VarType)
 
         changed_alias = False
         if CaseParam.Aliases in case_options.keys() and case_options[CaseParam.Aliases] != CaseOption.DoNotChange:

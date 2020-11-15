@@ -1,5 +1,64 @@
 import errno
+from typing import List
 from tokens import *
+from formatblock import *
+
+class TokenNode:
+    def __init__(self, token, parent):
+        self.token = token
+        self.parent = parent
+    token = None
+    parent = None
+    childes = None
+    def get_closest_token(self):
+        node = self
+        while TokenNode.node_is_token(node):
+            if node.parent is None:
+                return None
+            node = node.parent
+        return node.token
+    def add_child(self, child):
+        if self.childes is None:
+            self.childes = [child]
+        else:
+            self.childes.append(child)
+    def print(self, indent):
+        if not TokenNode.node_is_token(self):
+            print(indent * '    ' + self.token)
+        else:
+            print(indent * '    ' + self.token.value)
+        if self.childes is not None:
+            for child in self.childes:
+                child.print(indent + 1)
+    def find_node_by_token(self, token):
+        if self.token is not None and\
+            self.token == token:
+            return self
+        if self.childes is not None:
+            for child in self.childes:
+                child_token = child.find_node_by_token(token)
+                if child_token is not None:
+                    return child_token
+        if self.parent is not None:
+            parent_token = self.parent.find_node_by_token(token)
+            if parent_token is not None:
+                return parent_token
+        return None
+    def is_sub_block(self):
+        return self.token and self.token == 'sub-block'
+    def is_block(self):
+        return self.token and self.token == 'block'
+    def is_token(self):
+        return TokenNode.node_is_token(self)
+    @staticmethod
+    def node_is_token(node):
+        if node is None \
+            or node.token is None \
+            or node.token == 'block'\
+            or node.token == 'sub-block':
+            return False
+        return True
+
 
 class Lexer:
     pos = 0
@@ -10,6 +69,7 @@ class Lexer:
     tokens_dict = {}
     error_token = []
     _shft_by_error = 0
+    token_tree = None
     def reset(self):
         self.pos = 0
         self.prev_chars = ''
@@ -117,7 +177,7 @@ class Lexer:
         return self.is_start_of_identifier(char) or char.isdigit()
     def is_start_of_digit(self, i):
         return self.is_correct_pos(i) and (self.prev_chars[i].isdigit() or \
-            self.prev_chars[i] == ALL_TOKEN_DICT[PunctType.Minus] and self.is_correct_pos(i+1) and self.prev_chars[i+1].isdigit())
+            self.prev_chars[i] == ALL_TOKEN_DICT[OperationType.Minus] and self.is_correct_pos(i+1) and self.prev_chars[i+1].isdigit())
     def can_be_in_digit(self, i):
         correct_digit = False
         if self.prev_chars[i] == '.':
@@ -241,7 +301,7 @@ class Lexer:
                 current_token = self.parse_next_word()
                 # if this not identifier, it will wkow about this inside at token.set_type()
                 token = self.insert_token(current_token, TokenType.Identifier)
-                if current_token not in ALL_TOKEN:
+                if current_token.lower() not in ALL_TOKEN:
                     # if pre-previous token is AS, so we are find AliaS
                     if len(self.tokens) > 1 and self.tokens[-2].token_type == TokenType.KeyWord and self.tokens[-2].subtype == KeyWordType.As:
                         token.subtype = IdentifierType.AliasDefault
@@ -250,12 +310,13 @@ class Lexer:
                 continue
             if self.is_start_of_digit(self.pos):
                 current_token = self.parse_next_digit()
-                current_type = TokenType.Real if '.' in current_token else TokenType.Integer
-                self.insert_token(current_token, current_type)
+                token = self.insert_token(current_token, TokenType.Value)
+                token.subtype = ValuesType.Real if '.' in current_token else ValuesType.Integer
                 continue
             if c == ALL_TOKEN_DICT[PunctType.SingleQuotes]:
                 current_token = self.parse_next_string(PunctType.SingleQuotes)
-                self.insert_token(current_token, TokenType.String)
+                token = self.insert_token(current_token, TokenType.Value)
+                token.subtype = ValuesType.String
                 continue
             if c == ALL_TOKEN_DICT[PunctType.DoubleQuotes]:
                 current_token = self.parse_next_string(PunctType.DoubleQuotes)
@@ -266,10 +327,12 @@ class Lexer:
                 token = self.insert_token(current_token, TokenType.Identifier)
                 token.subtype = token_subtype
                 continue
-            if c in TOKEN_DICT[TokenType.Punctuaition].values():
+            if c in TOKEN_DICT[TokenType.Punctuaition].values() \
+                or c in TOKEN_DICT[TokenType.Operations].values():
                 if self.is_correct_pos(self.pos+1):
                     temp_c = c + self.prev_chars[self.pos + 1]
                     if temp_c in TOKEN_DICT[TokenType.Punctuaition].values() \
+                        or temp_c in TOKEN_DICT[TokenType.Operations].values() \
                         or temp_c in TOKEN_DICT[TokenType.Comment].values():
                         c = temp_c
                 if c in TOKEN_DICT[TokenType.Comment].values():
@@ -277,9 +340,14 @@ class Lexer:
                     self.insert_token(current_token, TokenType.Comment).subtype = commentType
                 elif c in TOKEN_DICT[TokenType.Punctuaition].values():
                     self.insert_token(c, TokenType.Punctuaition)
+                elif c in TOKEN_DICT[TokenType.Operations].values():
+                    self.insert_token(c, TokenType.Operations)
                 continue
+            if c == ALL_TOKEN_DICT[KeyWordType.Star]:
+                self.insert_token(c, TokenType.KeyWord)
             self.next_char()
         self.calculate_column_and_row()
+        self.build_token_tree()
 
     def change_token_value(self, old_value, new_value):
         changed_tokens = []
@@ -342,14 +410,15 @@ class Lexer:
         return string
     def change_tab_to_space(self, tab_size):
         self.prev_chars = self.change_tab_to_space_in_string(self.prev_chars, tab_size)
-        multi_comment_token_for_change = []
-        for token_value in self.tokens_dict[TokenType.Comment]:
-            token = self.tokens_dict[TokenType.Comment][token_value][0]
-            if token.subtype == CommentType.MultiComment:
-                new_token_value = self.change_tab_to_space_in_string(token.value, tab_size)
-                multi_comment_token_for_change.append((token.value, new_token_value))
-        for t_v in multi_comment_token_for_change:
-            self.change_token_value(t_v[0], t_v[1])
+        if TokenType.Comment in self.tokens_dict:
+            multi_comment_token_for_change = []
+            for token_value in self.tokens_dict[TokenType.Comment]:
+                token = self.tokens_dict[TokenType.Comment][token_value][0]
+                if token.subtype == CommentType.MultiComment:
+                    new_token_value = self.change_tab_to_space_in_string(token.value, tab_size)
+                    multi_comment_token_for_change.append((token.value, new_token_value))
+            for t_v in multi_comment_token_for_change:
+                self.change_token_value(t_v[0], t_v[1])
         self.merge_token_and_spaces()
     def find_tabs(self, tab_size):
         i = 0
@@ -383,14 +452,16 @@ class Lexer:
         return string
     def change_space_to_tab(self, tab_size):
         self.prev_chars = self.change_space_to_tab_in_string(self.prev_chars, tab_size)
-        multi_comment_token_for_change = []
-        for token_value in self.tokens_dict[TokenType.Comment]:
-            token = self.tokens_dict[TokenType.Comment][token_value][0]
-            if token.subtype == CommentType.MultiComment:
-                new_token_value = self.change_space_to_tab_in_string(token.value, tab_size)
-                multi_comment_token_for_change.append((token.value, new_token_value))
-        for t_v in multi_comment_token_for_change:
-            self.change_token_value(t_v[0], t_v[1])
+        
+        if TokenType.Comment in self.tokens_dict:
+            multi_comment_token_for_change = []
+            for token_value in self.tokens_dict[TokenType.Comment]:
+                token = self.tokens_dict[TokenType.Comment][token_value][0]
+                if token.subtype == CommentType.MultiComment:
+                    new_token_value = self.change_space_to_tab_in_string(token.value, tab_size)
+                    multi_comment_token_for_change.append((token.value, new_token_value))
+            for t_v in multi_comment_token_for_change:
+                self.change_token_value(t_v[0], t_v[1])
         self.merge_token_and_spaces()
     def find_spaces_tabs(self, tab_size):
         i = 0
@@ -414,31 +485,123 @@ class Lexer:
                 i += 1
         return tabs_pos
 
-    def change_indent(self, indent, cont_indent):
-        open_brackets = 0
-        i = 0
-        file_char_size = len(self.prev_chars)
-        is_new_line = True
-        while i < file_char_size:
-            if is_new_line:
-                pos = i
-                while self.prev_chars[pos] == SPACES[SpacesType.Space]:
-                    pos += 1
-                if pos - i != indent:
-                    self.prev_chars = self.prev_chars[0:i] + ' '*indent + self.prev_chars[i + indent:file_char_size]
-                    file_char_size = len(self.prev_chars)
-                    i+= indent - 1
-                is_new_line = False
-            i += 1
-            if i < file_char_size:
-                if self.prev_chars[i] == SPACES[SpacesType.Sym_n]:
-                    is_new_line = True
-                    i += 1
-                elif self.prev_chars[i] == ALL_TOKEN_DICT[PunctType.RoundBracket_Open]:
-                    open_brackets += 1
-                elif self.prev_chars[i] == ALL_TOKEN_DICT[PunctType.RoundBracket_Close] and open_brackets > 0:
-                    open_brackets -= 1
+    # tree tokens logic
 
+    @staticmethod
+    def is_token_start_of_block(token):
+        if isinstance(token, Token):
+            return token.token_type in BLOCKS or token.subtype in BLOCKS
+        return False
+    @staticmethod
+    def is_token_start_of_enumeration(token):
+        if isinstance(token, Token):
+            return token.token_type in ENUMERAION or token.subtype in ENUMERAION
+        return False
+
+    @staticmethod
+    def parse_next_block(tokens, start):
+        if not isinstance(tokens, List) or not isinstance(start, Token):
+            return []
+        pos = tokens.index(start) + 1
+        block = [start]
+        if start.subtype == PunctType.RoundBracket_Open:
+            open_brackets_count = 1
+            while pos < len(tokens):
+                block.append(tokens[pos])
+                if tokens[pos].subtype == PunctType.RoundBracket_Close:
+                    open_brackets_count -= 1
+                if tokens[pos].subtype == PunctType.RoundBracket_Open:
+                    open_brackets_count += 1
+                if open_brackets_count == 0:
+                    break
+                pos += 1
+        else:
+            while pos < len(tokens):
+                block.append(tokens[pos])
+                if start.token_type in BLOCKS:
+                    if tokens[pos].subtype == BLOCKS[start.token_type] \
+                        or tokens[pos].token_type == BLOCKS[start.token_type]:
+                        break
+                if start.subtype in BLOCKS:   
+                   if tokens[pos].subtype == BLOCKS[start.subtype] \
+                        or tokens[pos].token_type == BLOCKS[start.subtype]:
+                        break
+
+                pos += 1
+        return block
+
+    @staticmethod
+    def check_block_for_enumeration(node):
+        if not isinstance(node, TokenNode) \
+            or node.childes is None:
+            return
+        start_type = None
+        start_i = None
+        i = 0
+        is_find_coma = False
+        while i < len(node.childes):
+            token = node.childes[i].token
+            if not TokenNode.node_is_token(node.childes[i]):
+                i += 1
+                continue
+            if Lexer.is_token_start_of_enumeration(token):
+                if token.token_type in ENUMERAION:
+                    start_type = token.token_type
+                else:
+                    start_type = token.subtype
+                start_i = i
+            elif is_find_coma and (token.token_type == ENUMERAION[start_type] \
+                or token.subtype == ENUMERAION[start_type])\
+                or token.subtype == PunctType.Coma:
+                is_find_coma = True
+                block_node = TokenNode('sub-block', node)
+                block_node.childes = node.childes[start_i:i+1]
+                node.childes = node.childes[0:start_i] + [block_node] + node.childes[i+1:len(node.childes)]
+                start_i += 1
+                i = start_i - 1
+            i += 1              
+
+    @staticmethod
+    def build_tree_from_block(block, start_block):
+        if start_block.childes is None or len(start_block.childes) == 0:
+            i = 0
+        else:
+            i = block.index(start_block.childes[0].token) + 1
+        while i < len(block):
+            token = block[i]
+            if Lexer.is_token_start_of_block(token):
+                new_block = Lexer.parse_next_block(block, token)
+                block_node = TokenNode('block', start_block)
+                block_node.add_child(TokenNode(token, start_block))
+                block_node = Lexer.build_tree_from_block(new_block, block_node)
+                Lexer.check_block_for_enumeration(block_node)
+                start_block.add_child(block_node)
+                i += len(new_block) - 1
+            else:
+                start_block.add_child(TokenNode(token, start_block))
+            i += 1
+        return start_block            
+    
+    def build_token_tree(self):
+        self.token_tree = TokenNode('block', None)
+        self.token_tree = Lexer.build_tree_from_block(self.tokens, self.token_tree)
+
+    # end tree tokens logic
+
+    def calculate_token_indent(self, updated_tokens, indent, cont_indent, current_indent, node):
+        pass
+
+    def change_indent(self, indent, cont_indent):
+        updated_tokens = {}
+        current_indent = 0
+        cur_node = self.token_tree
+        if cur_node.token == 'block' or self.token is None:
+            print(indent * '    ' + 'block')
+        else:
+            print(indent * '    ' + self.token.value)
+        if self.childes is not None:
+            for child in self.childes:
+                child.print(indent + 1)
         self.merge_token_and_spaces()
     def find_indent(self, indent, cont_indent):
         pass

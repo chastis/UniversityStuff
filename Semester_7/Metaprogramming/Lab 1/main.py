@@ -1,3 +1,4 @@
+from formatblock import CONNECTED_TOKENS, TOKEN_RULES
 from formatter import Formatter
 from lexer import Lexer
 from tokens import *
@@ -38,3 +39,7 @@ else:
     for token in l.tokens:
         print(token)
 f.print_format_errors('output.log')
+
+l.token_tree.print(0)
+
+print(CONNECTED_TOKENS)

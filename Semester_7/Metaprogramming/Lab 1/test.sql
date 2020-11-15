@@ -27,7 +27,7 @@ SELECT T.table_name as "The Table Name",
 FROM sys."tables" T,
      sys."indices" I
 
-WHERE T.table_name = I.table_name
+WHERE T.* = I.table_name
 GROUP BY T.table_name
 HAVING count(I.id) >= 0
 ORDER BY 2 desc;

@@ -3,16 +3,19 @@ from enum import Enum
 class TokenType(Enum):
     Invalid = 0
     Identifier = 1
-    String = 2
-    Integer = 3
-    Real = 4
-    Comment = 5
-    KeyWord = 6
-    Type = 7
-    Punctuaition = 8
-    Spaces = 9
+    Value = 2
+    Comment = 3
+    KeyWord = 4
+    VarType = 5
+    Punctuaition = 6
+    Spaces = 7
+    Operations = 8
     Other = 999
 
+class ValuesType(Enum):
+    String = 0
+    Integer = 1
+    Real = 2
 
 class IdentifierType(Enum):
     Default = 0
@@ -44,7 +47,7 @@ class KeyWordType(Enum):
     Using = 20
     Cross = 21
     Is = 22
-    Forreign = 23
+    Foreign = 23
     Key = 24
     View = 25
     References = 26
@@ -55,10 +58,25 @@ class KeyWordType(Enum):
     Case = 31
     Else = 32
     Then = 33
+    Distinct = 34
+    Primary = 35
+    Exist = 36
+    Insert = 37
+    Into = 38
+    Values = 39
+    Update = 40
+    Set = 41
+    Max = 42
+    Min = 43
+    When = 44
+    End = 45
 
 class VarTypeType(Enum):
     Int = 0,
     Varchar = 1
+    Char = 2
+    Decimal = 3
+    Integer = 4
 
 class PunctType(Enum):
     Dot = 0,
@@ -66,6 +84,11 @@ class PunctType(Enum):
     RoundBracket_Open = 2,
     RoundBracket_Close = 3,
     Semicolon = 4,
+    Quotes = 14,
+    SingleQuotes = 15,
+    DoubleQuotes = 16
+
+class OperationType(Enum):
     More = 5,
     Less = 6,
     Eq = 7,
@@ -74,10 +97,7 @@ class PunctType(Enum):
     NotEq = 10,
     Plus = 11,
     Minus = 12,
-    Devide = 13,
-    Quotes = 14,
-    SingleQuotes = 15,
-    DoubleQuotes = 16
+    Devide = 13
 
 class CommentType(Enum):
     MultiComment_Open = 0,
@@ -92,44 +112,59 @@ class SpacesType(Enum):
 
 TOKEN_DICT = {
     TokenType.KeyWord: {
-        KeyWordType.Create    : 'create',
-        KeyWordType.Table     : 'table',
-        KeyWordType.Select    : 'select',
-        KeyWordType.From      : 'from',
-        KeyWordType.Where     : 'where',
-        KeyWordType.Group     : 'group',
-        KeyWordType.By        : 'by',
-        KeyWordType.Having    : 'having',
-        KeyWordType.Order     : 'order',
-        KeyWordType.Desc      : 'desc',
-        KeyWordType.As        : 'as',
-        KeyWordType.Not       : 'not',
-        KeyWordType.Null      : 'null',
-        KeyWordType.Star      : '*',
-        KeyWordType.Left      : "left",
-        KeyWordType.Outer     : "outer",
-        KeyWordType.Join      : "join",
-        KeyWordType.Natural   : "natural",
-        KeyWordType.Inner     : "inner",
-        KeyWordType.On        : "on",
-        KeyWordType.Using     : "using",
-        KeyWordType.Cross     : "cross",
-        KeyWordType.Is        : "is",
-        KeyWordType.Forreign  : "foreign",
-        KeyWordType.Key       : "key",
-        KeyWordType.View      : "view",
-        KeyWordType.References: "references",
-        KeyWordType.Delete    : "delete",
-        KeyWordType.Cascade   : "cascade",
-        KeyWordType.Constraint: "constraint",
-        KeyWordType.Unique    : "unique",
-        KeyWordType.Case      : "case",
-        KeyWordType.Else      : "else",
-        KeyWordType.Then      : "then"
+        KeyWordType.Create            : 'create',
+        KeyWordType.Table             : 'table',
+        KeyWordType.Select            : 'select',
+        KeyWordType.From              : 'from',
+        KeyWordType.Where             : 'where',
+        KeyWordType.Group             : 'group',
+        KeyWordType.By                : 'by',
+        KeyWordType.Having            : 'having',
+        KeyWordType.Order             : 'order',
+        KeyWordType.Desc              : 'desc',
+        KeyWordType.As                : 'as',
+        KeyWordType.Not               : 'not',
+        KeyWordType.Null              : 'null',
+        KeyWordType.Star              : '*',
+        KeyWordType.Left              : "left",
+        KeyWordType.Outer             : "outer",
+        KeyWordType.Join              : "join",
+        KeyWordType.Natural           : "natural",
+        KeyWordType.Inner             : "inner",
+        KeyWordType.On                : "on",
+        KeyWordType.Using             : "using",
+        KeyWordType.Cross             : "cross",
+        KeyWordType.Is                : "is",
+        KeyWordType.Foreign           : "foreign",
+        KeyWordType.Key               : "key",
+        KeyWordType.View              : "view",
+        KeyWordType.References        : "references",
+        KeyWordType.Delete            : "delete",
+        KeyWordType.Cascade           : "cascade",
+        KeyWordType.Constraint        : "constraint",
+        KeyWordType.Unique            : "unique",
+        KeyWordType.Case              : "case",
+        KeyWordType.Else              : "else",
+        KeyWordType.Then              : "then",
+        KeyWordType.Distinct          : "distinct",
+        KeyWordType.Primary           : "primary",
+        KeyWordType.Exist             : "exist",
+        KeyWordType.Insert            : "insert",
+        KeyWordType.Into              : "into",
+        KeyWordType.Values            : "values",
+        KeyWordType.Update            : "update",
+        KeyWordType.Set               : "set",
+        KeyWordType.Max               : "max",
+        KeyWordType.Min               : "min",
+        KeyWordType.When              : "when",
+        KeyWordType.End               : "End"
     },
-    TokenType.Type: {
-        VarTypeType.Int    : 'int',
-        VarTypeType.Varchar: 'varchar'
+    TokenType.VarType: {
+        VarTypeType.Int               : 'int',
+        VarTypeType.Varchar           : 'varchar',
+        VarTypeType.Char              : 'char',
+        VarTypeType.Decimal           : 'decimal',
+        VarTypeType.Integer           : 'integer'
     },
     TokenType.Punctuaition: {
         PunctType.Dot                 :'.',
@@ -137,17 +172,19 @@ TOKEN_DICT = {
         PunctType.RoundBracket_Open   :'(',
         PunctType.RoundBracket_Close  :')',
         PunctType.Semicolon           :';',
-        PunctType.More                :'>',
-        PunctType.Less                :'<',
-        PunctType.Eq                  :'=',
-        PunctType.LessEq              :'<=',
-        PunctType.MoreEq              :'>=',
-        PunctType.NotEq               :'<>',
-        PunctType.Plus                :'+',
-        PunctType.Minus               :'-',
-        PunctType.Devide              :'/',
         PunctType.SingleQuotes        :"'",
         PunctType.DoubleQuotes        :'"'
+    },
+    TokenType.Operations: {
+        OperationType.More            :'>',
+        OperationType.Less            :'<',
+        OperationType.Eq              :'=',
+        OperationType.LessEq          :'<=',
+        OperationType.MoreEq          :'>=',
+        OperationType.NotEq           :'<>',
+        OperationType.Plus            :'+',
+        OperationType.Minus           :'-',
+        OperationType.Devide          :'/'
     },
     TokenType.Comment: {
         CommentType.MultiComment_Open : '/*',
