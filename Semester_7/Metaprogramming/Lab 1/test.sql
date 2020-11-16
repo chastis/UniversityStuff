@@ -1,5 +1,7 @@
 CREATE TABLE My_Table
 (
+    
+	
 	    Id   int         not null,
 	Name varchar(60) not null,
     Note varchar(2000.)
@@ -18,10 +20,13 @@ create table a;
 -- comment
 
 /* 
+         
+	
+
     another comment 
 */
 
-
+       
 SELECT T.table_name as "The Table Name",
 count(I.id)  as "Number of Fields"
 FROM sys."tables" T,

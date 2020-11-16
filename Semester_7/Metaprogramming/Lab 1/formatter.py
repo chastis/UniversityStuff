@@ -48,7 +48,9 @@ FormatErrors = {
     3: "Incorrect Case, expected: quote",
     4: "Incorrect Case, expected: unquote",
     5: "Incorrect Tab, expected Spaces",
-    6: "Incorrect Spaces, expected Tab"
+    6: "Incorrect Spaces, expected Tab",
+    7: "Not empty Line",
+    8: "Incorrect Indent"
 }
 
 class Formatter:
@@ -69,7 +71,7 @@ class Formatter:
         for pos in poses:
             row, column = self.formatted_lexer.get_row_and_column_for_position(pos)
             if (row, column) in self.unformatted_tokens:
-                if message not in self.unformatted_tokens[(row, column)]:
+                if message not in self.unformatted_tokens[(row, column)][2]:
                     self.unformatted_tokens[(row, column)][2].append(message)
             else:
                 self.unformatted_tokens[(row, column)] = (None, None, [])
@@ -213,8 +215,18 @@ class Formatter:
 
         if self.changing:
             self.formatted_lexer.change_tab_to_space(tab_size)
-
             self.formatted_lexer.change_indent(indent_size, cont_indent_size)
+        else:
+            inc_indents = self.formatted_lexer.find_indent(indent_size, cont_indent_size, tab_size)
+            self.add_error_message_to_pos(inc_indents, FormatErrors[8])
+
+        if TabsAndIndentsParam.KeepIndentsOnEmptyLines in indent_options.keys():
+            if indent_options[TabsAndIndentsParam.KeepIndentsOnEmptyLines] == str(False):
+                if self.changing:
+                    self.formatted_lexer.remove_empty_lines()
+                else:
+                    misspaces = self.formatted_lexer.find_not_empty_lines()
+                    self.add_error_message_to_pos(misspaces, FormatErrors[7])
 
         if TabsAndIndentsParam.UseTabCharacter in indent_options.keys():
             if indent_options[TabsAndIndentsParam.UseTabCharacter] == str(True):
@@ -251,10 +263,15 @@ class Formatter:
         with open(file_name, "w") as file:
             for token in self.unformatted_tokens:
                 for error in self.unformatted_tokens[token][2]:
+                    err_code = 42
+                    for c, e in FormatErrors.items():
+                        if e == error:
+                            err_code = c
+                            break
                     if self.unformatted_tokens[token][0] is not None:
-                        file.write('At file {3:30} at line {0:5} in {1:30} - {2:1}\n'.format(str(token[0]), str(self.unformatted_tokens[token][1]), error, file_with_errors))
+                        file.write('At file {3:30} at line {0:5} in {1:30} - Error[{4:03}] {2:1}\n'.format(str(token[0]), str(self.unformatted_tokens[token][1]), error, file_with_errors, err_code))
                     else:
-                        file.write('At file {3:30} at line {0:5} at pos {1:26} - {2:1}\n'.format(str(token[0]), str(token[1]), error, file_with_errors))
+                        file.write('At file {3:30} at line {0:5} at pos {1:26} - Error[{4:03}] {2:1}\n'.format(str(token[0]), str(token[1]), error, file_with_errors, err_code))
             
             
     def create_formatted_file(self, file_name):

@@ -673,18 +673,61 @@ class Lexer:
                 or child.subtype is not None and child.subtype in PSEUDONONNECTED_TOKENS[parent.subtype]:
                 return True
         return False
-    def calculate_token_indent(self, updated_tokens, indent, cont_indent, current_indent, node):
-        pass
 
-    def change_indent(self, indent, cont_indent):
+    @staticmethod
+    def remove_empty_line(string):
+        i = 0
+        is_new_line = True
+        new_line_pos = 0
+        while i < len(string):
+            if string[i] == SPACES[SpacesType.Sym_n]:
+                if is_new_line:
+                    string = string[0:new_line_pos] + string[i:len(string)]
+                    i = new_line_pos
+                is_new_line = True
+                new_line_pos = i+1
+            elif string[i] not in SPACES.values():
+                is_new_line = False
+            i += 1
+        return string
+    def remove_empty_lines(self):
+        self.prev_chars = self.remove_empty_line(self.prev_chars)
+
+        if TokenType.Comment in self.tokens_dict:
+            multi_comment_token_for_change = []
+            for token_value in self.tokens_dict[TokenType.Comment]:
+                token = self.tokens_dict[TokenType.Comment][token_value][0]
+                if token.subtype == CommentType.MultiComment:
+                    new_token_value = self.remove_empty_line(token.value)
+                    multi_comment_token_for_change.append((token.value, new_token_value))
+            for t_v in multi_comment_token_for_change:
+                self.change_token_value(t_v[0], t_v[1])
         self.merge_token_and_spaces()
-
+    def find_not_empty_lines(self):
+        string = self.prev_chars
+        i = 0
+        is_new_line = True
+        new_line_pos = 0
+        not_empty_lines = []
+        while i < len(string):
+            if string[i] == SPACES[SpacesType.Sym_n]:
+                if is_new_line:
+                    if new_line_pos != i:
+                        not_empty_lines.append(new_line_pos)
+                is_new_line = True
+                new_line_pos = i+1
+            elif string[i] not in SPACES.values():
+                is_new_line = False
+            i += 1
+        return not_empty_lines
+    def get_changed_indents(self, indent, cont_indent, string, skip_comments = False):
         cur_token = 0
         i = 0
         is_new_line = True
         indented_tokens = {}
+        new_lines_tokens = []
         first_token_on_line = None
-        while i < len(self.prev_chars):
+        while i < len(string):
             if cur_token is None:
                 i += 1
                 break
@@ -692,13 +735,14 @@ class Lexer:
             pos = i
             is_token = True
             for c in token.value:
-                if self.prev_chars[pos] != c:
+                if string[pos] != c:
                     is_token = False
                     break
                 else:
                     pos += 1
             if is_token:
                 if is_new_line:
+                    new_lines_tokens.append(token)
                     first_token_on_line = token
                     node = self.token_tree.find_node_by_token(token)
                     prev_childs = node.get_prev_childs_with_blocks()
@@ -743,22 +787,38 @@ class Lexer:
                                 total_indent += indent
                             indented_tokens[token] = total_indent
                     pos = i
-                    while pos > 0 and self.prev_chars[pos-1] != SPACES[SpacesType.Sym_n]:
+                    while pos > 0 and string[pos-1] != SPACES[SpacesType.Sym_n]:
                         pos -= 1
-                    self.prev_chars = self.prev_chars[0:pos] + ' ' * indented_tokens[token] + self.prev_chars[i:len(self.prev_chars)]
+                    string = string[0:pos] + ' ' * indented_tokens[token] + string[i:len(string)]
                     i = pos + indented_tokens[token]
                 else:
                     indented_tokens[token] = indented_tokens[first_token_on_line]
                 i += len(token.value) - 1
                 cur_token += 1
+                while cur_token != len(self.tokens) and \
+                    not skip_comments and self.tokens[cur_token].subtype == CommentType.MultiComment:
+                    cur_token+=1
                 if cur_token == len(self.tokens):
                     cur_token = None
-            if self.prev_chars[i] == SPACES[SpacesType.Sym_n]:
+            if string[i] == SPACES[SpacesType.Sym_n]:
                 is_new_line = True
-            elif self.prev_chars[i] not in SPACES.values():
+            elif string[i] not in SPACES.values():
                 is_new_line = False
             i += 1
+        return string, indented_tokens, new_lines_tokens
+    def change_indent(self, indent, cont_indent):
         self.merge_token_and_spaces()
-        return indented_tokens
-    def find_indent(self, indent, cont_indent):
-        pass
+        self.prev_chars, a, b = self.get_changed_indents(indent, cont_indent, self.prev_chars)
+        self.merge_token_and_spaces()
+    def find_indent(self, indent, cont_indent, tab_size):
+        inc_indents = []
+        s = self.change_tab_to_space_in_string(self.prev_chars, tab_size)
+        s, indented_tokens, new_lines_tokens = self.get_changed_indents(indent, cont_indent, s)
+        for token in new_lines_tokens:
+            token_indent = indented_tokens[token]
+            i = token.pos
+            while i > 0 and self.prev_chars[i - 1] != SPACES[SpacesType.Sym_n]:
+                i -= 1
+            if token.pos - i != token_indent:
+                inc_indents.append(i)
+        return inc_indents
