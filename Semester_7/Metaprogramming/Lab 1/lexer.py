@@ -24,6 +24,17 @@ class TokenNode:
             if index > 0:
                 return self.parent.childes[0:index]
         return None
+    def get_prev_childs_token(self):
+        if self.parent is not None:
+            index = self.parent.childes.index(self)
+            if index > 0:
+                prev_childes = []
+                for child in self.parent.childes[0:index]:
+                    if child is not None and child.is_token():
+                        prev_childes.append(child)
+                if len(prev_childes) > 0:
+                    return prev_childes
+        return None
     def get_prev_childs_with_blocks(self):
         if self.parent is not None:
             index = self.parent.childes.index(self)
@@ -562,12 +573,12 @@ class Lexer:
             while pos < len(tokens):
                 block.append(tokens[pos])
                 if start.token_type in BLOCKS:
-                    if tokens[pos].subtype == BLOCKS[start.token_type] \
-                        or tokens[pos].token_type == BLOCKS[start.token_type]:
+                    if tokens[pos].subtype in BLOCKS[start.token_type] \
+                        or tokens[pos].token_type in BLOCKS[start.token_type]:
                         break
                 if start.subtype in BLOCKS:   
-                   if tokens[pos].subtype == BLOCKS[start.subtype] \
-                        or tokens[pos].token_type == BLOCKS[start.subtype]:
+                   if tokens[pos].subtype in BLOCKS[start.subtype] \
+                        or tokens[pos].token_type in BLOCKS[start.subtype]:
                         break
 
                 pos += 1
@@ -587,13 +598,7 @@ class Lexer:
             if not TokenNode.node_is_token(node.childes[i]):
                 i += 1
                 continue
-            if Lexer.is_token_start_of_enumeration(token):
-                if token.token_type in ENUMERAION:
-                    start_type = token.token_type
-                else:
-                    start_type = token.subtype
-                start_i = i
-            elif start_type is not None \
+            if start_type is not None \
                 and (is_find_coma and (token.token_type == ENUMERAION[start_type] \
                 or token.subtype == ENUMERAION[start_type])\
                 or token.subtype == PunctType.Coma):
@@ -615,6 +620,12 @@ class Lexer:
                     update_child.parent = block_node
                 start_i += 1
                 i = start_i - 1
+            elif Lexer.is_token_start_of_enumeration(token):
+                if token.token_type in ENUMERAION:
+                    start_type = token.token_type
+                else:
+                    start_type = token.subtype
+                start_i = i
             i += 1              
 
     @staticmethod
@@ -634,7 +645,8 @@ class Lexer:
                 start_block.add_child(block_node)
                 i += len(new_block) - 1
             else:
-                start_block.add_child(TokenNode(token, start_block))
+                if token.token_type != TokenType.Comment:
+                    start_block.add_child(TokenNode(token, start_block))
             i += 1
         return start_block            
     
@@ -744,48 +756,59 @@ class Lexer:
                 if is_new_line:
                     new_lines_tokens.append(token)
                     first_token_on_line = token
-                    node = self.token_tree.find_node_by_token(token)
-                    prev_childs = node.get_prev_childs_with_blocks()
-                    while prev_childs is None:
-                        if node.parent is None:
-                            break
-                        node = node.parent
-                        prev_childs = node.get_prev_childs_with_blocks()
-                    connected_prev_child = None
-                    need_add_indent = True
-                    if prev_childs is not None:
-                        for child in reversed(prev_childs):
-                            if child.is_token() and Lexer.token_connected_to_token(child.token, token):
-                                connected_prev_child = child
-                                break
-                        if connected_prev_child is None and len(prev_childs) > 0:
-                            for child in reversed(prev_childs):
-                                if child.is_token() and Lexer.token_pseudoconnected_to_token(child.token, token):
-                                    connected_prev_child = child
-                                    need_add_indent = False #@#############
-                                    break
-                        if connected_prev_child is None:    
-                            connected_prev_child = prev_childs[0]
-                            need_add_indent = False
-                    if connected_prev_child is not None:
-                        total_indent = indented_tokens[connected_prev_child.token]
-                        if need_add_indent:
-                            if connected_prev_child.token.subtype == PunctType.RoundBracket_Open:
-                                total_indent += cont_indent
-                            else:
-                                total_indent += indent
-                        indented_tokens[token] = total_indent
+                    if (token.token_type == TokenType.Comment):
+                        comment_indent = 0
+                        if cur_token - 1 != 0:
+                            comment_indent = indented_tokens[self.tokens[cur_token - 1]]
+                        indented_tokens[token] = comment_indent
                     else:
-                        prev_parent = node.get_closest_parent_token()
-                        if prev_parent is None:
-                            indented_tokens[token] = 0
-                        else:
-                            total_indent = indented_tokens[prev_parent.token]
-                            if prev_parent.token.subtype == PunctType.RoundBracket_Open:
-                                total_indent += cont_indent
-                            else:
-                                total_indent += indent
+                        node = self.token_tree.find_node_by_token(token)
+                        prev_childs = node.get_prev_childs_token()
+                        while prev_childs is None:
+                            if node.parent is None:
+                                break
+                            node = node.parent
+                            if node.token == 'sub-block':
+                                prev_childs = node.get_prev_childs()
+                                if prev_childs is not None:
+                                    prev_childs = [prev_childs[0].get_first_child_token()]
+                                    break
+                            prev_childs = node.get_prev_childs_token()
+                        connected_prev_child = None
+                        need_add_indent = True
+                        if prev_childs is not None:
+                            for child in prev_childs: # reversed ?
+                                if child.is_token() and Lexer.token_connected_to_token(child.token, token):
+                                    connected_prev_child = child
+                                    break
+                            if connected_prev_child is None and len(prev_childs) > 0:
+                                for child in prev_childs: # reversed ?
+                                    if child.is_token() and Lexer.token_pseudoconnected_to_token(child.token, token):
+                                        connected_prev_child = child
+                                        need_add_indent = False #@#############
+                                        break
+                            if connected_prev_child is None:    
+                                connected_prev_child = prev_childs[0]
+                                need_add_indent = False
+                        if connected_prev_child is not None:
+                            total_indent = indented_tokens[connected_prev_child.token]
+                            if need_add_indent:
+                                if connected_prev_child.token.subtype == PunctType.RoundBracket_Open:
+                                    total_indent += cont_indent
+                                else:
+                                    total_indent += indent
                             indented_tokens[token] = total_indent
+                        else:
+                            prev_parent = node.get_closest_parent_token()
+                            if prev_parent is None:
+                                indented_tokens[token] = 0
+                            else:
+                                total_indent = indented_tokens[prev_parent.token]
+                                if prev_parent.token.subtype == PunctType.RoundBracket_Open:
+                                    total_indent += cont_indent
+                                else:
+                                    total_indent += indent
+                                indented_tokens[token] = total_indent
                     pos = i
                     while pos > 0 and string[pos-1] != SPACES[SpacesType.Sym_n]:
                         pos -= 1

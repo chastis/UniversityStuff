@@ -1,20 +1,21 @@
 from tokens import *
 
 BLOCKS = {
-    KeyWordType.Create : PunctType.Semicolon, 
-    KeyWordType.Select : PunctType.Semicolon,
-    KeyWordType.Update : PunctType.Semicolon,
-    KeyWordType.Insert : PunctType.Semicolon,
-    PunctType.RoundBracket_Open : PunctType.RoundBracket_Close
+    KeyWordType.Create : [PunctType.Semicolon], 
+    KeyWordType.Select : [PunctType.Semicolon],
+    KeyWordType.Update : [PunctType.Semicolon],
+    KeyWordType.Insert : [PunctType.Semicolon],
+    PunctType.RoundBracket_Open : [PunctType.RoundBracket_Close],
 }
 
 ENUMERAION = {
     KeyWordType.Set : PunctType.Semicolon,
     KeyWordType.Select: KeyWordType.From,
+    KeyWordType.From: KeyWordType.Where,
     PunctType.RoundBracket_Open : PunctType.RoundBracket_Close
 }
 
-ENUMERAION_ENDING_SKIP = [KeyWordType.Select, PunctType.RoundBracket_Open]
+ENUMERAION_ENDING_SKIP = [KeyWordType.Select, PunctType.RoundBracket_Open, KeyWordType.From]
 
 # we suppose that we can insert round_brackets anywhere
 CONNECTED_TOKENS = {
@@ -22,15 +23,17 @@ CONNECTED_TOKENS = {
     KeyWordType.Select: [TokenType.Identifier],
     KeyWordType.Update: [TokenType.Identifier],
     KeyWordType.Insert: [TokenType.Identifier],
-    PunctType.RoundBracket_Open: [TokenType.Identifier, KeyWordType.Constraint, TokenType.Value],
-    TokenType.Identifier: [TokenType.VarType, KeyWordType.Not, KeyWordType.Null, TokenType.Value, TokenType.Operations],
+    PunctType.RoundBracket_Open: [TokenType.Identifier, TokenType.Value],
+    TokenType.Identifier: [TokenType.VarType, KeyWordType.Not, KeyWordType.Null, TokenType.Value, TokenType.Operations, KeyWordType.Constraint],
     TokenType.Operations: [TokenType.Identifier, TokenType.Value],
     KeyWordType.Not: [KeyWordType.Null, KeyWordType.Exist],
     KeyWordType.Foreign: [KeyWordType.Key, KeyWordType.References, KeyWordType.On],
+    KeyWordType.Primary: [KeyWordType.Key, KeyWordType.References, KeyWordType.On],
     KeyWordType.On: [KeyWordType.Delete, KeyWordType.Cascade],
     KeyWordType.Join: [TokenType.Identifier, KeyWordType.On],
     KeyWordType.Case: [KeyWordType.When, KeyWordType.Else, KeyWordType.End],
-    KeyWordType.When: [KeyWordType.Then, TokenType.Identifier, TokenType.Value]
+    KeyWordType.When: [KeyWordType.Then, TokenType.Identifier, TokenType.Value],
+    KeyWordType.Constraint: [KeyWordType.Foreign, KeyWordType.Check, KeyWordType.Primary]
 }
 
 PSEUDONONNECTED_TOKENS = {

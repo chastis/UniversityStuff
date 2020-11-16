@@ -60,3 +60,18 @@ on delete cascade ( a,
 d,
 b)
 );
+
+create table My_Table
+(
+-- internal columns
+    Id decimal(9) not null                                                                       -- entity surrogate identifier (thanks, Cap)
+        constraint My_Table_Id_ch                                                                -- positive
+            check (Id > 0) 
+             constraint My_Table_pk primary key,
+    Kind char(1) not null                                                                        -- kind of entry
+        constraint My_Table_Kind_ch check (Kind in ('O','P','F')),                               -- O is bla-blah, P is …, F is …
+    Status decimal(1) default 1 constraint My_Table_Status_ch check ( Status between -1 and 3 ), -- 1..3 actual, 0 in progress, -1 archived
+
+-- natural data
+    Name varchar(80) not null constraint My_Table_Name_ak unique,
+    Note varchar(2000))
