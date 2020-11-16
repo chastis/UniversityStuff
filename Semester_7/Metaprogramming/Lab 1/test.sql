@@ -2,8 +2,7 @@ CREATE TABLE My_Table
 (
     
 	
-	    Id   int         not null,
-	Name varchar(60) not null,
+	    Id   int         not null, Name varchar(60) not null,
     Note varchar(2000.)
  values 
   (
@@ -13,25 +12,13 @@ CREATE TABLE My_Table
     3, 
     4
   )
-) ;
-
+) 
+;
 create table a;
-
--- comment
-
-/* 
-         
-	
-
-    another comment 
-*/
-
-       
 SELECT T.table_name as "The Table Name",
 count(I.id)  as "Number of Fields"
 FROM sys."tables" T,
 sys."indices" I
-
 WHERE T.* = I.table_name
 GROUP BY T.table_name
 HAVING count(I.id) >= 0
@@ -43,6 +30,10 @@ Pos  integer     not null primary key,
 Name varchar(80) not null unique,
 Note varchar(1000)
 );
+
+
+
+
 
 
 CREATE TABLE Detail
@@ -60,6 +51,11 @@ on delete cascade ( a,
 d,
 b)
 );
+
+
+
+
+
 
 create table My_Table
 (

@@ -8,6 +8,8 @@ import copy
 class FormatPartition(Enum):
     Case = 0
     TabsAndIndents = 1
+    Wrapping = 2
+    Expression = 3
 
 class CaseParam(Enum):
     Keywords = 0
@@ -34,11 +36,25 @@ class TabsAndIndentsParam(Enum):
     ContinuationIndent = 3
     KeepIndentsOnEmptyLines = 4
 
+class WrappingParam(Enum):
+    WrappedWords = 0
+    MaximumLins = 1
+    MinimumLines = 2
+    WrapSubClausesWithElementsMoreThan = 3
+
+class ExpressionParam(Enum):
+    SpaceBeforeComa = 0
+    SpaceAfterComa = 1
+    SpaceWithinParentheses = 2
+    SpaceBeforeParentheses = 3
+
 CONST_TAB_SIZE = 4
 
 FormatLibrary = {
    FormatPartition.Case: (CaseParam, CaseOption),
-   FormatPartition.TabsAndIndents: (TabsAndIndentsParam, [])
+   FormatPartition.TabsAndIndents: (TabsAndIndentsParam, []),
+   FormatPartition.Wrapping: (WrappingParam, []),
+   FormatPartition.Expression: (ExpressionParam, [])
 }
 
 FormatErrors = {
@@ -241,7 +257,69 @@ class Formatter:
                 else:
                     mistabs = self.formatted_lexer.find_tabs(tab_size)
                     self.add_error_message_to_pos(mistabs, FormatErrors[5])
+    def format_wrap(self):
+        wrap_options = self.options[FormatPartition.Wrapping] 
+        min_lines = 1
+        max_lines = 1   
+        if WrappingParam.MaximumLins in wrap_options.keys():
+            if wrap_options[WrappingParam.MaximumLins].isdigit():
+                new_max_lines = int(wrap_options[WrappingParam.MaximumLins])
+                max_lines = 1 if new_max_lines < 0 or new_max_lines > 32 else new_max_lines
+        if WrappingParam.MinimumLines in wrap_options.keys():
+            if wrap_options[WrappingParam.MinimumLines].isdigit():
+                new_min_lines = int(wrap_options[WrappingParam.MinimumLines])
+                min_lines = 1 if new_min_lines < 0 or new_min_lines > 32 else new_min_lines
+        if WrappingParam.WrappedWords in wrap_options.keys():
+            tokens_for_wrapped = wrap_options[WrappingParam.WrappedWords]
+            types_for_wrapped = []
+            for token in tokens_for_wrapped:
+                for type in KeyWordType:
+                    if token == type.name:
+                        types_for_wrapped.append(type)
+                        break
+            if self.changing:
+                self.formatted_lexer.wrapp_tokens(types_for_wrapped)
+        
+        elements_num = None
+        if WrappingParam.WrapSubClausesWithElementsMoreThan in wrap_options.keys():
+            if wrap_options[WrappingParam.WrapSubClausesWithElementsMoreThan].isdigit():
+                elements_num = int(wrap_options[WrappingParam.WrapSubClausesWithElementsMoreThan])
+        
+        if elements_num is not None and self.changing:
+            self.formatted_lexer.change_subcloses_lines(elements_num)
+        if self.changing:
+            self.formatted_lexer.change_tokens_with_token_rules()
+            self.formatted_lexer.change_empty_lines(min_lines, max_lines)
+    def format_expression(self):
+        expression_options = self.options[FormatPartition.Expression] 
 
+        if ExpressionParam.SpaceBeforeComa in expression_options.keys():
+            if self.changing:
+                if expression_options[ExpressionParam.SpaceBeforeComa] == str(True):
+                    self.formatted_lexer.change_space_between_tokens(' ', PunctType.Coma, before = True)
+                else:
+                    self.formatted_lexer.change_space_between_tokens('', PunctType.Coma, before = True)
+        if ExpressionParam.SpaceAfterComa in expression_options.keys():
+            if self.changing:
+                if expression_options[ExpressionParam.SpaceAfterComa] == str(True):
+                    self.formatted_lexer.change_space_between_tokens(' ', PunctType.Coma, after = True)
+                else:
+                    self.formatted_lexer.change_space_between_tokens('', PunctType.Coma, after= True)
+        if ExpressionParam.SpaceWithinParentheses in expression_options.keys():
+            if self.changing:
+                if expression_options[ExpressionParam.SpaceWithinParentheses] == str(True):
+                    self.formatted_lexer.change_space_between_tokens(' ', PunctType.RoundBracket_Close, before = True)
+                    self.formatted_lexer.change_space_between_tokens(' ', PunctType.RoundBracket_Open, after = True)
+                else:
+                    self.formatted_lexer.change_space_between_tokens('', PunctType.RoundBracket_Close, before = True)
+                    self.formatted_lexer.change_space_between_tokens('', PunctType.RoundBracket_Open, after = True)
+        if ExpressionParam.SpaceBeforeParentheses in expression_options.keys():
+            if self.changing:
+                if expression_options[ExpressionParam.SpaceBeforeParentheses] == str(True):
+                    self.formatted_lexer.change_space_between_tokens(' ', PunctType.RoundBracket_Open, before = True)
+                else:
+                    self.formatted_lexer.change_space_between_tokens('', PunctType.RoundBracket_Open, before = True)
+        
     def format_lexer(self, lexer):
         if self.data is None or not isinstance(lexer, Lexer):
             return # error
@@ -251,6 +329,10 @@ class Formatter:
         for i in range(2):
             if FormatPartition.Case in self.options.keys():
                 self.format_case()
+            if FormatPartition.Wrapping in self.options.keys():
+                self.format_wrap()
+            if FormatPartition.Expression in self.options.keys():
+                self.format_expression()
             if FormatPartition.TabsAndIndents in self.options.keys():
                 self.format_indents()
             self.changing = need_changing

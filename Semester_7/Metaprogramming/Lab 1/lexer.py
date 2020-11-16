@@ -35,6 +35,26 @@ class TokenNode:
                 if len(prev_childes) > 0:
                     return prev_childes
         return None
+    def get_prev_child_token(self):
+        if self.parent is not None:
+            index = self.parent.childes.index(self)
+            if index > 0:
+                child = self.parent.childes[index-1]
+                return child.get_last_child_token()
+            else:
+                self.parent.get_prev_child_token()
+        return None
+    def get_last_child_token(self):
+        if self.childes is None:
+            return None
+        for child in reversed(self.childes):
+            if child.is_token():
+                return child
+            else:
+                child_token = child.get_last_child_token()
+                if child_token is not None:
+                    return child_token
+        return None
     def get_prev_childs_with_blocks(self):
         if self.parent is not None:
             index = self.parent.childes.index(self)
@@ -59,6 +79,19 @@ class TokenNode:
                 if child_token is not None:
                     return child_token
         return None
+    def get_first_child_token_or_self(self):
+        if self.is_token():
+            return self
+        if self.childes is None:
+            return None
+        for child in self.childes:
+            if child.is_token():
+                return child
+            else:
+                child_token = child.get_first_child_token_or_self()
+                if child_token is not None:
+                    return child_token
+        return None   
     def get_closest_parent_token(self):
         if self.parent is not None:
             if self.parent.is_token():
@@ -69,6 +102,13 @@ class TokenNode:
     def get_closest_parent_in_block(self):
         if TokenNode.node_is_token(self.parent):
             return self.parent
+        return None
+    def is_closest_parent_block(self):
+        if self.parent is not None:
+            if self.parent.is_block():
+                return self.parent
+            elif self.parent.is_sub_block():
+                return self.parent.is_closest_parent_block()
         return None
     def add_child(self, child):
         if self.childes is None:
@@ -771,7 +811,7 @@ class Lexer:
                             if node.token == 'sub-block':
                                 prev_childs = node.get_prev_childs()
                                 if prev_childs is not None:
-                                    prev_childs = [prev_childs[0].get_first_child_token()]
+                                    prev_childs = [prev_childs[0].get_first_child_token_or_self()] # or_self ?
                                     break
                             prev_childs = node.get_prev_childs_token()
                         connected_prev_child = None
@@ -845,3 +885,182 @@ class Lexer:
             if token.pos - i != token_indent:
                 inc_indents.append(i)
         return inc_indents
+
+    @staticmethod
+    def find_amount_lines_between_tokens(self, a, b):
+        return b.row - a.row
+
+    def change_empty_lines(self, min_lines, max_lines):
+        self.merge_token_and_spaces()
+        string = self.prev_chars
+        cur_token = 0
+        i = 0
+        is_new_line = True
+        while i < len(string):
+            if cur_token is None:
+                i += 1
+                break
+            token = self.tokens[cur_token]
+            pos = i
+            is_token = True
+            for c in token.value:
+                if string[pos] != c:
+                    is_token = False
+                    break
+                else:
+                    pos += 1
+            if is_token:
+                if token.token_type in DEVIDED_TOKENS or token.subtype  in DEVIDED_TOKENS:
+                    if (token.token_type == TokenType.Comment):
+                            pass
+                    elif True: # is_new_line:
+                        node = self.token_tree.find_node_by_token(token)
+                        block =  node.is_closest_parent_block()
+                        if block is not None:
+                            parent_block = block.is_closest_parent_block()
+                            if parent_block is not None:
+                                prev_child = node.get_prev_child_token()
+                                if prev_child is None:
+                                    prev_child = block.get_prev_child_token()
+                                if prev_child is not None:
+                                    pos = i
+                                    space_between_tokens = ''
+                                    while pos > 0 and string[pos-1] in SPACES.values():
+                                        space_between_tokens +=string[pos-1]
+                                        pos -= 1
+                                    space_count = space_between_tokens.count(SPACES[SpacesType.Sym_n]) - 1
+                                    if space_count < min_lines:
+                                        string = string[0:pos] + space_between_tokens + (min_lines-space_count)*'\n' + string[i:len(string)]
+                                        i += min_lines-space_count - 1
+                                    elif space_count > max_lines:
+                                        need_delete = space_count - max_lines
+                                        orig_len = len(space_between_tokens)
+                                        for a in range(need_delete):
+                                            index = space_between_tokens.rfind('\n')
+                                            space_between_tokens = space_between_tokens[0:index]
+                                        string = string[0:pos] + space_between_tokens + string[i:len(string)]
+                                        i -= orig_len + len(space_between_tokens)
+                i += len(token.value) - 1
+                cur_token += 1
+                if cur_token == len(self.tokens):
+                    cur_token = None
+            if string[i] == SPACES[SpacesType.Sym_n]:
+                is_new_line = True
+            elif string[i] not in SPACES.values():
+                is_new_line = False
+            i += 1
+        self.prev_chars = string
+        self.merge_token_and_spaces()
+
+    def wrapp_tokens(self, tokens_for_wrap):
+        self.merge_token_and_spaces()
+        for i in range(len(self.tokens)):
+            if i > 0:
+                a = self.tokens[i]
+                b = self.tokens[i-1]
+                if a.token_type in tokens_for_wrap or a.subtype in tokens_for_wrap:
+                    if i > 0 and a.row == b.row \
+                        and a.column != b.column + len(b.value):
+                        self.prev_chars = self.prev_chars[0:a.pos-1] + '\n' + self.prev_chars[a.pos:len(self.prev_chars)]
+        self.merge_token_and_spaces()
+
+    def change_subcloses_lines(self, elements):
+        self.merge_token_and_spaces()
+        string = self.prev_chars
+        cur_token = 0
+        i = 0
+        is_new_line = True
+        while i < len(string):
+            if cur_token is None:
+                i += 1
+                break
+            token = self.tokens[cur_token]
+            pos = i
+            is_token = True
+            for c in token.value:
+                if string[pos] != c:
+                    is_token = False
+                    break
+                else:
+                    pos += 1
+            if is_token:
+                if (token.token_type == TokenType.Comment):
+                        pass
+                elif not is_new_line:
+                        node = self.token_tree.find_node_by_token(token)
+                        if node.parent is not None and node.parent.is_sub_block():
+                            if node.parent.childes is not None and len(node.parent.childes) > elements:
+                                prev =  node.parent.get_prev_child_token()
+                                if prev is not None:
+                                    a = node.token
+                                    b = prev.token
+                                    if a.row == b.row and a.column != b.column + len(b.value):
+                                        string = string[0:a.pos-1] + '\n' +string[a.pos:len(string)]
+                                        self.prev_chars = string
+                                        self.calculate_column_and_row()
+                i += len(token.value) - 1
+                cur_token += 1
+                if cur_token == len(self.tokens):
+                    cur_token = None
+            if string[i] == SPACES[SpacesType.Sym_n]:
+                is_new_line = True
+            elif string[i] not in SPACES.values():
+                is_new_line = False
+            i += 1
+        self.prev_chars = string
+        self.merge_token_and_spaces()
+    def change_space_between_tokens_once(self, a, b, space):
+        self.prev_chars = self.prev_chars[0:a.pos+len(a.value)] + space + self.prev_chars[b.pos:len(self.prev_chars)]
+        self.merge_token_and_spaces()
+    def change_space_between_tokens(self, new_space, subtype, after = None, before = None):
+        self.merge_token_and_spaces()
+        for i in range(len(self.tokens)):
+            a = None
+            b = None
+            if after is not None and after and i+1 < len(self.tokens): 
+                a = self.tokens[i+1]
+                b = self.tokens[i]
+            elif before is not None and before and i > 0:
+                a = self.tokens[i-1]
+                b = self.tokens[i]
+            if a is None or b is None:
+                continue
+            if b.token_type == TokenType.Punctuaition and b.subtype == subtype:
+                if a.row == b.row:
+                    if after is not None and after:
+                        self.change_space_between_tokens_once(b, a, new_space)
+                    else: # before
+                        self.change_space_between_tokens_once(a, b, new_space)
+        self.merge_token_and_spaces() 
+    
+    def change_tokens_with_token_rules(self):
+        self.merge_token_and_spaces()
+        for i in range(len(self.tokens)):
+            a = self.tokens[i]
+            rules = []
+            choosed_rule = []
+            rule_tokens = [a]
+            for rule_variant in TOKEN_RULES:
+                if len(rule_variant) > 0 and (a.token_type == rule_variant[0] or a.subtype == rule_variant[0]):
+                    rules.append(rule_variant)
+            if len(rules) > 0:
+                for rule in rules:
+                    pos = 1
+                    while pos < len(rule):
+                        if i+pos < len(self.tokens):
+                            b = self.tokens[i+pos]
+                            if b.token_type == rule[pos] or b.subtype == rule[pos]:
+                                rule_tokens.append(b)
+                                pos += 1
+                                continue
+                        break
+                    if len(rule_tokens) == len(rule):
+                        choosed_rule = rule
+                        break
+                    else:
+                        rule_tokens = [a]
+                if len(choosed_rule) > 0:
+                    for token_i in range(len(rule_tokens)-1):
+                        self.change_space_between_tokens_once(rule_tokens[token_i], rule_tokens[token_i+1], ' ')
+        self.merge_token_and_spaces() 
+

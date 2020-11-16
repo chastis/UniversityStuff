@@ -15,6 +15,18 @@
 			"Indent": "5",
 			"ContinuationIndent": "10",
 			"KeepIndentsOnEmptyLines": "False"
+		},
+		"Wrapping": {
+			"WrappedWords": ["As", "Constraint"],
+			"WrapSubClausesWithElementsMoreThan": "3",
+			"MaximumLins": "3",
+			"MinimumLines": "1"
+		},
+		"Expression": {
+			"SpaceBeforeComa": "False",
+			"SpaceAfterComa": "True",
+			"SpaceWithinParentheses": "True",
+			"SpaceBeforeParentheses": "False"
 		}
 	}
 }
