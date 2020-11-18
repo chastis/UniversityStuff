@@ -28,5 +28,35 @@
 			"SpaceWithinParentheses": "True",
 			"SpaceBeforeParentheses": "False"
 		}
+	},
+	"FullFormat": 
+	{
+		"Case": {
+			"Keywords": "ToUpper",
+			"Types": "ToUpper",
+			"Identifiers": "ToUpper",
+			"Aliases": "ToUpper",
+			"QuotedIdentifiers": "ToTittle",
+			"IdentifierQuotation": "Quote"
+		},
+		"TabsAndIndents": {
+			"UseTabCharacter": "False",
+			"TabSize": "4",
+			"Indent": "4",
+			"ContinuationIndent": "2",
+			"KeepIndentsOnEmptyLines": "False"
+		},
+		"Wrapping": {
+			"WrappedWords": ["As", "Constraint", "Where", "Group", "Having", "From", "Join", "Left", "Select", "Create", "Inner", "Cross", "Table", "Primary", "Foreign", "Natural", "On", "Case", "Else", "When"],
+			"WrapSubClausesWithElementsMoreThan": "3",
+			"MaximumLins": "3",
+			"MinimumLines": "1"
+		},
+		"Expression": {
+			"SpaceBeforeComa": "False",
+			"SpaceAfterComa": "True",
+			"SpaceWithinParentheses": "True",
+			"SpaceBeforeParentheses": "False"
+		}
 	}
 }

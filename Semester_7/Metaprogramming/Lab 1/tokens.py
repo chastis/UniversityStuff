@@ -71,6 +71,7 @@ class KeyWordType(Enum):
     When = 44
     End = 45
     Check = 46
+    And = 47
 
 class VarTypeType(Enum):
     Int = 0,
@@ -159,7 +160,8 @@ TOKEN_DICT = {
         KeyWordType.Min               : "min",
         KeyWordType.When              : "when",
         KeyWordType.End               : "end",
-        KeyWordType.Check             : "check"
+        KeyWordType.Check             : "check",
+        KeyWordType.And               : "and"
     },
     TokenType.VarType: {
         VarTypeType.Int               : 'int',

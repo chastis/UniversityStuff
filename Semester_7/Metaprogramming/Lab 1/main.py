@@ -7,7 +7,7 @@ from os import listdir
 from os.path import isfile, join, splitext
 import sys
 
-DEBUG = False
+DEBUG = True
 
 def get_dirs_from_path(dir_path):
     dirs = []
@@ -60,7 +60,7 @@ def process_files_in_project(path, config_name, action):
         process_files_in_project(join(path, dir), config_name, action)
 
 if DEBUG:
-    process('full.sql', 'MyTemplate', '-f')
+    process('full.sql', 'FullFormat', '-f')
 else:
     if len(sys.argv) == 2 and sys.argv[1] == '-h' \
         or sys.argv[1] == '--help':

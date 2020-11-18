@@ -5,6 +5,7 @@ BLOCKS = {
     KeyWordType.Select : [PunctType.Semicolon],
     KeyWordType.Update : [PunctType.Semicolon],
     KeyWordType.Insert : [PunctType.Semicolon],
+    KeyWordType.Delete : [PunctType.Semicolon, KeyWordType.Cascade],
     PunctType.RoundBracket_Open : [PunctType.RoundBracket_Close],
 }
 
@@ -20,10 +21,10 @@ ENUMERAION_ENDING_SKIP = [KeyWordType.Select, KeyWordType.From] # , PunctType.Ro
 # we suppose that we can insert round_brackets anywhere
 CONNECTED_TOKENS = {
     KeyWordType.Create: [KeyWordType.Table, TokenType.Identifier],
-    KeyWordType.Select: [TokenType.Identifier, KeyWordType.As],
+    KeyWordType.Select: [TokenType.Identifier, KeyWordType.Max, KeyWordType.Min, KeyWordType.Case],
     KeyWordType.Update: [TokenType.Identifier],
-    KeyWordType.Insert: [TokenType.Identifier],
-    PunctType.RoundBracket_Open: [TokenType.Identifier, TokenType.Value, KeyWordType.Constraint, PunctType.Coma],
+    KeyWordType.Insert: [TokenType.Identifier, KeyWordType.Into , KeyWordType.Values, PunctType.RoundBracket_Open],
+    PunctType.RoundBracket_Open: [TokenType.Identifier, TokenType.Value, KeyWordType.Constraint, PunctType.Coma, KeyWordType.Primary, KeyWordType.Key],
     TokenType.Identifier: [TokenType.VarType, KeyWordType.Not, KeyWordType.Null, 
                             TokenType.Value, TokenType.Operations, KeyWordType.Constraint,
                             KeyWordType.As],
@@ -36,11 +37,15 @@ CONNECTED_TOKENS = {
     KeyWordType.Case: [KeyWordType.When, KeyWordType.Else, KeyWordType.End],
     KeyWordType.When: [KeyWordType.Then, TokenType.Identifier, TokenType.Value],
     KeyWordType.As: [TokenType.Identifier],
-    KeyWordType.Constraint: [KeyWordType.Foreign, KeyWordType.Check, KeyWordType.Primary]
+    KeyWordType.Constraint: [KeyWordType.Foreign, KeyWordType.Check, KeyWordType.Primary],
+    KeyWordType.Max: [KeyWordType.As],
+    KeyWordType.Min: [KeyWordType.As],
+    KeyWordType.From: [KeyWordType.Natural, KeyWordType.Join, KeyWordType.Left, KeyWordType.Inner, KeyWordType.Outer, KeyWordType.Cross]
 }
 
 PSEUDONONNECTED_TOKENS = {
-    PunctType.RoundBracket_Open: [PunctType.RoundBracket_Close]
+    PunctType.RoundBracket_Open: [PunctType.RoundBracket_Close],
+    TokenType.Identifier: [TokenType.Identifier]
 }
 
 DEVIDED_TOKENS = [
@@ -48,6 +53,7 @@ DEVIDED_TOKENS = [
     KeyWordType.Select,
     KeyWordType.Update,
     KeyWordType.Insert,
+    KeyWordType.Delete
 ]
 
 TOKEN_RULES = [
@@ -58,7 +64,7 @@ TOKEN_RULES = [
     [KeyWordType.Select, KeyWordType.Max],
     [KeyWordType.Where, TokenType.Identifier],
     [KeyWordType.Create, KeyWordType.View],
-    [PunctType.RoundBracket_Open, ValuesType.String, PunctType.RoundBracket_Close],
+   # [PunctType.RoundBracket_Open, ValuesType.String, PunctType.RoundBracket_Close],
     [PunctType.RoundBracket_Open, ValuesType.Integer, PunctType.RoundBracket_Close],
     [PunctType.RoundBracket_Open, ValuesType.Real, PunctType.RoundBracket_Close],
     [KeyWordType.Left, KeyWordType.Join],
@@ -66,6 +72,7 @@ TOKEN_RULES = [
     [KeyWordType.Left, KeyWordType.Outer],
     [KeyWordType.Inner, KeyWordType.Join],
     [KeyWordType.Natural, KeyWordType.Join],
+    [KeyWordType.Cross, KeyWordType.Join],
     [KeyWordType.Group, KeyWordType.By],
     [KeyWordType.Order, KeyWordType.By],
     [KeyWordType.By, TokenType.Identifier],
@@ -74,4 +81,8 @@ TOKEN_RULES = [
     [KeyWordType.Max, KeyWordType.As],
     [KeyWordType.Min, TokenType.Identifier],
     [KeyWordType.Min, KeyWordType.As]
+]
+
+DEVIDED_TOKEN_RULES = [
+    [KeyWordType.Create, TokenType.Identifier, PunctType.RoundBracket_Open]
 ]

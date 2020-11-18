@@ -229,12 +229,7 @@ class Formatter:
                 new_cont_indent_size = int(indent_options[TabsAndIndentsParam.ContinuationIndent])
                 cont_indent_size = 1 if new_cont_indent_size < 0 or new_cont_indent_size > 32 else new_cont_indent_size
 
-        if self.changing:
-            self.formatted_lexer.change_tab_to_space(tab_size)
-            self.formatted_lexer.change_indent(indent_size, cont_indent_size)
-        else:
-            inc_indents = self.formatted_lexer.find_indent(indent_size, cont_indent_size, tab_size)
-            self.add_error_message_to_pos(inc_indents, FormatErrors[8])
+        ## here was indent
 
         if TabsAndIndentsParam.KeepIndentsOnEmptyLines in indent_options.keys():
             if indent_options[TabsAndIndentsParam.KeepIndentsOnEmptyLines] == str(False):
@@ -243,6 +238,13 @@ class Formatter:
                 else:
                     misspaces = self.formatted_lexer.find_not_empty_lines()
                     self.add_error_message_to_pos(misspaces, FormatErrors[7])
+
+        if self.changing:
+            self.formatted_lexer.change_tab_to_space(tab_size)
+            self.formatted_lexer.change_indent(indent_size, cont_indent_size)
+        #else:
+            #inc_indents = self.formatted_lexer.find_indent(indent_size, cont_indent_size, tab_size)
+            #self.add_error_message_to_pos(inc_indents, FormatErrors[8])
 
         if TabsAndIndentsParam.UseTabCharacter in indent_options.keys():
             if indent_options[TabsAndIndentsParam.UseTabCharacter] == str(True):

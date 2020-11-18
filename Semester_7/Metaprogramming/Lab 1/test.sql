@@ -1,73 +1,22 @@
-CREATE TABLE My_Table
-(
-    
-	
-	    Id   int         not null, Name varchar(60) not null,
-    Note varchar(2000.)
- values 
-  (
-    1991, 
-    1, 
-    2, 
-    3, 
-    4
-  )
-) 
-;
-create table a;
-SELECT T.table_name as "The Table Name",
-count(I.id)  as "Number of Fields"
-FROM sys."tables" T,
-sys."indices" I
-WHERE T.* = I.table_name
-GROUP BY T.table_name
-HAVING count(I.id) >= 0
-ORDER BY 2 desc;
+SELECT d.dep_id,
+p.per_id,
+count(*)      as per_cnt,
+max(m.actual) as has_actual_template
+from department d
+join manager m on d.dep_id = m.dep_id
+left join person p on m.per_id = p.per_id,
+message m
+left outer join mark mk on m.id = mk.msg_id
+left join template tp on m.template_id = tp.id
+where d.dep_id = m.dep_1
+group by d.dep_id, p.per_id
+having count(*) >= 2
+order by per_cnt desc;
 
-CREATE TABLE Position
-(
-Pos  integer     not null primary key,
-Name varchar(80) not null unique,
-Note varchar(1000)
-);
-
-
-
-
-
-
-CREATE TABLE Detail
-(
-Id   integer     not null,
-Name varchar(26) not null,
-Note varchar(1000),
-Pos  decimal(4)  not null,
-constraint Detail_pk
-primary key (Id),
-constraint Detail_fk
-foreign key (Pos)
-references Position
-on delete cascade ( a,
-d,
-b)
-);
-
-
-
-
-
-
-create table My_Table
-(
--- internal columns
-    Id decimal(9) not null                                                                       -- entity surrogate identifier (thanks, Cap)
-        constraint My_Table_Id_ch                                                                -- positive
-            check (Id > 0) 
-             constraint My_Table_pk primary key,
-    Kind char(1) not null                                                                        -- kind of entry
-        constraint My_Table_Kind_ch check (Kind in ('O','P','F')),                               -- O is bla-blah, P is …, F is …
-    Status decimal(1) default 1 constraint My_Table_Status_ch check ( Status between -1 and 3 ), -- 1..3 actual, 0 in progress, -1 archived
-
--- natural data
-    Name varchar(80) not null constraint My_Table_Name_ak unique,
-    Note varchar(2000))
+INSERT
+into my_temporary_table (id, value_1, value_2, value_3, value_4)
+values (1991, 1, 2, 3, 4),
+(1992, 5, 6, 
+7, 8
+),
+(1993, 9, 10, 11, 12);

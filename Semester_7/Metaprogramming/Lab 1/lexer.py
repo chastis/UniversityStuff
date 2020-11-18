@@ -439,6 +439,7 @@ class Lexer:
                 continue
             if c == ALL_TOKEN_DICT[KeyWordType.Star]:
                 self.insert_token(c, TokenType.KeyWord)
+                continue
             self.next_char()
         self.calculate_column_and_row()
         self.build_token_tree()
@@ -633,6 +634,7 @@ class Lexer:
         start_i = None
         i = 0
         is_find_coma = False
+        amount_of_open_brackets = 0
         while i < len(node.childes):
             token = node.childes[i].token
             if not TokenNode.node_is_token(node.childes[i]):
@@ -660,14 +662,44 @@ class Lexer:
                     update_child.parent = block_node
                 start_i += 1
                 i = start_i - 1
+                if token.subtype != PunctType.Coma:
+                    break
             elif Lexer.is_token_start_of_enumeration(token):
+                if token.subtype == PunctType.RoundBracket_Open:
+                    amount_of_open_brackets += 1
+                    if amount_of_open_brackets == 1:
+                        start_type = token.subtype
+                        start_i = i
+                    i += 1
+                    continue
                 if token.token_type in ENUMERAION:
                     start_type = token.token_type
                 else:
                     start_type = token.subtype
                 start_i = i
+            elif token.subtype == PunctType.RoundBracket_Close:
+                amount_of_open_brackets -= 1
             i += 1              
 
+    @staticmethod
+    def is_token_end_of_block(token, start_node):
+        if not isinstance(token, Token) or not isinstance(start_node, TokenNode):
+            return False
+        if start_node.childes is None or len(start_node.childes) == 0:
+            return False
+        if not start_node.is_block():
+            return False
+        check_type = []
+        if not start_node.childes[0].is_token():
+            return False
+        if start_node.childes[0].token.token_type in BLOCKS:
+            check_type = BLOCKS[start_node.childes[0].token.token_type]
+        if start_node.childes[0].token.subtype in BLOCKS:
+            check_type = BLOCKS[start_node.childes[0].token.subtype]
+        if len(check_type) > 0:
+            return token.token_type in check_type or token.subtype in check_type
+        return False
+        
     @staticmethod
     def build_tree_from_block(block, start_block):
         if start_block.childes is None or len(start_block.childes) == 0:
@@ -684,9 +716,10 @@ class Lexer:
                 Lexer.check_block_for_enumeration(block_node)
                 start_block.add_child(block_node)
                 i += len(new_block) - 1
-            else:
-                if token.token_type != TokenType.Comment:
-                    start_block.add_child(TokenNode(token, start_block))
+            elif token.token_type != TokenType.Comment:
+                start_block.add_child(TokenNode(token, start_block))
+                if Lexer.is_token_end_of_block(token, start_block):
+                    break
             i += 1
         return start_block            
     
@@ -855,7 +888,18 @@ class Lexer:
                     string = string[0:pos] + ' ' * indented_tokens[token] + string[i:len(string)]
                     i = pos + indented_tokens[token]
                 else:
-                    indented_tokens[token] = indented_tokens[first_token_on_line]
+                    if (token.token_type == TokenType.Comment):
+                        indented_tokens[token] = indented_tokens[first_token_on_line]
+                    else:
+                        node = self.token_tree.find_node_by_token(token)
+                        if node.parent is not None and (node.parent.is_block() and node.parent.childes[0] == node \
+                            or node.parent.is_sub_block() and node.parent.parent is not None and node.parent.parent.childes[0] == node.parent):
+                            pos = i
+                            while pos > 0 and string[pos-1] != SPACES[SpacesType.Sym_n]:
+                                pos -= 1
+                            indented_tokens[token] = i - pos
+                        else:
+                            indented_tokens[token] = indented_tokens[first_token_on_line]
                 i += len(token.value) - 1
                 cur_token += 1
                 while cur_token != len(self.tokens) and \
