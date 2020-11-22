@@ -57,6 +57,13 @@
 			"SpaceAfterComa": "True",
 			"SpaceWithinParentheses": "True",
 			"SpaceBeforeParentheses": "False"
+		},
+		"DDLAndCode": {
+			"AlignTypes": "True",
+			"AlignJoin": "True",
+			"AlignNullabilities": "True",
+			"AlignAssigne": "True",
+			"AlliqnEqual": "True"
 		}
 	}
 }

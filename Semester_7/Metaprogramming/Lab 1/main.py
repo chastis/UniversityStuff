@@ -7,7 +7,7 @@ from os import listdir
 from os.path import isfile, join, splitext
 import sys
 
-DEBUG = True
+DEBUG = False
 
 def get_dirs_from_path(dir_path):
     dirs = []

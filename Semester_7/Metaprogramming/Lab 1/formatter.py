@@ -10,6 +10,7 @@ class FormatPartition(Enum):
     TabsAndIndents = 1
     Wrapping = 2
     Expression = 3
+    DDLAndCode = 4
 
 class CaseParam(Enum):
     Keywords = 0
@@ -48,13 +49,21 @@ class ExpressionParam(Enum):
     SpaceWithinParentheses = 2
     SpaceBeforeParentheses = 3
 
+class DDLAndCodeParam(Enum):
+    AlignTypes = 0
+    AlignJoin = 1
+    AlignNullabilities = 2
+    AlignAssigne = 3
+    AlliqnEqual = 4
+
 CONST_TAB_SIZE = 4
 
 FormatLibrary = {
    FormatPartition.Case: (CaseParam, CaseOption),
    FormatPartition.TabsAndIndents: (TabsAndIndentsParam, []),
    FormatPartition.Wrapping: (WrappingParam, []),
-   FormatPartition.Expression: (ExpressionParam, [])
+   FormatPartition.Expression: (ExpressionParam, []),
+   FormatPartition.DDLAndCode: (DDLAndCodeParam, [])
 }
 
 FormatErrors = {
@@ -206,8 +215,30 @@ class Formatter:
             if not changed_alias:
                 self.change_case(case_options[CaseParam.QuotedIdentifiers], TokenType.Identifier, IdentifierType.AliasQuoted)
 
-        
+    def format_ddl_code(self):
+        ddl_code_options = self.options[FormatPartition.DDLAndCode]  
 
+        rules = []
+
+        if DDLAndCodeParam.AlignTypes in ddl_code_options.keys():
+            if ddl_code_options[DDLAndCodeParam.AlignTypes] == str(True):
+                rules.append(ALIGNED_TOKENS[0])
+        if DDLAndCodeParam.AlignJoin in ddl_code_options.keys():
+            if ddl_code_options[DDLAndCodeParam.AlignJoin] == str(True):
+                rules.append(ALIGNED_TOKENS[1])
+        if DDLAndCodeParam.AlignNullabilities in ddl_code_options.keys():
+            if ddl_code_options[DDLAndCodeParam.AlignNullabilities] == str(True):
+                rules.append(ALIGNED_TOKENS[2])
+        if DDLAndCodeParam.AlignAssigne in ddl_code_options.keys():
+            if ddl_code_options[DDLAndCodeParam.AlignAssigne] == str(True):
+                rules.append(ALIGNED_TOKENS[3])
+        if DDLAndCodeParam.AlliqnEqual in ddl_code_options.keys():
+            if ddl_code_options[DDLAndCodeParam.AlliqnEqual] == str(True):
+                rules.append(ALIGNED_TOKENS[4])
+
+        if self.changing:
+            self.formatted_lexer.change_aling(rules)
+        
     def format_indents(self):
         indent_options = self.options[FormatPartition.TabsAndIndents]    
 
@@ -241,10 +272,15 @@ class Formatter:
 
         if self.changing:
             self.formatted_lexer.change_tab_to_space(tab_size)
+            self.formatted_lexer.delete_redundant_spaced()
             self.formatted_lexer.change_indent(indent_size, cont_indent_size)
-        #else:
-            #inc_indents = self.formatted_lexer.find_indent(indent_size, cont_indent_size, tab_size)
-            #self.add_error_message_to_pos(inc_indents, FormatErrors[8])
+        else:
+            inc_indents = self.formatted_lexer.find_indent(indent_size, cont_indent_size, tab_size)
+            self.add_error_message_to_pos(inc_indents, FormatErrors[8])
+
+        if self.changing:
+            self.format_ddl_code()
+            #self.formatted_lexer.change_aling()
 
         if TabsAndIndentsParam.UseTabCharacter in indent_options.keys():
             if indent_options[TabsAndIndentsParam.UseTabCharacter] == str(True):

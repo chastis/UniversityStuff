@@ -56,6 +56,20 @@ DEVIDED_TOKENS = [
     KeyWordType.Delete
 ]
 
+ALIGNED_TOKENS_DEVIDERS = [
+    KeyWordType.From,
+    KeyWordType.Where
+]
+
+ALIGNED_TOKENS = [
+    ([[TokenType.VarType]], [0]),
+    ([[KeyWordType.Join], [TokenType.Identifier]], [1]),
+    ([[SpecialType.Optional, -1, KeyWordType.Not], [KeyWordType.Null]], [0, 1]),
+    ([[SpecialType.Optional, -1, TokenType.Identifier], [SpecialType.Optional, 0, PunctType.Dot], [TokenType.Identifier], [OperationType.Eq]], [0, 2]),
+    ([[OperationType.Eq]], [0])
+    
+]
+
 TOKEN_RULES = [
     [TokenType.Identifier, TokenType.Identifier],
     [KeyWordType.From, TokenType.Identifier],
@@ -80,7 +94,8 @@ TOKEN_RULES = [
     [KeyWordType.Max, TokenType.Identifier],
     [KeyWordType.Max, KeyWordType.As],
     [KeyWordType.Min, TokenType.Identifier],
-    [KeyWordType.Min, KeyWordType.As]
+    [KeyWordType.Min, KeyWordType.As],
+    [KeyWordType.Not, KeyWordType.Null]
 ]
 
 DEVIDED_TOKEN_RULES = [

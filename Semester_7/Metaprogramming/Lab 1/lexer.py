@@ -110,6 +110,14 @@ class TokenNode:
             elif self.parent.is_sub_block():
                 return self.parent.is_closest_parent_block()
         return None
+    def get_all_childrens_tokens_as_list(self):
+        cheild_tokens = []
+        for child in self.childes:
+            if child.is_token():
+                cheild_tokens.append(child.token)
+            else:
+                cheild_tokens += child.get_all_childrens_tokens_as_list()
+        return cheild_tokens
     def add_child(self, child):
         if self.childes is None:
             self.childes = [child]
@@ -931,6 +939,184 @@ class Lexer:
         return inc_indents
 
     @staticmethod
+    def get_next_nonoptional_rule(rule, start):
+        while start < len(rule[0]):
+            if SpecialType.Optional in rule[0][start]:
+                start += 1
+            else:
+                break
+
+        return start
+
+    @staticmethod
+    def get_tokens_for_aligned_rule(rule, tokens):
+        i = 0
+        finded = {}
+        saved = []
+        while i < len(tokens):
+            
+            pos = i
+
+            shift = 0
+            
+            while True:
+                temp_finded = {}
+                temp_saved = []
+                for rule_i in range(len(rule[0]) - shift):
+                    curren_i = rule_i + shift
+                    token = tokens[pos]
+                    if SpecialType.Optional in rule[0][curren_i]:
+                        if token.token_type in rule[0][curren_i] or token.subtype in rule[0][curren_i]:
+                            if rule[0][curren_i][1] != -1 and rule[0][curren_i][1] + shift not in temp_finded:
+                                # we have not connected depended optional
+                                temp_finded.clear()
+                                break
+                            if curren_i in temp_finded:
+                                temp_finded[curren_i].append(token)
+                            else:
+                                temp_finded[curren_i] = [token]
+                        elif rule[0][curren_i][1] != -1:
+                            # pic it's depended option
+                            temp_finded.clear()
+                            break
+                    else:
+                        if token.token_type in rule[0][curren_i] or token.subtype in rule[0][curren_i]:
+                            if curren_i in temp_finded:
+                                temp_finded[curren_i].append(token)
+                            else:
+                                temp_finded[curren_i] = [token]
+                        else:
+                            temp_finded.clear()
+                            break
+                    if curren_i in rule[1] and curren_i in temp_finded:
+                        temp_saved.append(token)
+                    if len(rule[0]) > curren_i + 1:
+                        pos += 1
+                        if pos == len(tokens):
+                            next_non_optional = Lexer.get_next_nonoptional_rule(rule, curren_i)
+                            if next_non_optional != len(rule[0]):
+                                temp_finded.clear()
+                            break
+
+                if len(temp_finded) > 0 and len(temp_saved) > 0:
+                    saved.append(temp_saved[0])
+                    finded.update(temp_finded)
+                    i += len(temp_finded)
+                    break
+                else:
+                    if pos == len(tokens):
+                        break
+                    elif shift < len(rule[0]) and SpecialType.Optional in rule[0][shift]:
+                        shift += 1
+                    else:
+                        break
+            i = i + 1
+        i = 0
+        existing_rows = []
+        final_saved = []
+        while i < len(saved):
+            if saved[i].row not in existing_rows:
+                existing_rows.append(saved[i].row)
+                final_saved.append(saved[i])
+            i += 1
+        return final_saved
+    def get_changed_align(self, string, rule):
+        cur_token = 0
+        i = 0
+        tokens_for_align = []
+        skipped_token = None
+        while i < len(string):
+            if cur_token is None:
+                i += 1
+                break
+            token = self.tokens[cur_token]
+            pos = i
+            is_token = True
+            for c in token.value:
+                if string[pos] != c:
+                    is_token = False
+                    break
+                else:
+                    pos += 1
+            if is_token:
+                if skipped_token is not None:
+                    if skipped_token == token:
+                        skipped_token = None
+                else:
+                    if (token.token_type == TokenType.Comment):
+                        cur_token += 1
+                    else:
+                        node = self.token_tree.find_node_by_token(token)
+                        prev_parent = node.is_closest_parent_block()
+                        if prev_parent is not None:
+                            all_childes = prev_parent.get_all_childrens_tokens_as_list()
+                            if all_childes is not None and len(all_childes) > 0:
+
+                                iteration = [[]]
+                                for child in all_childes:
+                                    if child.token_type not in ALIGNED_TOKENS_DEVIDERS and child.subtype not in ALIGNED_TOKENS_DEVIDERS:
+                                        iteration[len(iteration) - 1].append(child)
+                                    else:
+                                        iteration.append([child])
+                                for it in iteration:
+                                    #for rule in ALIGNED_TOKENS:
+                                    finded = Lexer.get_tokens_for_aligned_rule(rule, it)
+                                    if len(finded) > 0:
+                                        tokens_for_align.append(finded)
+                                    #endfor
+                                    skipped_token = it[-1]
+                cur_token += 1
+                if cur_token == len(self.tokens):
+                    cur_token = None
+                i += len(token.value) - 1
+            i += 1
+        aligned_tokens = {}
+        for ruled_tokens in tokens_for_align:
+            max_distance = 0
+            for t in ruled_tokens:
+                max_distance = max(max_distance, t.pos - string[0:t.pos].rfind('\n') - 1)
+            for t in ruled_tokens:
+                delta_dist =  max_distance - (t.pos - string[0:t.pos].rfind('\n') - 1)
+                if delta_dist != 0:
+                    aligned_tokens[t] = delta_dist
+                    #string = string[0:t.pos-1] + delta_dist*' ' + string[t.pos:len(string)]
+        return aligned_tokens
+    def change_aling(self, rules):
+        self.merge_token_and_spaces()
+        for rule in rules:
+            aligned_tokens = self.get_changed_align(self.prev_chars, rule)
+
+            cur_token = 0
+            i = 0
+            while i < len(self.prev_chars):
+                if cur_token is None:
+                    i += 1
+                    break
+                token = self.tokens[cur_token]
+                pos = i
+                is_token = True
+                for c in token.value:
+                    if self.prev_chars[pos] != c:
+                        is_token = False
+                        break
+                    else:
+                        pos += 1
+                if is_token:
+                    if (token.token_type == TokenType.Comment):
+                        pass
+                    else:
+                        if token in aligned_tokens:
+                            self.prev_chars = self.prev_chars[0:i-1] + aligned_tokens[token]*' ' + self.prev_chars[i-1:len(self.prev_chars)]
+                            i += aligned_tokens[token]
+                    i += len(token.value) - 1
+                    cur_token += 1
+                    if len(self.tokens) == cur_token:
+                        cur_token = None
+                i += 1
+
+            self.merge_token_and_spaces()
+        # end change_aling
+    @staticmethod
     def find_amount_lines_between_tokens(self, a, b):
         return b.row - a.row
 
@@ -1107,4 +1293,8 @@ class Lexer:
                     for token_i in range(len(rule_tokens)-1):
                         self.change_space_between_tokens_once(rule_tokens[token_i], rule_tokens[token_i+1], ' ')
         self.merge_token_and_spaces() 
+    def delete_redundant_spaced(self):
+        while self.prev_chars.find('  ') != -1:
+            self.prev_chars = self.prev_chars.replace('  ',' ')
+        self.merge_token_and_spaces()
 

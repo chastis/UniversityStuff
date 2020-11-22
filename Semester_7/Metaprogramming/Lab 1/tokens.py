@@ -203,6 +203,12 @@ SPACES = {
     SpacesType.Sym_t: '\t'
 }
 
+class SpecialType(Enum):
+    Optional = 0
+    Any = 1
+    Not = 2
+
+
 ALL_TOKEN = []
 ALL_TOKEN_DICT = {}
 for a in TOKEN_DICT.values():
