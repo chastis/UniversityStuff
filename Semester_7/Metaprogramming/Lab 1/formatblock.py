@@ -95,7 +95,8 @@ TOKEN_RULES = [
     [KeyWordType.Max, KeyWordType.As],
     [KeyWordType.Min, TokenType.Identifier],
     [KeyWordType.Min, KeyWordType.As],
-    [KeyWordType.Not, KeyWordType.Null]
+    [KeyWordType.Not, KeyWordType.Null],
+    [KeyWordType.Not, KeyWordType.In]
 ]
 
 DEVIDED_TOKEN_RULES = [

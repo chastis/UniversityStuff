@@ -278,9 +278,10 @@ class Formatter:
             inc_indents = self.formatted_lexer.find_indent(indent_size, cont_indent_size, tab_size)
             self.add_error_message_to_pos(inc_indents, FormatErrors[8])
 
-        if self.changing:
-            self.format_ddl_code()
-            #self.formatted_lexer.change_aling()
+        if FormatPartition.DDLAndCode in self.options.keys():
+            if self.changing:
+                self.format_ddl_code()
+                #self.formatted_lexer.change_aling()
 
         if TabsAndIndentsParam.UseTabCharacter in indent_options.keys():
             if indent_options[TabsAndIndentsParam.UseTabCharacter] == str(True):
@@ -376,8 +377,8 @@ class Formatter:
             self.changing = need_changing
             if not need_changing:
                 break
-        if not need_changing:
-            self.formatted_lexer.merge_token_and_spaces()
+        #if not need_changing:
+        self.formatted_lexer.merge_token_and_spaces()
     
     def print_format_errors(self, file_name, file_with_errors):
         with open(file_name, "w") as file:
