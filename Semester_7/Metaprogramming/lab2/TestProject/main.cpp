@@ -1,6 +1,11 @@
 # include <iostream> 
 #include<iomanip>
 
+#define def
+
+def def def
+def
+
 template <class T>
 class A
 {
@@ -26,8 +31,12 @@ struct a
 class B;
 int main()
 {
+    std::F* f;
+
     class T {} t;
     T td;
+    int i {};
+    auto lambda = [](){};
     switch (1)
     {
     case 1:

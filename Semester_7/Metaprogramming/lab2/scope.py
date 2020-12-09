@@ -3,162 +3,153 @@ from typing import List
 from tokens import *
 import typing
 
-class CommandType(Enum):
+class BlockType(Enum):
     Include = 0
     Macros = 1
-    Initialization = 2
-    Assigne = 3
-    InitAndAssigne = 4
+    Definition = 2
+    Operation = 3
+    RoundBracketsScope = 4
+    SquareBracketsScope = 5
+    BraceBracketsScope = 6
+    ClassMemberTypeScope = 7
+    Token = 8
+    Global = 9
+    NonIdentified = 10
 
+class Block:
+    def __init__(self, type : BlockType):
+        self.type = type
+        self.tokens = []
+    def is_token(self) -> bool:
+        return self.type == BlockType.Token
+    type : BlockType
+    token : Token
+    tokens : typing.List['Block']
+    child_len : int = 0
+    parent : 'Block' = None
 class ScopeNode:
-    def __init__(self, token, parent):
-        self.token = token
-        self.parent = parent
-    token = None
-    parent : ScopeNode = None
-    childes = None
-    def get_closest_token(self):
-        node = self
-        while ScopeNode.node_is_token(node):
-            if node.parent is None:
-                return None
-            node = node.parent
-        return node.token
-    def get_prev_childs(self):
-        if self.parent is not None:
-            index = self.parent.childes.index(self)
-            if index > 0:
-                return self.parent.childes[0:index]
-        return None
-    def get_prev_childs_token(self):
-        if self.parent is not None:
-            index = self.parent.childes.index(self)
-            if index > 0:
-                prev_childes = []
-                for child in self.parent.childes[0:index]:
-                    if child is not None and child.is_token():
-                        prev_childes.append(child)
-                if len(prev_childes) > 0:
-                    return prev_childes
-        return None
-    def get_prev_child_token(self):
-        if self.parent is not None:
-            index = self.parent.childes.index(self)
-            if index > 0:
-                child = self.parent.childes[index-1]
-                return child.get_last_child_token()
-            else:
-                self.parent.get_prev_child_token()
-        return None
-    def get_last_child_token(self):
-        if self.childes is None:
-            return None
-        for child in reversed(self.childes):
-            if child.is_token():
-                return child
-            else:
-                child_token = child.get_last_child_token()
-                if child_token is not None:
-                    return child_token
-        return None
-    def get_prev_childs_with_blocks(self):
-        if self.parent is not None:
-            index = self.parent.childes.index(self)
-            if index > 0:
-                childes = self.parent.childes[0:index]
-                i = 0
-                while i < len(childes):
-                    if childes[i].is_block() or childes[i].is_sub_block():
-                        new_child = childes[i].get_first_child_token()
-                        childes[i] = new_child
-                    i += 1
-                return childes
-        return None
-    def get_first_child_token(self):
-        if self.childes is None:
-            return None
-        for child in self.childes:
-            if child.is_token():
-                return child
-            else:
-                child_token = child.get_first_child_token()
-                if child_token is not None:
-                    return child_token
-        return None
-    def get_first_child_token_or_self(self):
-        if self.is_token():
-            return self
-        if self.childes is None:
-            return None
-        for child in self.childes:
-            if child.is_token():
-                return child
-            else:
-                child_token = child.get_first_child_token_or_self()
-                if child_token is not None:
-                    return child_token
-        return None   
-    def get_closest_parent_token(self):
-        if self.parent is not None:
-            if self.parent.is_token():
-                return self.parent
-            else:
-                return self.parent.get_closest_parent_token()
-        return None
-    def get_closest_parent_in_block(self):
-        if ScopeNode.node_is_token(self.parent):
-            return self.parent
-        return None
-    def is_closest_parent_block(self):
-        if self.parent is not None:
-            if self.parent.is_block():
-                return self.parent
-            elif self.parent.is_sub_block():
-                return self.parent.is_closest_parent_block()
-        return None
-    def get_all_childrens_tokens_as_list(self):
-        cheild_tokens = []
-        for child in self.childes:
-            if child.is_token():
-                cheild_tokens.append(child.token)
-            else:
-                cheild_tokens += child.get_all_childrens_tokens_as_list()
-        return cheild_tokens
-    def add_child(self, child):
-        if self.childes is None:
-            self.childes = [child]
-        else:
-            self.childes.append(child)
-    def print(self, indent):
-        if not ScopeNode.node_is_token(self):
-            print(indent * '    ' + self.token)
-        else:
-            print(indent * '    ' + self.token.value)
-        if self.childes is not None:
-            for child in self.childes:
-                child.print(indent + 1)
-    def find_node_by_token(self, token):
-        if self.token is not None and\
-            self.token == token:
-            return self
-        if self.childes is not None:
-            for child in self.childes:
-                child_token = child.find_node_by_token(token)
-                if child_token is not None:
-                    return child_token
-        return None
-    def is_sub_block(self):
-        return self.token and self.token == 'sub-block'
-    def is_block(self):
-        return self.token and self.token == 'block'
-    def is_token(self):
-        return ScopeNode.node_is_token(self)
+    scope = Block(BlockType.Global)
     @staticmethod
-    def node_is_token(node):
-        if node is None \
-            or node.token is None \
-            or node.token == 'block'\
-            or node.token == 'sub-block':
-            return False
-        return True
+    def if_start_of_block(start : Token) -> bool:
+        return start.token_subtype == PunctType.RoundBracket_Open or \
+                start.token_subtype == PunctType.BraceBracket_Open or \
+                start.token_subtype == PunctType.SquareBracket_Open or \
+                start.token_subtype == KeyWordType.Private or \
+                start.token_subtype == KeyWordType.Protected or \
+                start.token_subtype == KeyWordType.Public or \
+                start.token_subtype == PunctType.Sharp
+    @staticmethod   
+    def parse_templates(full_block : Block) -> Block:
+        pos = 0
+        pos_finish = len(full_block.tokens)
+        while pos < pos_finish:
+            token = full_block.tokens[pos]
+            if token.type == BlockType.NonIdentified:
+                pass
+            pos += 1
+    @staticmethod
+    def parse_next_block(pos_start : int, pos_finish : int, full_block : Block, start : Block = None) -> Block :
+        out = Block(BlockType.Global)
+        end_scope_type = []
+        is_end_included = True
+        row_depended = None
+        last_unregistred_token = None
+        if start is not None:
+            out.tokens.append(start)
+            out.child_len += start.child_len
+            out.type = BlockType.NonIdentified
+            if start.is_token():
+                if start.token.token_subtype == PunctType.RoundBracket_Open:
+                    out.type = BlockType.RoundBracketsScope
+                    end_scope_type = [PunctType.RoundBracket_Close]
+                elif start.token.token_subtype == PunctType.BraceBracket_Open:
+                    out.type = BlockType.BraceBracketsScope
+                    end_scope_type = [PunctType.BraceBracket_Close]
+                elif start.token.token_subtype == PunctType.SquareBracket_Open:
+                    out.type = BlockType.SquareBracketsScope
+                    end_scope_type = [PunctType.SquareBracket_Close]
+                elif start.token.token_subtype == KeyWordType.Public or\
+                    start.token.token_subtype == KeyWordType.Protected or\
+                    start.token.token_subtype == KeyWordType.Private :
+                    out.type = BlockType.ClassMemberTypeScope
+                    end_scope_type = [PunctType.BraceBracket_Close, KeyWordType.Public, KeyWordType.Protected, KeyWordType.Private]
+                    is_end_included = False
+                    if pos_start < pos_finish:
+                        if full_block.tokens[pos_start].is_token() and\
+                            full_block.tokens[pos_start].token.token_subtype == OperationType.Colon:
+                            out.tokens.append(full_block.tokens[pos_start])
+                            out.child_len += full_block.tokens[pos_start].child_len
+                            full_block.tokens[pos_start].parent = out
+                            pos_start += 1
+                elif start.token.token_subtype == PunctType.Sharp:
+                    out.type = BlockType.Macros
+                    if pos_start < pos_finish:
+                        if full_block.tokens[pos_start].is_token() and\
+                            full_block.tokens[pos_start].token.token_subtype == KeyWordType.Include:
+                            out.type = BlockType.Include
+                    row_depended = start.token.row
+                else:
+                    end_scope_type = [PunctType.Semicolon]
+                    last_unregistred_token = start
+        
+        pos = pos_start
+        
+        while pos < pos_finish:
+            token = full_block.tokens[pos]
+            if token.is_token() and token.token:
+                if last_unregistred_token is None and\
+                    token.token.token_type == TokenType.Identifier:
+                    last_unregistred_token = token
+                if row_depended is not None:
+                    if row_depended != token.token.row:
+                        if token.token.token_subtype == PunctType.BackSlash:
+                            row_depended = token.token.row + 1
+                        else:
+                            break
+                if token.token.token_subtype in end_scope_type or\
+                   token.token.token_type in end_scope_type:
+                    if is_end_included:
+                        out.tokens.append(token)
+                        token.parent = out
+                        out.child_len += token.child_len
+                    break
+                if ScopeNode.if_start_of_block(token.token):
+                    new_block = ScopeNode.parse_next_block(pos + 1, pos_finish, full_block, token)
+                    new_block.parent = out
+                    out.tokens.append(new_block)
+                    out.child_len += new_block.child_len
+                    pos += new_block.child_len
+                    if out.type == BlockType.NonIdentified and \
+                        new_block.type == BlockType.BraceBracketsScope and \
+                        len(out.tokens) > 3 and out.tokens[-2].type == BlockType.RoundBracketsScope and \
+                        out.tokens[-3].is_token() and out.tokens[-3].token.token_type == TokenType.Identifier:
+                        break
+                    continue
+                elif out.type != BlockType.BraceBracketsScope and \
+                    out.type != BlockType.ClassMemberTypeScope and \
+                    out.type != BlockType.Global:
+                    out.tokens.append(token)
+                    token.parent = out
+                    out.child_len += token.child_len
+                else:
+                    new_block = ScopeNode.parse_next_block(pos + 1, pos_finish, full_block, token)
+                    new_block.parent = out
+                    out.tokens.append(new_block)
+                    out.child_len += new_block.child_len
+                    pos += new_block.child_len
+                    continue 
+            pos += 1
+        return out
+    def parse_tokens(self, tokens : typing.List[Token]):
+        self.scope.type = BlockType.Global
+        for token in tokens:
+            tokenBlock =  Block(BlockType.Token)
+            tokenBlock.token = token
+            tokenBlock.child_len = 1
+            tokenBlock.parent = self.scope
+            self.scope.tokens.append(tokenBlock)
+        if len(tokens) > 0:
+            self.scope = self.parse_next_block(0, len(self.scope.tokens), self.scope)
+        print('in tokens len = ' + str(len(tokens)))
+        print('out tokens len = ' + str(self.scope.child_len))
 

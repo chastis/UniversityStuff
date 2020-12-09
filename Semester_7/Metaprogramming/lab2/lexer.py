@@ -1,5 +1,6 @@
 from copy import copy
 import errno
+from scope import ScopeNode
 from typing import List
 from tokens import *
 import typing
@@ -12,6 +13,7 @@ class Lexer:
     tokens_dict : typing.Dict[TokenType, typing.Dict[str, typing.List[Token]]] = {}
     error_token : typing.List[Token] = []
     _shft_by_error = 0
+    scope = ScopeNode()
     def reset(self):
         self.pos = 0
         self.orig_chars = ''
@@ -242,7 +244,7 @@ class Lexer:
                 continue
             self.next_char()
         self.calculate_column_and_row()
-
+        self.scope.parse_tokens(self.tokens)
     def change_token_value(self, old_value, new_value):
         changed_tokens = []
         for token_type in self.tokens_dict:

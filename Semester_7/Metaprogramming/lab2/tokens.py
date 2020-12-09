@@ -62,6 +62,7 @@ class VarTypeType(Enum):
     Bool = 3
     Void = 4
     Double = 5
+    Custom = 6
 
 class PunctType(Enum):
     RoundBracket_Open = 2
@@ -74,6 +75,7 @@ class PunctType(Enum):
     SingleQuotes = 7
     DoubleQuotes = 8
     BackSlash = 10
+    Sharp = 11
 
 class OperationType(Enum):
     NotEq = 0
@@ -178,7 +180,8 @@ TOKEN_DICT = {
         PunctType.Semicolon           :';',
         PunctType.SingleQuotes        :"'",
         PunctType.DoubleQuotes        :'"',
-        PunctType.BackSlash           :'\\'
+        PunctType.BackSlash           :'\\',
+        PunctType.Sharp               :'#'
     },
     TokenType.Operations: {
         OperationType.NotEq             :'!=',
