@@ -1,0 +1,344 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module py2sql</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>py2sql</strong></big></big> (version 0.2.0)</font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cnick%5Cpycharmprojects%5Clab3%5Cpy2sql%5Cpy2sql.py">c:\users\nick\pycharmprojects\lab3\py2sql\py2sql.py</a></font></td></tr></table>
+    <p><tt>Py2SQL.py2sql:&nbsp;provides&nbsp;entry&nbsp;point&nbsp;<a href="#-main">main</a>().</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="Py2SQL.util_for_handle_usual_data.html">Py2SQL.util_for_handle_usual_data</a><br>
+<a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="Py2SQL.sql_queries.html">Py2SQL.sql_queries</a><br>
+<a href="sqlite3.html">sqlite3</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+<a href="Py2SQL.util_for_db.html">Py2SQL.util_for_db</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="py2sql.html#Cat">Cat</a>
+</font></dt><dt><font face="helvetica, arial"><a href="py2sql.html#Database">Database</a>
+</font></dt><dt><font face="helvetica, arial"><a href="py2sql.html#Lesson">Lesson</a>
+</font></dt><dt><font face="helvetica, arial"><a href="py2sql.html#test1">test1</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="py2sql.html#test2">test2</a>
+</font></dt><dt><font face="helvetica, arial"><a href="py2sql.html#test3">test3</a>
+</font></dt></dl>
+</dd>
+</dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Cat">class <strong>Cat</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Cat">Cat</a>(id_=1,&nbsp;name='Барсик')<br>
+&nbsp;<br>
+<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Cat-__init__"><strong>__init__</strong></a>(self, id_=1, name='Барсик')</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>id</strong> = 1</dl>
+
+<dl><dt><strong>name</strong> = 'барсик'</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Database">class <strong>Database</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Database-__enter__"><strong>__enter__</strong></a>(self)</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Реализовано&nbsp;для&nbsp;менеджера&nbsp;контекста&nbsp;(with&nbsp;as)<br>
+:return:&nbsp;объект&nbsp;базы&nbsp;данных</tt></dd></dl>
+
+<dl><dt><a name="Database-__exit__"><strong>__exit__</strong></a>(self, exc_type, exc_val, exc_tb)</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Реализовано&nbsp;для&nbsp;менеджера&nbsp;контекста&nbsp;(with&nbsp;as)<br>
+:return:</tt></dd></dl>
+
+<dl><dt><a name="Database-__init__"><strong>__init__</strong></a>(self)</dt><dd><tt>Конструктор&nbsp;для&nbsp;класса,&nbsp;производится&nbsp;коннект&nbsp;и&nbsp;получение&nbsp;курсора</tt></dd></dl>
+
+<dl><dt><a name="Database-create_class"><strong>create_class</strong></a>(self, table: str, module: str)</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Создание&nbsp;модуля<br>
+:param&nbsp;table:&nbsp;название&nbsp;таблицы&nbsp;по&nbsp;которой&nbsp;создается&nbsp;модуль<br>
+:param&nbsp;module:&nbsp;название&nbsp;модуля&nbsp;/&nbsp;класса&nbsp;в&nbsp;нём&nbsp;создаваемого<br>
+:return:</tt></dd></dl>
+
+<dl><dt><a name="Database-create_hierarchy"><strong>create_hierarchy</strong></a>(self, table: str, module: str)</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Создание&nbsp;иерархии&nbsp;классов<br>
+:param&nbsp;table:&nbsp;название&nbsp;таблицы&nbsp;по&nbsp;которой&nbsp;создается&nbsp;модуль<br>
+:param&nbsp;module:&nbsp;название&nbsp;модуля<br>
+:return:</tt></dd></dl>
+
+<dl><dt><a name="Database-create_object"><strong>create_object</strong></a>(self, table: str, id_: Union[str, int]) -&gt; object</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Создание&nbsp;объектов&nbsp;из&nbsp;одной&nbsp;записи<br>
+:param&nbsp;table:&nbsp;название&nbsp;таблицы<br>
+:param&nbsp;id_:&nbsp;запись&nbsp;в&nbsp;бд<br>
+:return:&nbsp;список&nbsp;объектов</tt></dd></dl>
+
+<dl><dt><a name="Database-create_objects"><strong>create_objects</strong></a>(self, table: str, fid: Union[str, int], lid: Union[str, int]) -&gt; List[object]</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Создание&nbsp;объектов&nbsp;из&nbsp;нескольки&nbsp;записей<br>
+:param&nbsp;lid:&nbsp;правая&nbsp;граница&nbsp;множества<br>
+:param&nbsp;fid:&nbsp;левая&nbsp;граница&nbsp;множества<br>
+:param&nbsp;table:&nbsp;название&nbsp;таблицы<br>
+:return:&nbsp;список&nbsp;объектов</tt></dd></dl>
+
+<dl><dt><a name="Database-delete_class"><strong>delete_class</strong></a>(self, py_class)</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Удаление&nbsp;таблицы&nbsp;из&nbsp;БД<br>
+:param&nbsp;py_class:&nbsp;класс,&nbsp;по&nbsp;которому&nbsp;будет&nbsp;удалена&nbsp;бд<br>
+:return:&nbsp;статус&nbsp;удаления&nbsp;или&nbsp;контролируемая&nbsp;ошибка</tt></dd></dl>
+
+<dl><dt><a name="Database-delete_hierarches"><strong>delete_hierarches</strong></a>(self, root_class: object)</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Поиск&nbsp;каких-либо&nbsp;иерархий,&nbsp;или&nbsp;же&nbsp;связанных&nbsp;таблиц<br>
+:return:&nbsp;список&nbsp;кортежей&nbsp;с&nbsp;форматом:&nbsp;родительская&nbsp;таблица,&nbsp;дочерняя&nbsp;таблица.</tt></dd></dl>
+
+<dl><dt><a name="Database-delete_object"><strong>delete_object</strong></a>(self, py_object: object)</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Удаление&nbsp;записи<br>
+:param&nbsp;py_object:&nbsp;объект&nbsp;записи<br>
+:return:&nbsp;статус&nbsp;удаления&nbsp;или&nbsp;контролируемая&nbsp;ошибка</tt></dd></dl>
+
+<dl><dt><a name="Database-find_class"><strong>find_class</strong></a>(self, py_class)</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Поиск&nbsp;необходимого&nbsp;класса<br>
+:param&nbsp;py_class:&nbsp;python&nbsp;класс<br>
+:return:&nbsp;все&nbsp;данные&nbsp;найденого&nbsp;класса&nbsp;по&nbsp;ячейкам</tt></dd></dl>
+
+<dl><dt><a name="Database-find_classes_by"><strong>find_classes_by</strong></a>(self, *attributes)</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Поиск&nbsp;необходимого&nbsp;класса&nbsp;по&nbsp;введенным&nbsp;аттрибутам<br>
+:param&nbsp;py_class:&nbsp;python&nbsp;класс<br>
+:return:&nbsp;все&nbsp;данные&nbsp;найденого&nbsp;класса&nbsp;по&nbsp;ячейкам</tt></dd></dl>
+
+<dl><dt><a name="Database-find_hierarches"><strong>find_hierarches</strong></a>(self)</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Поиск&nbsp;каких-либо&nbsp;иерархий,&nbsp;или&nbsp;же&nbsp;связанных&nbsp;таблиц<br>
+:return:&nbsp;список&nbsp;кортежей&nbsp;с&nbsp;форматом:&nbsp;родительская&nbsp;таблица,&nbsp;дочерняя&nbsp;таблица.</tt></dd></dl>
+
+<dl><dt><a name="Database-find_object"><strong>find_object</strong></a>(self, table: str, py_object: object) -&gt; list</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Поиск&nbsp;строки&nbsp;с&nbsp;эквивалетными&nbsp;параметрами&nbsp;что&nbsp;и&nbsp;у&nbsp;объекта<br>
+:param&nbsp;table:&nbsp;название&nbsp;таблицы<br>
+:param&nbsp;py_object:&nbsp;объект&nbsp;требуемый&nbsp;к&nbsp;нахождению<br>
+:return:&nbsp;список&nbsp;кортежей&nbsp;где&nbsp;1&nbsp;кортеж&nbsp;является&nbsp;информацией&nbsp;о&nbsp;одном&nbsp;поле</tt></dd></dl>
+
+<dl><dt><a name="Database-find_objects_by"><strong>find_objects_by</strong></a>(self, table: str, *attributes)</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Поиск&nbsp;записи&nbsp;по&nbsp;заданным&nbsp;параметрам<br>
+:param&nbsp;table:&nbsp;название&nbsp;таблицы<br>
+:param&nbsp;attributes:&nbsp;нужный&nbsp;параметры&nbsp;для&nbsp;поиска<br>
+:return:&nbsp;найденные&nbsp;строки&nbsp;в&nbsp;формате:&nbsp;название&nbsp;стобца,&nbsp;тип,&nbsp;занчение</tt></dd></dl>
+
+<dl><dt><a name="Database-get_table_info"><strong>get_table_info</strong></a>(self, table: str) -&gt; list</dt><dd><tt>:param&nbsp;table:&nbsp;название&nbsp;таблицы&nbsp;в&nbsp;БД<br>
+:return:&nbsp;список&nbsp;параметров&nbsp;таблицы:&nbsp;айди_поля,&nbsp;название_поля,&nbsp;тип_поля.</tt></dd></dl>
+
+<dl><dt><a name="Database-get_tables"><strong>get_tables</strong></a>(self) -&gt; tuple</dt><dd><tt>:return:&nbsp;Названия&nbsp;имеющихся&nbsp;таблиц</tt></dd></dl>
+
+<dl><dt><a name="Database-save_class"><strong>save_class</strong></a>(self, py_class)</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Сохранение&nbsp;таблицы&nbsp;в&nbsp;БД<br>
+:param&nbsp;py_class:&nbsp;класс,&nbsp;по&nbsp;которому&nbsp;будет&nbsp;выстроена&nbsp;бд<br>
+:return:&nbsp;статус&nbsp;сохранения&nbsp;или&nbsp;контролируемая&nbsp;ошибка</tt></dd></dl>
+
+<dl><dt><a name="Database-save_hierarchy"><strong>save_hierarchy</strong></a>(self, root_class: object)</dt></dl>
+
+<dl><dt><a name="Database-save_object"><strong>save_object</strong></a>(self, py_object: object)</dt><dd><tt>&nbsp;&nbsp;&nbsp;&nbsp;Сохранение&nbsp;объекта&nbsp;в&nbsp;базу&nbsp;данных<br>
+:param&nbsp;py_object:&nbsp;объект<br>
+:return:&nbsp;статус&nbsp;добавления,&nbsp;или&nbsp;же&nbsp;контролируемая&nbsp;ошибка</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Lesson">class <strong>Lesson</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Lesson">Lesson</a>(id_,&nbsp;title)<br>
+&nbsp;<br>
+<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Lesson-__init__"><strong>__init__</strong></a>(self, id_, title)</dt><dd><tt>Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>id</strong> = 1</dl>
+
+<dl><dt><strong>title</strong> = 'Математика'</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="test1">class <strong>test1</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>id</strong> = 1</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="test2">class <strong>test2</strong></a>(<a href="py2sql.html#test1">test1</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="py2sql.html#test2">test2</a></dd>
+<dd><a href="py2sql.html#test1">test1</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>id</strong> = 1</dl>
+
+<hr>
+Data descriptors inherited from <a href="py2sql.html#test1">test1</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="test3">class <strong>test3</strong></a>(<a href="py2sql.html#test1">test1</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="py2sql.html#test3">test3</a></dd>
+<dd><a href="py2sql.html#test1">test1</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>id</strong> = 1</dl>
+
+<hr>
+Data descriptors inherited from <a href="py2sql.html#test1">test1</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-main"><strong>main</strong></a>()</dt></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>AbstractSet</strong> = typing.AbstractSet<br>
+<strong>Any</strong> = typing.Any<br>
+<strong>AnyStr</strong> = ~AnyStr<br>
+<strong>AsyncContextManager</strong> = typing.AbstractAsyncContextManager<br>
+<strong>AsyncGenerator</strong> = typing.AsyncGenerator<br>
+<strong>AsyncIterable</strong> = typing.AsyncIterable<br>
+<strong>AsyncIterator</strong> = typing.AsyncIterator<br>
+<strong>Awaitable</strong> = typing.Awaitable<br>
+<strong>ByteString</strong> = typing.ByteString<br>
+<strong>Callable</strong> = typing.Callable<br>
+<strong>ChainMap</strong> = typing.ChainMap<br>
+<strong>ClassVar</strong> = typing.ClassVar<br>
+<strong>Collection</strong> = typing.Collection<br>
+<strong>Container</strong> = typing.Container<br>
+<strong>ContextManager</strong> = typing.AbstractContextManager<br>
+<strong>Coroutine</strong> = typing.Coroutine<br>
+<strong>Counter</strong> = typing.Counter<br>
+<strong>DB_FILENAME</strong> = 'db.sqlite3'<br>
+<strong>DefaultDict</strong> = typing.DefaultDict<br>
+<strong>Deque</strong> = typing.Deque<br>
+<strong>Dict</strong> = typing.Dict<br>
+<strong>EXCEPTION_TEXT_CLASS_EXIST</strong> = 'Идентичный класс уже присутствует в Базе Данных.'<br>
+<strong>EXCEPTION_TEXT_CLASS_NO_ID</strong> = 'У класса нет поля id.'<br>
+<strong>EXCEPTION_TEXT_NO_ID</strong> = 'У объекта нет поля id.'<br>
+<strong>EXCEPTION_TEXT_NO_RECORD</strong> = 'Запись с заданными параметрами не найдена.'<br>
+<strong>EXCEPTION_TEXT_NO_TABLE</strong> = 'Введенной таблицы не найдено.'<br>
+<strong>EXCEPTION_TEXT_NO_TABLE_WITH_THESE_ATTRS</strong> = 'Таблицы с эквивалетными параметрами не найдено.'<br>
+<strong>Final</strong> = typing.Final<br>
+<strong>FrozenSet</strong> = typing.FrozenSet<br>
+<strong>Generator</strong> = typing.Generator<br>
+<strong>HIERARH_WAS_CREATED</strong> = 'Связка таблиц была построена.'<br>
+<strong>HIERARH_WAS_CREATED_IN_PY</strong> = 'Модуль построен по иерархии'<br>
+<strong>Hashable</strong> = typing.Hashable<br>
+<strong>ItemsView</strong> = typing.ItemsView<br>
+<strong>Iterable</strong> = typing.Iterable<br>
+<strong>Iterator</strong> = typing.Iterator<br>
+<strong>KeysView</strong> = typing.KeysView<br>
+<strong>List</strong> = typing.List<br>
+<strong>Literal</strong> = typing.Literal<br>
+<strong>MODULE_WAS_CREATED</strong> = 'Модуль был успешно создан.'<br>
+<strong>Mapping</strong> = typing.Mapping<br>
+<strong>MappingView</strong> = typing.MappingView<br>
+<strong>MutableMapping</strong> = typing.MutableMapping<br>
+<strong>MutableSequence</strong> = typing.MutableSequence<br>
+<strong>MutableSet</strong> = typing.MutableSet<br>
+<strong>NoReturn</strong> = typing.NoReturn<br>
+<strong>Optional</strong> = typing.Optional<br>
+<strong>OrderedDict</strong> = typing.OrderedDict<br>
+<strong>RECORD_INSERT</strong> = 'Запись добавлена.'<br>
+<strong>RECORD_UPDATE</strong> = 'Запись обновлена.'<br>
+<strong>RECORD_WAS_DELETED</strong> = 'Запись была удалена.'<br>
+<strong>REVERSE_SUPPORTED_TYPES</strong> = {'INTEGER': 'int', 'REAL': 'float', 'TEXT': 'str'}<br>
+<strong>Reversible</strong> = typing.Reversible<br>
+<strong>SUPPORTED_TYPES</strong> = {'float': 'REAL', 'int': 'INTEGER', 'str': 'TEXT'}<br>
+<strong>Sequence</strong> = typing.Sequence<br>
+<strong>Set</strong> = typing.Set<br>
+<strong>Sized</strong> = typing.Sized<br>
+<strong>TABLE_WAS_CREATED</strong> = 'Таблица создана.'<br>
+<strong>TABLE_WAS_DELETED</strong> = 'Таблица успешно удалена.'<br>
+<strong>TABLE_WAS_UPDATED</strong> = 'Таблица была пересоздана.'<br>
+<strong>TYPE_CHECKING</strong> = False<br>
+<strong>Tuple</strong> = typing.Tuple<br>
+<strong>Type</strong> = typing.Type<br>
+<strong>Union</strong> = typing.Union<br>
+<strong>ValuesView</strong> = typing.ValuesView</td></tr></table>
+</body></html>
