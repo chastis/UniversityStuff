@@ -16,7 +16,7 @@ class BookType(Enum):
 class BookBase:
     book_type = BookType.NONE
     id = 0
-    def _set_id_and_type(self, type):
+    def _set_id_and_type(self):
         if isinstance(type, BookType):
             self.id = type.value
             self.book_type = type
