@@ -22,11 +22,36 @@ class Block:
         self.tokens = []
     def is_token(self) -> bool:
         return self.type == BlockType.Token
+    def get_by_type(self, type : BlockType) -> typing.List['Block']:
+        out : typing.List['Block'] = []
+        if self.type == type:
+            out.append(self)
+        for child in self.tokens:
+            if child.type == type:
+                out.append(child)
+            else:
+                child_out = child.get_by_type(type)
+                if len(child_out) > 0:
+                    out += child_out
+        return out
+    def get_all_child_tokens(self) -> typing.List['Block']:
+        out : typing.List['Block'] = []
+        if self.is_token():
+            out.append(self)
+        for child in self.tokens:
+            if child.is_token():
+                out.append(child)
+            else:
+                child_out = child.get_all_child_tokens()
+                if len(child_out) > 0:
+                    out += child_out
+        return out
     type : BlockType
     token : Token
     tokens : typing.List['Block']
     child_len : int = 0
     parent : 'Block' = None
+
 class ScopeNode:
     scope = Block(BlockType.Global)
     @staticmethod
@@ -152,4 +177,14 @@ class ScopeNode:
             self.scope = self.parse_next_block(0, len(self.scope.tokens), self.scope)
         print('in tokens len = ' + str(len(tokens)))
         print('out tokens len = ' + str(self.scope.child_len))
+    def get_variables(self) -> typing.List[Token]:
+        blocks = self.scope.get_by_type(BlockType.NonIdentified)
+        token_blocks = []
+        tokens = []
+        for block in blocks:
+            token_blocks += block.get_all_child_tokens()
+        for token_block in token_blocks:
+            if token_block.is_token() and token_block.token.token_type == TokenType.Identifier:
+                tokens.append(token_block.token)
+        return tokens
 

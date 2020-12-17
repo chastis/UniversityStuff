@@ -1,4 +1,5 @@
 from lexer import Lexer
+from formatter import Formatter
 from tokens import *
 import os
 from os import listdir
@@ -36,6 +37,10 @@ def process(file_name, action):
     l = Lexer()
     l.parse(file_name)
     if DEBUG:
+        l.print_tokens()
+        f = Formatter()
+        f.change_case(l)
+        print('chaned ------------------------------')
         l.print_tokens()
     del l
  

@@ -54,6 +54,8 @@ class KeyWordType(Enum):
     Protected = 27
     Final = 28
     Include = 29
+    Switch = 30
+    Auto = 31
 
 class VarTypeType(Enum):
     Int = 0
@@ -160,7 +162,9 @@ TOKEN_DICT = {
         KeyWordType.Private           : 'private',
         KeyWordType.Protected         : 'protected',
         KeyWordType.Final             : 'final',
-        KeyWordType.Include           : 'include'
+        KeyWordType.Include           : 'include',
+        KeyWordType.Switch            : 'switch',
+        KeyWordType.Auto              : 'auto'
     },
     TokenType.VarType: {
         VarTypeType.Int               : 'int',

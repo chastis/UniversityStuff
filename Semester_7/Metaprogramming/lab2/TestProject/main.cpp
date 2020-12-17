@@ -1,5 +1,6 @@
 # include <iostream> 
 #include<iomanip>
+#include <vector>
 
 #define def
 
@@ -49,6 +50,7 @@ int main()
         ;;
         while (true);
     A<int> a;
+    std::vector<int> v;
     a.foo();
     int e, d = 0;
     e = d = 42;
