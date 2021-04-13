@@ -1,0 +1,57 @@
+name:                Lab1
+version:             0.1.0.0
+github:              "githubuser/Lab1"
+license:             BSD3
+author:              "Author name here"
+maintainer:          "example@example.com"
+copyright:           "2021 Author name here"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/githubuser/Lab1#readme>
+
+dependencies:
+- base >= 4.11 && < 5
+- mysql-haskell >= 0.8.4.3
+- io-streams >= 1.5.2.0
+- text >= 1.2.4.0
+- time >= 1.9.3
+- bytestring >= 0.10.10.0
+- haskeline >= 0.8.1.1
+- utf8-string >= 1.0.2
+- binary >= 0.8.7.0
+- pretty >= 1.1.3.6
+
+library:
+  source-dirs: src
+
+executables:
+  Lab1-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - Lab1
+
+tests:
+  Lab1-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - Lab1
