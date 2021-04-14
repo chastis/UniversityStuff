@@ -24,6 +24,11 @@ dependencies:
 - containers 
 - random 
 - time 
+- test-framework
+- test-framework-hunit
+- HUnit
+- containers
+- QuickCheck
 
 library:
   source-dirs: src
@@ -49,3 +54,4 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - Lab2
+    

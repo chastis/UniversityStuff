@@ -5,6 +5,8 @@ import Data.Text as T ( Text )
 import Database.MySQL.Base
 import qualified System.IO.Streams as Streams
 import qualified Data.ByteString.Lazy.Char8 as BtSt ( pack )
+import Data.Int
+import qualified Converter as Conv ( strToInt32, myToString )
 
 -- connect to database which is started by docker-compose
 connectDB :: IO MySQLConn
@@ -141,6 +143,12 @@ class Table a where
     getAllValues :: a -> MySQLConn -> IO a
     getAllValues tableInfo conn =
         fromMySQLValues (getRidOfStream ( query_ conn (toQuery("SELECT * FROM " ++ getName tableInfo ++ ";"))))
+
+    -- get all values from table
+    getCountRecord :: a -> MySQLConn -> IO Int32
+    getCountRecord tableInfo conn = do
+        answer <- getRidOfStream ( query_ conn (toQuery("SELECT COUNT(*) FROM " ++ getName tableInfo ++ ";")))
+        return $ Conv.strToInt32 $ Conv.myToString $ head $ head answer
 
     -- get any value by compare from table
     getValue :: a -> MySQLConn -> IO a 

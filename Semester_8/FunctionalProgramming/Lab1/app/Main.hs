@@ -5,6 +5,7 @@
 module Main where
 
 import MySQLConnector ( connectDB, deployDB, closeDB )
+import ProgramsTable
 import qualified UIInterface as UI ( doAction )
 
 
@@ -16,7 +17,7 @@ main = do
     deployDB conn
 
     UI.doAction conn
-    
+
     closeDB conn
 
 
